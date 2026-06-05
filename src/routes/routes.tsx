@@ -1,5 +1,8 @@
 import { Suspense, lazy } from "react";
 import { useRoutes } from "react-router-dom";
+import { DocumentsPage } from "../pages/DocumentsPage";
+import { HomePage } from "../pages/HomePage";
+import { AppShellLayout } from "../pages/AppShellLayout";
 import { AuthRoute } from "./AuthRoute";
 
 const ContextBuilderModule = lazy(() => import("../modules/context-builder/ContextBuilderModule"));
@@ -9,17 +12,33 @@ export const routes = [
     path: "/",
     element: (
       <AuthRoute>
-        <Suspense
-          fallback={
-            <div className="flex min-h-screen items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-300">
-              Loading Context Builder...
-            </div>
-          }
-        >
-          <ContextBuilderModule />
-        </Suspense>
+        <AppShellLayout />
       </AuthRoute>
     ),
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: "context-builder",
+        element: (
+          <Suspense
+            fallback={
+              <div className="panel flex min-h-[240px] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-300">
+                Cargando Context Builder...
+              </div>
+            }
+          >
+            <ContextBuilderModule />
+          </Suspense>
+        ),
+      },
+      {
+        path: "documents",
+        element: <DocumentsPage />,
+      },
+    ],
   },
 ];
 

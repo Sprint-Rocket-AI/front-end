@@ -1,0 +1,47 @@
+import type { DocumentRecordInterface } from "../interfaces/DocumentRecordInterface";
+import { DocumentEstadoEnum } from "../../modules/context-builder/interfaces/DocumentEstadoEnum";
+import { DocumentTipoEnum } from "../../modules/context-builder/interfaces/DocumentTipoEnum";
+
+export const mockDocuments: DocumentRecordInterface[] = [
+  {
+    id: "demo-negocio-1",
+    tipo: DocumentTipoEnum.NEGOCIO,
+    origin: "AI",
+    data: {
+      id: "demo-negocio-1",
+      titulo: "Flujo de onboarding digital",
+      contenido: "El cliente debe validar identidad, firmar términos y recibir confirmación automática.",
+      proyectoId: "CTX-001",
+      estado: DocumentEstadoEnum.PUBLICADO,
+      tags: ["onboarding", "cliente"],
+      createdAt: "2026-06-05T10:00:00.000Z",
+      updatedAt: "2026-06-05T10:00:00.000Z",
+      fuente: "CONFLUENCE",
+      urlFuente: "https://confluence.local/onboarding",
+      criteriosAceptacion: [
+        "El usuario completa identidad en menos de 3 minutos.",
+        "La evidencia queda disponible para auditoría.",
+      ],
+      resumen: "Documento base para el flujo de onboarding y firma electrónica.",
+    },
+  },
+  {
+    id: "demo-sistema-1",
+    tipo: DocumentTipoEnum.SISTEMA,
+    origin: "MANUAL",
+    data: {
+      id: "demo-sistema-1",
+      titulo: "Portal Context Builder",
+      contenido: "Frontend React con servicios Node para documentar y estructurar conocimiento de proyecto.",
+      proyectoId: "CTX-001",
+      estado: DocumentEstadoEnum.BORRADOR,
+      tags: ["frontend", "node"],
+      createdAt: "2026-06-05T11:00:00.000Z",
+      updatedAt: "2026-06-05T11:00:00.000Z",
+      tipo: "SISTEMA",
+      urlRepos: ["https://github.com/example/context-builder-app"],
+      stack: ["React 19", "TypeScript", "Node.js 26.3"],
+      devs: ["Matias", "Copilot"],
+    },
+  },
+];

@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import { DocumentsPage } from "../pages/DocumentsPage";
 import { HomePage } from "../pages/HomePage";
 import { AppShellLayout } from "../pages/AppShellLayout";
@@ -22,6 +22,14 @@ export const routes = [
       },
       {
         path: "context-builder",
+        element: <Navigate to="/documents/builder" replace />,
+      },
+      {
+        path: "documents",
+        element: <Navigate to="/documents/builder" replace />,
+      },
+      {
+        path: "documents/builder",
         element: (
           <Suspense
             fallback={
@@ -35,7 +43,7 @@ export const routes = [
         ),
       },
       {
-        path: "documents",
+        path: "documents/view",
         element: <DocumentsPage />,
       },
     ],

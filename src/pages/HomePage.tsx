@@ -21,7 +21,7 @@ export const HomePage = () => {
 
         <div className="grid gap-4 md:grid-cols-2">
           <Link
-            to="/context-builder"
+            to="/documents/builder"
             className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-5 transition hover:border-orange-200 hover:bg-orange-50/60 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-orange-500/20 dark:hover:bg-orange-500/5"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-500">Builder</p>
@@ -32,7 +32,7 @@ export const HomePage = () => {
           </Link>
 
           <Link
-            to="/documents"
+            to="/documents/view"
             className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-5 transition hover:border-orange-200 hover:bg-orange-50/60 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-orange-500/20 dark:hover:bg-orange-500/5"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-500">Documentos</p>

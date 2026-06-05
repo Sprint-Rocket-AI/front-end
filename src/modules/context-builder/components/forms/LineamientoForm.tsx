@@ -1,4 +1,5 @@
 import type { DocumentoLineamientoRequestInterface } from "../../interfaces/DocumentoLineamientoRequestInterface";
+import { TagListInput } from "../TagListInput";
 import { CommonDocumentFields } from "./CommonDocumentFields";
 
 interface LineamientoFormProps {
@@ -34,24 +35,21 @@ export const LineamientoForm = ({ data, onChange }: LineamientoFormProps) => {
           />
         </div>
 
-        <div>
-          <label className="label" htmlFor="dominio">
-            Dominio
-          </label>
-          <input id="dominio" className="field" value={data.dominio} onChange={(event) => updateField("dominio", event.target.value)} />
-        </div>
+        <TagListInput
+          id="dominio"
+          label="Dominio"
+          values={data.dominio}
+          onChange={(nextValues) => updateField("dominio", nextValues)}
+          placeholder="Escribe un dominio y presiona Enter"
+        />
 
-        <div>
-          <label className="label" htmlFor="categoria">
-            Categoría
-          </label>
-          <input
-            id="categoria"
-            className="field"
-            value={data.categoria}
-            onChange={(event) => updateField("categoria", event.target.value)}
-          />
-        </div>
+        <TagListInput
+          id="categoria"
+          label="Categoría"
+          values={data.categoria}
+          onChange={(nextValues) => updateField("categoria", nextValues)}
+          placeholder="Escribe una categoría y presiona Enter"
+        />
       </div>
     </div>
   );

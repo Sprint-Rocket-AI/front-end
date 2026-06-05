@@ -19,6 +19,21 @@ const cleanLines = (value: string) =>
     .map((line) => line.trim())
     .filter(Boolean);
 
+const normalizeStringList = (value: string | string[] | undefined) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => item.trim()).filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(/\r?\n|,/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
 const extractTags = (rawText: string) =>
   Array.from(
     new Set(
@@ -90,8 +105,8 @@ export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnion
       return {
         ...base,
         lineamiento: "",
-        dominio: "",
-        categoria: "",
+        dominio: [],
+        categoria: [],
       };
   }
 };
@@ -144,8 +159,8 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
         ...createEmptyDocumentByType(tipo),
         ...base,
         lineamiento: createExcerpt(rawText),
-        dominio: "Arquitectura",
-        categoria: "General",
+        dominio: ["Arquitectura"],
+        categoria: ["General"],
       };
   }
 };
@@ -187,6 +202,8 @@ export const mergeAiResult = (tipo: DocumentTipoEnum, partial: Partial<DocumentU
       return {
         ...base,
         ...draft,
+        dominio: normalizeStringList(draft.dominio),
+        categoria: normalizeStringList(draft.categoria),
       };
     }
   }

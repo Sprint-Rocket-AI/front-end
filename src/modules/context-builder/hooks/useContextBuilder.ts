@@ -26,7 +26,7 @@ export const useContextBuilder = () => {
     setEditingId(null);
     setIsAI(false);
     setRawText("");
-    setShowStructuredForm(false);
+    setShowStructuredForm((prevValue) => (nextTipo ? prevValue : false));
     setInitialState(null);
     setFormData(nextTipo ? createEmptyDocumentByType(nextTipo) : null);
     setFeedback(nextTipo ? `Ready to model a ${nextTipo} document.` : "Choose a type to begin building context.");

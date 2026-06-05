@@ -24,7 +24,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
     <header className="panel sticky top-4 z-20 flex flex-col gap-4 border border-slate-200/80 bg-white/90 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:top-6 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex min-w-0 flex-col gap-4 lg:flex-1 lg:flex-row lg:items-center lg:gap-8">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-orange-500">Context Builder</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-orange-500">Sprint Rocket.AI</p>
           <h1 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100 sm:text-xl">Workspace documental</h1>
         </div>
 

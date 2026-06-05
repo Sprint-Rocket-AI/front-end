@@ -90,15 +90,6 @@ export const ContextBuilderPage = () => {
             <div className="rounded-2xl border border-orange-200/50 bg-orange-50 px-4 py-3 text-sm text-slate-700 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-100">
               {feedback}
             </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="button" className="action-primary w-full sm:w-auto" onClick={saveCurrentDocument} disabled={!formData}>
-                Guardar
-              </button>
-              <button type="button" className="action-secondary w-full sm:w-auto" onClick={reset} disabled={!tipo}>
-                Restablecer
-              </button>
-            </div>
           </div>
 
           <DocumentTable documents={documents} onEdit={beginEdit} onDelete={deleteById} />
@@ -109,6 +100,10 @@ export const ContextBuilderPage = () => {
           data={formData}
           showStructuredForm={showStructuredForm}
           mode={mode}
+          onSave={saveCurrentDocument}
+          onReset={reset}
+          canSave={Boolean(formData)}
+          canReset={Boolean(tipo)}
           onChange={setFormData}
         />
       </section>

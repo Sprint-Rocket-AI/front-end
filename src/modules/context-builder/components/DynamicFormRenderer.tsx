@@ -14,6 +14,10 @@ interface DynamicFormRendererProps {
   data: DocumentUnionType | null;
   showStructuredForm: boolean;
   mode: "create" | "edit";
+  onSave: () => void;
+  onReset: () => void;
+  canSave: boolean;
+  canReset: boolean;
   onChange: (nextData: DocumentUnionType) => void;
 }
 
@@ -22,6 +26,10 @@ export const DynamicFormRenderer = ({
   data,
   showStructuredForm,
   mode,
+  onSave,
+  onReset,
+  canSave,
+  canReset,
   onChange,
 }: DynamicFormRendererProps) => {
   const modeLabel = mode === "create" ? "Creación" : "Edición";
@@ -59,6 +67,15 @@ export const DynamicFormRenderer = ({
       {tipo === DocumentTipoEnum.LINEAMIENTO && (
         <LineamientoForm data={data as DocumentoLineamientoRequestInterface} onChange={(nextData) => onChange(nextData)} />
       )}
+
+      <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 dark:border-slate-800 sm:flex-row">
+        <button type="button" className="action-primary w-full sm:w-auto" onClick={onSave} disabled={!canSave}>
+          Guardar
+        </button>
+        <button type="button" className="action-secondary w-full sm:w-auto" onClick={onReset} disabled={!canReset}>
+          Restablecer
+        </button>
+      </div>
     </section>
   );
 };

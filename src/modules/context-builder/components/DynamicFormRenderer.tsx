@@ -28,18 +28,18 @@ export const DynamicFormRenderer = ({
 
   if (!tipo || !data || !showStructuredForm) {
     return (
-      <div className="panel border-dashed text-sm text-slate-500 dark:text-slate-300">
+      <div className="panel border-dashed text-sm leading-6 text-slate-500 dark:text-slate-300 xl:sticky xl:top-6">
         Selecciona un tipo y genera el formulario con IA o inicia un borrador manual.
       </div>
     );
   }
 
   return (
-    <section className="panel space-y-6">
-      <div className="flex flex-col gap-2 border-b border-slate-200 pb-4 dark:border-slate-800 md:flex-row md:items-end md:justify-between">
+    <section className="panel space-y-6 xl:sticky xl:top-6">
+      <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 dark:border-slate-800 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-orange-500">Formulario de tipo: </p>
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{tipo}</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-orange-500">Formulario</p>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 sm:text-2xl">{tipo}</h2>
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400">Modo: {modeLabel}</p>
       </div>

@@ -60,7 +60,7 @@
 
 @layer components {
   .panel {
-    @apply rounded-3xl border border-white/10 p-6 shadow-panel backdrop-blur dark:border-white/10;
+    @apply rounded-[1.75rem] border border-white/10 p-4 shadow-panel backdrop-blur dark:border-white/10 sm:p-6;
     background-color: rgb(255 255 255 / 0.85);
   }
 

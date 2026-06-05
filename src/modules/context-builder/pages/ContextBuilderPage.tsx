@@ -35,45 +35,50 @@ export const ContextBuilderPage = () => {
   }, [isDark]);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
       <section className="panel overflow-hidden p-0">
-        <div className="grid gap-8 bg-[radial-gradient(circle_at_top_left,_rgba(251,146,60,0.22),_transparent_28%),linear-gradient(135deg,_rgba(15,23,42,0.98),_rgba(30,41,59,0.92))] px-6 py-8 text-white md:grid-cols-[1.6fr_0.9fr] md:px-8 md:py-10">
-          <div className="space-y-4">
-            <span className="inline-flex rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-orange-200">
+        <div className="grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.8fr)] lg:px-8 lg:py-7">
+          <div className="space-y-3">
+            <span className="inline-flex w-fit rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200">
               Context Builder
             </span>
-            <h1 className="max-w-2xl text-4xl font-bold tracking-tight md:text-5xl">
-              React 19 + Node 26.3 starter focused on structured project knowledge.
+            <h1 className="max-w-2xl text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl lg:text-[2rem]">
+              Editor estructurado para contexto documental.
             </h1>
-            <p className="max-w-2xl text-sm leading-7 text-slate-200 md:text-base">
-              Convierte texto libre en formularios editables, administra documentos tipados y deja lista una base modular con Vite, Tailwind, Redux Toolkit y Router.
+            <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-[15px]">
+              Convierte texto libre en formularios editables, administra registros tipados y mantiene el flujo de trabajo claro en una interfaz simple y adaptable.
             </p>
           </div>
 
-          <div className="flex flex-col justify-between gap-5 rounded-[2rem] border border-white/10 bg-white/10 p-6 backdrop-blur">
+          <div className="grid gap-3 rounded-[1.75rem] border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/60 sm:grid-cols-[1fr_auto] sm:items-end sm:gap-4 sm:p-5 lg:grid-cols-1 lg:items-start">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-orange-200">Workspace status</p>
-              <p className="mt-3 text-3xl font-semibold">{documents.length}</p>
-              <p className="text-sm text-slate-200">documents ready for create, edit and reset flows.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-slate-500 dark:text-slate-400">Workspace</p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">{documents.length}</p>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">registros listos para crear, editar y reorganizar.</p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" className="action-primary" onClick={createNewDraft}>
-                New Draft
+
+            <div className="flex flex-col gap-2 sm:flex-row lg:w-full lg:flex-col">
+              <button type="button" className="action-primary w-full sm:w-auto lg:w-full" onClick={createNewDraft}>
+                Nuevo borrador
               </button>
-              <button type="button" className="action-secondary border-white/20 text-white hover:text-orange-200" onClick={() => setIsDark((value) => !value)}>
-                {isDark ? "Light Mode" : "Dark Mode"}
+              <button
+                type="button"
+                className="action-secondary w-full sm:w-auto lg:w-full"
+                onClick={() => setIsDark((value) => !value)}
+              >
+                {isDark ? "Modo claro" : "Modo oscuro"}
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:items-start">
         <div className="space-y-6">
           <div className="panel space-y-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-orange-500">Builder Setup</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Context Builder</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-orange-500">Configuración</p>
+              <h2 className="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100 sm:text-2xl">Context Builder</h2>
             </div>
 
             <ContextTypeSelector value={tipo} onChange={setTipo} />
@@ -94,10 +99,10 @@ export const ContextBuilderPage = () => {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="button" className="action-primary" onClick={saveCurrentDocument} disabled={!formData}>
+              <button type="button" className="action-primary w-full sm:w-auto" onClick={saveCurrentDocument} disabled={!formData}>
                 Guardar
               </button>
-              <button type="button" className="action-secondary" onClick={reset} disabled={!tipo}>
+              <button type="button" className="action-secondary w-full sm:w-auto" onClick={reset} disabled={!tipo}>
                 Restablecer
               </button>
             </div>

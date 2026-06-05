@@ -8,6 +8,7 @@ import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import { createEmptyDocumentByType, createFallbackFromRawText, mergeAiResult } from "../templates/documentTemplates";
 
 export const useContextBuilder = () => {
+  const feedbackInitial = "Selecciona un tipo de documento para comenzar a construir el contexto.";
   const dispatch = useAppDispatch();
   const [tipo, setTipo] = useState<DocumentTipoEnum | "">("");
   const [rawText, setRawText] = useState("");
@@ -18,28 +19,27 @@ export const useContextBuilder = () => {
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [feedback, setFeedback] = useState("Choose a type to begin building context.");
-
+  const [feedback, setFeedback] = useState(feedbackInitial);
   const handleTypeChange = (nextTipo: DocumentTipoEnum | "") => {
     setTipo(nextTipo);
     setMode("create");
     setEditingId(null);
     setIsAI(false);
     setRawText("");
-    setShowStructuredForm((prevValue) => (nextTipo ? prevValue : false));
+    setShowStructuredForm(false);
     setInitialState(null);
     setFormData(nextTipo ? createEmptyDocumentByType(nextTipo) : null);
-    setFeedback(nextTipo ? `Ready to model a ${nextTipo} document.` : "Choose a type to begin building context.");
+    setFeedback(nextTipo ? `Listo para modelar un documento ${nextTipo}.` : feedbackInitial);
   };
 
   const generateFromAI = async () => {
     if (!tipo) {
-      setFeedback("Select a document type before generating a structured form.");
+      setFeedback("Selecciona un tipo de documento antes de generar un formulario estructurado.");
       return;
     }
 
     if (!rawText.trim()) {
-      setFeedback("Paste source text before generating with AI.");
+      setFeedback("Pega el texto fuente antes de generar con IA.");
       return;
     }
 
@@ -52,14 +52,14 @@ export const useContextBuilder = () => {
       setInitialState(nextData);
       setShowStructuredForm(true);
       setIsAI(true);
-      setFeedback("Structured draft generated from AI payload.");
+      setFeedback("Borrador estructurado generado a partir del payload de IA.");
     } catch {
       const fallback = createFallbackFromRawText(tipo, rawText);
       setFormData(fallback);
       setInitialState(fallback);
       setShowStructuredForm(true);
       setIsAI(true);
-      setFeedback("AI endpoint unavailable. A local structured draft was created instead.");
+      setFeedback("Endpoint de IA no disponible. Se creó un borrador estructurado local en su lugar.");
     } finally {
       setIsGenerating(false);
     }
@@ -67,7 +67,7 @@ export const useContextBuilder = () => {
 
   const startManualForm = () => {
     if (!tipo) {
-      setFeedback("Select a document type before creating a manual draft.");
+      setFeedback("Selecciona un tipo de documento antes de crear un borrador manual.");
       return;
     }
 
@@ -78,7 +78,7 @@ export const useContextBuilder = () => {
     setIsAI(false);
     setMode("create");
     setEditingId(null);
-    setFeedback(`Manual ${tipo} draft ready.`);
+    setFeedback(`Borrador manual de ${tipo} listo.`);
   };
 
   const reset = () => {
@@ -88,23 +88,23 @@ export const useContextBuilder = () => {
 
     if (mode === "edit" && initialState) {
       setFormData(initialState);
-      setFeedback("Form restored to the last saved version.");
+      setFeedback("Formulario restaurado a la última versión guardada.");
       return;
     }
 
     if (isAI && initialState) {
       setFormData(initialState);
-      setFeedback("Form restored to the AI structured draft.");
+      setFeedback("Formulario restaurado al borrador estructurado por IA.");
       return;
     }
 
     setFormData(createEmptyDocumentByType(tipo));
-    setFeedback("Form cleared to an empty manual draft.");
+    setFeedback("Formulario vacío.");
   };
 
   const saveCurrentDocument = () => {
     if (!tipo || !formData) {
-      setFeedback("Generate or create a structured form before saving.");
+      setFeedback("Genera o crea un formulario antes de guardar.");
       return;
     }
 
@@ -130,7 +130,7 @@ export const useContextBuilder = () => {
     setInitialState(nextData);
     setEditingId(id);
     setMode("edit");
-    setFeedback(`Document ${nextData.titulo || id} saved successfully.`);
+    setFeedback(`Documento ${nextData.titulo || id} guardado con éxito.`);
   };
 
   const beginEdit = (record: DocumentRecordInterface) => {

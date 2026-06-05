@@ -1,16 +1,11 @@
 import type { DocumentoSistemaRequestInterface } from "../../interfaces/DocumentoSistemaRequestInterface";
+import { TagListInput } from "../TagListInput";
 import { CommonDocumentFields } from "./CommonDocumentFields";
 
 interface SistemaFormProps {
   data: DocumentoSistemaRequestInterface;
   onChange: (nextData: DocumentoSistemaRequestInterface) => void;
 }
-
-const parseLines = (value: string) =>
-  value
-    .split(/\r?\n/)
-    .map((item) => item.trim())
-    .filter(Boolean);
 
 export const SistemaForm = ({ data, onChange }: SistemaFormProps) => {
   const updateField = <K extends keyof DocumentoSistemaRequestInterface>(
@@ -28,44 +23,29 @@ export const SistemaForm = ({ data, onChange }: SistemaFormProps) => {
       <CommonDocumentFields data={data} onChange={onChange} />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div>
-          <label className="label" htmlFor="repos">
-            Repositorios
-          </label>
-          <textarea
+        <TagListInput
             id="repos"
-            className="field min-h-28"
-            value={data.urlRepos.join("\n")}
-            onChange={(event) => updateField("urlRepos", parseLines(event.target.value))}
-            placeholder="Un repo por línea"
-          />
-        </div>
+            label="Repositorios"
+            values={data.urlRepos}
+            onChange={(nextValues) => updateField("urlRepos", nextValues)}
+            placeholder="Escribe un repositorio y presiona Enter"
+        />
 
-        <div>
-          <label className="label" htmlFor="stack">
-            Stack
-          </label>
-          <textarea
+        <TagListInput
             id="stack"
-            className="field min-h-28"
-            value={data.stack.join("\n")}
-            onChange={(event) => updateField("stack", parseLines(event.target.value))}
-            placeholder="React 19&#10;Node.js 26.3"
-          />
-        </div>
+            label="Stack"
+            values={data.stack}
+            onChange={(nextValues) => updateField("stack", nextValues)}
+            placeholder="Escribe una tecnología y presiona Enter"
+        />
 
-        <div>
-          <label className="label" htmlFor="devs">
-            Developers
-          </label>
-          <textarea
+        <TagListInput
             id="devs"
-            className="field min-h-28"
-            value={data.devs.join("\n")}
-            onChange={(event) => updateField("devs", parseLines(event.target.value))}
-            placeholder="Un nombre por línea"
-          />
-        </div>
+            label="Developers"
+            values={data.devs}
+            onChange={(nextValues) => updateField("devs", nextValues)}
+            placeholder="Escribe un nombre y presiona Enter"
+        />
       </div>
     </div>
   );

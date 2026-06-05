@@ -1,5 +1,6 @@
 import type { BaseDocumentInterface } from "../../interfaces/BaseDocumentInterface";
 import { DocumentEstadoEnum } from "../../interfaces/DocumentEstadoEnum";
+import { TagListInput } from "../TagListInput";
 
 interface CommonDocumentFieldsProps<T extends BaseDocumentInterface> {
   data: T;
@@ -69,22 +70,11 @@ export const CommonDocumentFields = <T extends BaseDocumentInterface>({
       </div>
 
       <div className="md:col-span-2">
-        <label className="label" htmlFor="tags">
-          Tags
-        </label>
-        <input
+        <TagListInput
           id="tags"
-          className="field"
-          value={data.tags?.join(", ") ?? ""}
-          onChange={(event) =>
-            updateField(
-              "tags",
-              event.target.value
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter(Boolean),
-            )
-          }
+          label="Tags"
+          values={data.tags ?? []}
+          onChange={(nextValues) => updateField("tags", nextValues)}
           placeholder="frontend, ia, negocio"
         />
       </div>

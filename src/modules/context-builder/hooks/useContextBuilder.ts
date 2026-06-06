@@ -161,16 +161,6 @@ export const useContextBuilder = () => {
     setFeedback("Document deleted.");
   };
 
-  const createNewDraft = () => {
-    setMode("create");
-    setEditingId(null);
-    setRawText("");
-    setIsAI(false);
-    setInitialState(null);
-    setShowStructuredForm(false);
-    setFormData(tipo ? createEmptyDocumentByType(tipo) : null);
-    setFeedback("Create a fresh document draft.");
-  };
 
   return {
     tipo,
@@ -187,7 +177,6 @@ export const useContextBuilder = () => {
     saveCurrentDocument,
     beginEdit,
     deleteById,
-    createNewDraft,
     feedback,
     isGenerating,
     mode,

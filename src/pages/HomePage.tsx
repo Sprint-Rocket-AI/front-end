@@ -5,14 +5,14 @@ export const HomePage = () => {
   const documents = useAppSelector((state) => state.documents.items);
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+    <section className="grid gap-6 lg:grid-cols-1">
       <div className="panel space-y-6">
         <div className="space-y-3">
           <span className="inline-flex w-fit rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200">
             Inicio
           </span>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
-            Un punto de entrada para navegar entre módulos del frontend.
+            Un punto de entrada para navegar entre los distintos módulos de la aplicación
           </h2>
           <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-[15px]">
             Esta vista deja preparada una estructura de navegación para que el proyecto crezca con más páginas sin mezclar layout, rutas y lógica del módulo principal.
@@ -44,20 +44,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-      <aside className="panel space-y-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Resumen</p>
-          <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{documents.length}</p>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">documentos cargados en el workspace.</p>
-        </div>
-
-        <div className="rounded-[1.5rem] border border-dashed border-slate-300/80 bg-white/70 p-4 dark:border-slate-700 dark:bg-slate-950/40">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Uso esperado</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Usa la barra superior para cambiar entre páginas. El modo oscuro o claro queda disponible a nivel de toda la app.
-          </p>
-        </div>
-      </aside>
     </section>
   );
 };

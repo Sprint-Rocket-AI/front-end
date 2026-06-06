@@ -17,9 +17,11 @@ export const AppShellLayout = () => {
   }, [isDark]);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:max-w-[80vw] lg:px-8 lg:py-8 2xl:max-w-[1600px]">
+    <main className="flex min-h-screen w-full flex-col gap-6">
       <AppMenuBar isDark={isDark} onToggleTheme={() => setIsDark((value) => !value)} />
-      <Outlet />
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-4 sm:px-6 sm:pb-6 lg:max-w-[80vw] lg:px-8 lg:pb-8 2xl:max-w-[1600px]">
+        <Outlet />
+      </div>
     </main>
   );
 };

@@ -15,21 +15,21 @@ export const RawInputArea = ({
   isGenerating,
   disabled,
 }: RawInputAreaProps) => (
-  <div className="space-y-4">
+  <div className="space-y-3">
     <div>
       <label className="label" htmlFor="raw-context">
         Texto de entrada
       </label>
       <textarea
         id="raw-context"
-        className="field min-h-40 sm:min-h-52"
+        className="field min-h-32 sm:min-h-40"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Pega aquí el texto bruto para que la IA construya un formulario estructurado..."
       />
     </div>
 
-    <div className="flex flex-col gap-4 rounded-[1.5rem] border border-slate-200/80 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-900/50 sm:gap-3">
+    <div className="flex flex-col gap-3 rounded-[1.5rem] border border-slate-200/80 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-900/50">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <button type="button" className="action-secondary w-full sm:w-auto" onClick={onCreateManual} disabled={disabled}>
           Formulario manual

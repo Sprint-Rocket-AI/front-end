@@ -9,8 +9,11 @@ export interface AIServiceMapperResponse {
   [key: string]: any;
 }
 
-export const mapWithAI = (content: string, template: Record<string, any>) =>
-  apiClient.post<AIServiceMapperResponse>("/ai-engine/prompt/mapper", {
+export const mapWithAI = (content: string, template: Record<string, any>) => {
+  const path = "/ai-engine/prompt/mapper";
+  console.log("Llamando al endpoint ", path);
+  return apiClient.post<AIServiceMapperResponse>(path, {
     content,
     template,
   });
+};

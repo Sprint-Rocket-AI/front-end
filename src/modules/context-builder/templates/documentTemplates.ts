@@ -161,8 +161,36 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
 };
 
 export const mergeAiResult = (tipo: DocumentTipoEnum, partial: Partial<DocumentUnionType>): DocumentUnionType => {
-  return {
+  const merged = {
     ...createEmptyDocumentByType(tipo),
     ...partial,
   } as DocumentUnionType;
+
+  // Normalización para prevenir advertencias de React sobre valores null y asegurar el mapeo de DDL
+  if (tipo === DocumentTipoEnum.DDL) {
+    const ddl = merged as any;
+    if (ddl.motorBd) {
+      ddl.motorBd = ddl.motorBd.toUpperCase();
+    }
+    if (ddl.tablas) {
+      ddl.tablas = ddl.tablas.map((t: any) => ({
+        ...t,
+        nombre: t.nombre ?? "",
+        esquema: t.esquema ?? "",
+        descripcion: t.descripcion ?? "",
+        columnas: (t.columnas ?? []).map((c: any) => ({
+          ...c,
+          nombre: c.nombre ?? "",
+          tipoDato: c.tipoDato ?? "",
+          descripcion: c.descripcion ?? "",
+          esPk: !!c.esPk,
+          esFk: !!c.esFk,
+          esNullable: c.esNullable !== false,
+          esUnique: !!c.esUnique,
+        })),
+      }));
+    }
+  }
+
+  return merged;
 };

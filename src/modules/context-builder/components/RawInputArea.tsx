@@ -22,10 +22,11 @@ export const RawInputArea = ({
       </label>
       <textarea
         id="raw-context"
-        className="field min-h-32 sm:min-h-40"
+        className="field min-h-32 sm:min-h-40 disabled:opacity-60 disabled:cursor-not-allowed"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Pega aquí el texto bruto para que la IA construya un formulario estructurado..."
+        disabled={disabled}
       />
     </div>
 

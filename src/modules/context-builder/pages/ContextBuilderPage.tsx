@@ -1,12 +1,15 @@
+import { useState } from "react";
 import { useAppSelector } from "../../../commons/hooks/useAppSelector";
 import { ContextTypeSelector } from "../components/ContextTypeSelector";
 import { DocumentTable } from "../components/DocumentTable";
 import { DynamicFormRenderer } from "../components/DynamicFormRenderer";
 import { RawInputArea } from "../components/RawInputArea";
 import { useContextBuilder } from "../hooks/useContextBuilder";
+import { Toast } from "../components/Toast";
 
 export const ContextBuilderPage = () => {
   const documents = useAppSelector((state) => state.documents.items);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const {
     tipo,
     setTipo,
@@ -26,6 +29,13 @@ export const ContextBuilderPage = () => {
     isGenerating,
     mode,
   } = useContextBuilder();
+
+  const handleSave = () => {
+    saveCurrentDocument();
+    setShowStructuredForm(false);
+    const docTitle = formData?.titulo || "Documento sin título";
+    setToastMessage(`El documento "${docTitle}" ha sido guardado.`);
+  };
 
   return (
     <section className="space-y-6">
@@ -60,7 +70,7 @@ export const ContextBuilderPage = () => {
           showStructuredForm={showStructuredForm}
           mode={mode}
           onClose={() => setShowStructuredForm(false)}
-          onSave={saveCurrentDocument}
+          onSave={handleSave}
           onReset={reset}
           canSave={Boolean(formData)}
           canReset={Boolean(tipo)}
@@ -69,6 +79,10 @@ export const ContextBuilderPage = () => {
 
         <DocumentTable documents={documents} onEdit={beginEdit} onDelete={deleteById} />
       </section>
+
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      )}
     </section>
   );
 };

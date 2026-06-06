@@ -54,7 +54,7 @@ export const DynamicFormRenderer = ({
 
   return (
     <div className="fixed inset-0 z-40 overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-[2px] sm:p-6">
-      <div className="mx-auto flex min-h-full w-full max-w-6xl items-start justify-center">
+      <div className="mx-auto flex min-h-full w-full max-w-2xl items-start justify-center">
         <section className="panel mt-6 w-full space-y-6 shadow-2xl sm:mt-10">
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 dark:border-slate-800 md:flex-row md:items-end md:justify-between">
             <div>

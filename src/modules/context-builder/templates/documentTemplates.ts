@@ -3,13 +3,8 @@ import type { ColumnaInterface } from "../interfaces/ColumnaInterface";
 import { DocumentEstadoEnum } from "../interfaces/DocumentEstadoEnum";
 import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
-import type { DocumentoDDLRequestInterface } from "../interfaces/DocumentoDDLRequestInterface";
-import type { DocumentoLineamientoRequestInterface } from "../interfaces/DocumentoLineamientoRequestInterface";
-import type { DocumentoNegocioRequestInterface } from "../interfaces/DocumentoNegocioRequestInterface";
-import type { DocumentoSistemaRequestInterface } from "../interfaces/DocumentoSistemaRequestInterface";
 import type { TablaInterface } from "../interfaces/TablaInterface";
 
-const defaultProjectId = "CTX-001";
 
 const getNow = () => new Date().toISOString();
 
@@ -46,9 +41,9 @@ const extractTags = (rawText: string) =>
   );
 
 const createBaseDocument = (rawText = ""): BaseDocumentInterface => ({
-  titulo: cleanLines(rawText)[0] ?? "Nuevo documento",
+  titulo: cleanLines(rawText)[0] ?? "",
   contenido: rawText,
-  proyectoId: defaultProjectId,
+  proyectoId: "",
   estado: DocumentEstadoEnum.BORRADOR,
   tags: extractTags(rawText),
   createdAt: getNow(),
@@ -57,7 +52,7 @@ const createBaseDocument = (rawText = ""): BaseDocumentInterface => ({
 
 export const createEmptyColumn = (): ColumnaInterface => ({
   nombre: "",
-  tipoDato: "varchar(255)",
+  tipoDato: "",
   esPk: false,
   esFk: false,
   esNullable: true,
@@ -68,7 +63,7 @@ export const createEmptyColumn = (): ColumnaInterface => ({
 
 export const createEmptyTable = (): TablaInterface => ({
   nombre: "",
-  esquema: "public",
+  esquema: "",
   descripcion: "",
   columnas: [createEmptyColumn()],
   relaciones: [],
@@ -81,14 +76,14 @@ export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnion
     case DocumentTipoEnum.DDL:
       return {
         ...base,
-        motorBd: "POSTGRESQL",
-        version: "16",
+        motorBd: "" as any,
+        version: "",
         tablas: [createEmptyTable()],
       };
     case DocumentTipoEnum.NEGOCIO:
       return {
         ...base,
-        fuente: "OTRO",
+        fuente: "" as any,
         urlFuente: "",
         criteriosAceptacion: [],
         resumen: "",
@@ -96,7 +91,7 @@ export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnion
     case DocumentTipoEnum.SISTEMA:
       return {
         ...base,
-        tipo: "SISTEMA",
+        tipo: "" as any,
         urlRepos: [],
         stack: [],
         devs: [],
@@ -166,45 +161,8 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
 };
 
 export const mergeAiResult = (tipo: DocumentTipoEnum, partial: Partial<DocumentUnionType>): DocumentUnionType => {
-  switch (tipo) {
-    case DocumentTipoEnum.DDL: {
-      const base = createEmptyDocumentByType(tipo) as DocumentoDDLRequestInterface;
-      const draft = partial as Partial<DocumentoDDLRequestInterface>;
-      return {
-        ...base,
-        ...draft,
-        tablas: draft.tablas?.length ? draft.tablas : base.tablas,
-      };
-    }
-    case DocumentTipoEnum.NEGOCIO: {
-      const base = createEmptyDocumentByType(tipo) as DocumentoNegocioRequestInterface;
-      const draft = partial as Partial<DocumentoNegocioRequestInterface>;
-      return {
-        ...base,
-        ...draft,
-        criteriosAceptacion: draft.criteriosAceptacion ?? base.criteriosAceptacion,
-      };
-    }
-    case DocumentTipoEnum.SISTEMA: {
-      const base = createEmptyDocumentByType(tipo) as DocumentoSistemaRequestInterface;
-      const draft = partial as Partial<DocumentoSistemaRequestInterface>;
-      return {
-        ...base,
-        ...draft,
-        urlRepos: draft.urlRepos ?? base.urlRepos,
-        stack: draft.stack ?? base.stack,
-        devs: draft.devs ?? base.devs,
-      };
-    }
-    case DocumentTipoEnum.LINEAMIENTO: {
-      const base = createEmptyDocumentByType(tipo) as DocumentoLineamientoRequestInterface;
-      const draft = partial as Partial<DocumentoLineamientoRequestInterface>;
-      return {
-        ...base,
-        ...draft,
-        dominio: normalizeStringList(draft.dominio),
-        categoria: normalizeStringList(draft.categoria),
-      };
-    }
-  }
+  return {
+    ...createEmptyDocumentByType(tipo),
+    ...partial,
+  } as DocumentUnionType;
 };

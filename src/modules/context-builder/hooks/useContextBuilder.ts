@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAppDispatch } from "../../../commons/hooks/useAppDispatch";
 import type { DocumentRecordInterface } from "../../../commons/interfaces/DocumentRecordInterface";
-import { mapWithAI } from "../../../services/DocumentService";
+import { mapWithAI } from "../../../services/AIService";
 import { removeDocument, upsertDocument } from "../../../store/slices/documentsSlice";
 import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
 import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
@@ -46,8 +46,9 @@ export const useContextBuilder = () => {
     setIsGenerating(true);
 
     try {
-      const response = await mapWithAI(rawText, tipo);
-      const nextData = mergeAiResult(tipo, response.data.data);
+      const template = createEmptyDocumentByType(tipo);
+      const response = await mapWithAI(rawText, template);
+      const nextData = mergeAiResult(tipo, response.data);
       setFormData(nextData);
       setInitialState(nextData);
       setShowStructuredForm(true);

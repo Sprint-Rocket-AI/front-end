@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
-import { Navigate, useRoutes } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import { DocumentsPage } from "../pages/DocumentsPage";
+import { DiagramPage } from "../pages/DiagramPage";
 import { HomePage } from "../pages/HomePage";
 import { AppShellLayout } from "../pages/AppShellLayout";
 import { AuthRoute } from "./AuthRoute";
@@ -21,14 +22,6 @@ export const routes = [
         element: <HomePage />,
       },
       {
-        path: "context-builder",
-        element: <Navigate to="/documents/builder" replace />,
-      },
-      {
-        path: "documents",
-        element: <Navigate to="/documents/builder" replace />,
-      },
-      {
         path: "documents/builder",
         element: (
           <Suspense
@@ -46,6 +39,10 @@ export const routes = [
         path: "documents/view",
         element: <DocumentsPage />,
       },
+      {
+        path: "diagram",
+        element: <DiagramPage />,
+      }
     ],
   },
 ];

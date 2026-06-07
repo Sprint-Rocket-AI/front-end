@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../commons/hooks/useAppSelector";
 
 export const HomePage = () => {
-  const documents = useAppSelector((state) => state.documents.items);
 
   return (
     <section className="grid gap-6 lg:grid-cols-1">

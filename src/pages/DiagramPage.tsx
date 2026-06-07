@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
     ReactFlow,
     ReactFlowProvider,
@@ -18,6 +18,7 @@ import '@xyflow/react/dist/style.css';
 import { NodeInputText } from '../modules/diagrams/components/nodes/NodeInputText';
 import { EdgeInputText } from '../modules/diagrams/components/edges/EdgeInputText';
 import { useTheme } from '../commons/context/ThemeContext';
+import { useHistory } from '../modules/diagrams/hooks/useHistory';
 
 const initialNodes = [
     { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1' }, type: 'nodeInputText' },
@@ -30,6 +31,7 @@ const initialEdges = [
 
 const nodeTypes = { nodeInputText: NodeInputText };
 const edgeTypes = { edgeInputText: EdgeInputText };
+
 
 export const DiagramPage = () => {
     return (
@@ -45,7 +47,21 @@ const DiagramContent = () => {
     const [isAddingNode, setIsAddingNode] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const { isDark } = useTheme();
+    const { push: pushNodes, undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
+    const { push: pushEdges, undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
 
+    const undo = useCallback(() => { undoNodes(); undoEdges(); }, [undoNodes, undoEdges]);
+    const redo = useCallback(() => { redoNodes(); redoEdges(); }, [redoNodes, redoEdges]);
+
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (!(e.ctrlKey || e.metaKey)) return;
+            if (e.key === 'z') { e.preventDefault(); undo(); }
+            if (e.key === 'y') { e.preventDefault(); redo(); }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [undo, redo]);
     const { screenToFlowPosition } = useReactFlow();
 
     const onNodesChange = useCallback(
@@ -57,14 +73,11 @@ const DiagramContent = () => {
         (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
         []
     );
-    const onConnect = useCallback(
-        (params) => setEdges((eds) => addEdge({
-            ...params,
-            type: 'edgeInputText',
-            animated: false,
-        }, eds)),
-        []
-    );
+    const onConnect = useCallback((params) => {
+        pushEdges(addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, edges));
+    }, [edges, pushEdges]);
+
+
 
     const onEdgesDelete = useCallback((edgesToDelete) => {
         setEdges((eds) =>
@@ -73,76 +86,25 @@ const DiagramContent = () => {
     }, []);
 
 
-    const onPaneClick = useCallback(
-        (event) => {
-            if (!isAddingNode) return;
-
-            const position = screenToFlowPosition({
-                x: event.clientX,
-                y: event.clientY,
-            });
-
-            setNodes((nds) => {
-                const id = `n${nds.length + 1}`;
-
-                return [
-                    ...nds,
-                    {
-                        id,
-                        position,
-                        data: { label: `Node ${nds.length + 1}` },
-                        type: 'nodeInputText',
-                    },
-                ];
-            });
-
-            setIsAddingNode(false);
-        },
-        [isAddingNode, screenToFlowPosition]
-    );
-
     const panOnDrag = [1, 2];
 
-    const onConnectEnd = useCallback(
-        (event, connectionState) => {
-            if (!connectionState.isValid) {
-                const { clientX, clientY } =
-                    'changedTouches' in event ? event.changedTouches[0] : event;
+    const onConnectEnd = useCallback((event, connectionState) => {
+        if (!connectionState.isValid) {
+            const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+            const position = screenToFlowPosition({ x: clientX, y: clientY });
+            const id = `n${nodes.length + 1}`;
+            pushNodes([...nodes, { id, position, data: { label: `Node ${nodes.length + 1}` }, type: 'nodeInputText' }]);
+            pushEdges([...edges, { id: `e${edges.length + 1}`, source: connectionState.fromNode.id, target: id, type: 'edgeInputText', animated: false, label: '' }]);
+        }
+    }, [screenToFlowPosition, nodes, edges, pushNodes, pushEdges]);
 
-                const position = screenToFlowPosition({ x: clientX, y: clientY });
-
-                setNodes((nds) => {
-                    const id = `n${nds.length + 1}`;
-                    return [
-                        ...nds,
-                        {
-                            id,
-                            position,
-                            data: { label: `Node ${nds.length + 1}` },
-                            type: 'nodeInputText',
-                            origin: [0.5, 0.0],
-                        },
-                    ];
-                });
-
-                setEdges((eds) => {
-                    const newId = `e${eds.length + 1}`;
-                    return [
-                        ...eds,
-                        {
-                            id: newId,
-                            source: connectionState.fromNode.id,
-                            target: `n${nodes.length + 1}`,
-                            type: 'edgeInputText',
-                            animated: false,
-                            label: ''
-                        },
-                    ];
-                });
-            }
-        },
-        [screenToFlowPosition, nodes.length]
-    );
+    const onPaneClick = useCallback((event) => {
+        if (!isAddingNode) return;
+        const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+        const id = `n${nodes.length + 1}`;
+        pushNodes([...nodes, { id, position, data: { label: `Node ${nodes.length + 1}` }, type: 'nodeInputText' }]);
+        setIsAddingNode(false);
+    }, [isAddingNode, screenToFlowPosition, nodes, pushNodes]);
 
     return (
         <section className={`w-full h-screen ${isAddingNode ? 'cursor-crosshair' : ''}`}>
@@ -193,6 +155,17 @@ const DiagramContent = () => {
                                     </p>
                                 </div>
                             )}
+                        </div>
+                    </Panel>
+
+                    <Panel position="top-right">
+                        <div className="flex gap-2">
+                            <button onClick={undo} className="px-3 py-1 text-sm border rounded-md shadow">
+                                ↩ Deshacer
+                            </button>
+                            <button onClick={redo} className="px-3 py-1 text-sm border rounded-md shadow">
+                                ↪ Rehacer
+                            </button>
                         </div>
                     </Panel>
 

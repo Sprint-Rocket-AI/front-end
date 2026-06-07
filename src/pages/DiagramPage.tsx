@@ -17,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 
 import { NodeInputText } from '../modules/diagrams/components/nodes/NodeInputText';
 import { EdgeInputText } from '../modules/diagrams/components/edges/EdgeInputText';
+import { useTheme } from '../commons/context/ThemeContext';
 
 const initialNodes = [
     { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1' }, type: 'nodeInputText' },
@@ -43,6 +44,7 @@ const DiagramContent = () => {
     const [edges, setEdges] = useState(initialEdges);
     const [isAddingNode, setIsAddingNode] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const { isDark } = useTheme();
 
     const { screenToFlowPosition } = useReactFlow();
 
@@ -161,6 +163,7 @@ const DiagramContent = () => {
                     selectionMode={SelectionMode.Partial}
                     onPaneClick={onPaneClick}
                     onConnectEnd={onConnectEnd}
+                    colorMode={isDark ? 'dark' : 'light'}
                 >
                     <Panel position="top-left" className="bg-transparent shadow-none">
                         <div className="flex flex-col gap-2">
@@ -170,14 +173,14 @@ const DiagramContent = () => {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setIsAddingNode(true)}
-                                    className="px-3 py-1 text-sm bg-white border rounded-md shadow hover:bg-gray-100"
+                                    className="px-3 py-1 text-sm border rounded-md shadow"
                                 >
                                     ➕ Nodo
                                 </button>
 
                                 <button
                                     onClick={() => setExpanded((prev) => !prev)}
-                                    className="px-3 py-1 text-sm bg-white border rounded-md shadow hover:bg-gray-100"
+                                    className="px-3 py-1 text-sm border rounded-md shadow"
                                 >
                                     {expanded ? 'Ocultar detalle' : 'Ver detalle'}
                                 </button>

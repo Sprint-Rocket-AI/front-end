@@ -73,7 +73,7 @@ export function EdgeInputText({
                             style={{
                                 padding: '2px 8px', fontSize: 11, borderRadius: 4,
                                 border: '1px solid #b1b1b7',
-                                background: animated ? '#dbeafe' : '#fff', cursor: 'pointer'
+                                cursor: 'pointer'
                             }}
                         >
                             {animated ? '⏸' : '▶'}
@@ -87,7 +87,6 @@ export function EdgeInputText({
                                 style={{
                                     padding: '2px 8px', fontSize: 11, borderRadius: 4,
                                     border: '1px solid #b1b1b7',
-                                    background: lineType === t ? '#e0e7ff' : '#fff',
                                     cursor: 'pointer', fontWeight: lineType === t ? 600 : 400
                                 }}
                             >
@@ -111,7 +110,6 @@ export function EdgeInputText({
                         position: 'absolute',
                         transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
                         pointerEvents: 'all', cursor: 'text',
-                        background: label ? '#fff' : 'transparent',
                         border: label ? '1px solid #b1b1b7' : 'none',
                         borderRadius: 4, padding: label ? '2px 6px' : 0,
                         fontSize: 12, outline: 'none', minWidth: 40,

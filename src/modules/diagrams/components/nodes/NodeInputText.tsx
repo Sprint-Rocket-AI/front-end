@@ -31,10 +31,8 @@ export function NodeInputText({ id, data }) {
             className="react-flow__node-default"
             style={{ width: 'max-content', minWidth: '80px', maxWidth: '250px' }}
         >
-            <Handle type="target" position={Position.Top} />
             <Handle type="target" position={Position.Left} />
             <Handle type="source" position={Position.Right} />
-            <Handle type="source" position={Position.Bottom} />
 
             <span
                 ref={spanRef}

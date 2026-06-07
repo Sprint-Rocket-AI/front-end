@@ -101,7 +101,46 @@ const DiagramContent = () => {
 
     const panOnDrag = [1, 2];
 
+    const onConnectEnd = useCallback(
+        (event, connectionState) => {
+            if (!connectionState.isValid) {
+                const { clientX, clientY } =
+                    'changedTouches' in event ? event.changedTouches[0] : event;
 
+                const position = screenToFlowPosition({ x: clientX, y: clientY });
+
+                setNodes((nds) => {
+                    const id = `n${nds.length + 1}`;
+                    return [
+                        ...nds,
+                        {
+                            id,
+                            position,
+                            data: { label: `Node ${nds.length + 1}` },
+                            type: 'nodeInputText',
+                            origin: [0.5, 0.0],
+                        },
+                    ];
+                });
+
+                setEdges((eds) => {
+                    const newId = `e${eds.length + 1}`;
+                    return [
+                        ...eds,
+                        {
+                            id: newId,
+                            source: connectionState.fromNode.id,
+                            target: `n${nodes.length + 1}`,
+                            type: 'edgeInputText',
+                            animated: false,
+                            label: ''
+                        },
+                    ];
+                });
+            }
+        },
+        [screenToFlowPosition, nodes.length]
+    );
 
     return (
         <section className={`w-full h-screen ${isAddingNode ? 'cursor-crosshair' : ''}`}>
@@ -121,6 +160,7 @@ const DiagramContent = () => {
                     panOnDrag={panOnDrag}
                     selectionMode={SelectionMode.Partial}
                     onPaneClick={onPaneClick}
+                    onConnectEnd={onConnectEnd}
                 >
                     <Panel position="top-left" className="bg-transparent shadow-none">
                         <div className="flex flex-col gap-2">

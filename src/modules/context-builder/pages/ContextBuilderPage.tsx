@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useAppSelector } from "../../../commons/hooks/useAppSelector";
+import type { DocumentRecordInterface } from "../../../commons/interfaces/DocumentRecordInterface";
 import { ContextTypeSelector } from "../components/ContextTypeSelector";
 import { DocumentTable } from "../components/DocumentTable";
 import { DynamicFormRenderer } from "../components/DynamicFormRenderer";
 import { RawInputArea } from "../components/RawInputArea";
 import { useContextBuilder } from "../hooks/useContextBuilder";
 import { Toast } from "../components/Toast";
+import { DynamicDocumentViewer } from "../components/DynamicDocumentViewer";
 
 export const ContextBuilderPage = () => {
   const documents = useAppSelector((state) => state.documents.items);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [viewingRecord, setViewingRecord] = useState<DocumentRecordInterface | null>(null);
   const {
     tipo,
     setTipo,
@@ -77,12 +80,24 @@ export const ContextBuilderPage = () => {
           onChange={setFormData}
         />
 
-        <DocumentTable documents={documents} onEdit={beginEdit} onDelete={deleteById} />
+        <DocumentTable
+          documents={documents}
+          onView={(record) => setViewingRecord(record)}
+          onEdit={beginEdit}
+          onDelete={deleteById}
+        />
       </section>
 
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
+
+      <DynamicDocumentViewer
+        tipo={viewingRecord?.tipo ?? ""}
+        data={viewingRecord?.data ?? null}
+        isOpen={Boolean(viewingRecord)}
+        onClose={() => setViewingRecord(null)}
+      />
     </section>
   );
 };

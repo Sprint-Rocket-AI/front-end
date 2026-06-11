@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { useRoutes } from "react-router-dom";
 import { DocumentsPage } from "../pages/DocumentsPage";
 import { DiagramPage } from "../pages/DiagramPage";
+import { DiagramsListPage } from "../pages/DiagramsListPage";
 import { HomePage } from "../pages/HomePage";
 import { AppShellLayout } from "../pages/AppShellLayout";
 import { AuthRoute } from "./AuthRoute";
@@ -40,7 +41,11 @@ export const routes = [
         element: <DocumentsPage />,
       },
       {
-        path: "diagram",
+        path: "diagrams",
+        element: <DiagramsListPage />,
+      },
+      {
+        path: "diagram/:id",
         element: <DiagramPage />,
       }
     ],

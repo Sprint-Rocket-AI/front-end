@@ -45,6 +45,20 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
               >
                 Inicio
               </NavLink>
+              
+              <NavLink
+                to="/diagrams"
+                className={({ isActive }) =>
+                  [
+                    "inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm font-semibold transition",
+                    isActive
+                      ? "border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200"
+                      : "border-slate-200 bg-slate-50 text-slate-600 hover:border-orange-200 hover:text-orange-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/20 dark:hover:text-orange-200",
+                  ].join(" ")
+                }
+              >
+                Diagramas
+              </NavLink>
             </div>
 
             <div className="relative">

@@ -30,8 +30,8 @@ export const DiagramBoard = () => {
     } = useDiagramFlow();
 
     return (
-        <section className={`w-full h-screen ${isAddingNode ? 'cursor-crosshair' : ''}`}>
-            <section style={{ width: '100%', height: '80%' }}>
+        <section className={`w-full h-[85vh] p-4`}>
+            <div className="w-full h-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <ReactFlow
                     nodes={nodes}
                     nodeTypes={nodeTypes}
@@ -61,7 +61,7 @@ export const DiagramBoard = () => {
                     <MiniMap />
                     <Background />
                 </ReactFlow>
-            </section>
+            </div>
         </section>
     );
 };

@@ -20,7 +20,7 @@ export const AppShellLayout = () => {
     <ThemeContext.Provider value={{ isDark, toggle }}>
       <main className="flex min-h-screen w-full flex-col gap-6">
         <AppMenuBar isDark={isDark} onToggleTheme={toggle} />
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-4 sm:px-6 sm:pb-6 lg:max-w-[80vw] lg:px-8 lg:pb-8 2xl:max-w-[1600px]">
+        <div className="mx-auto flex w-full flex-1 flex-col px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
           <Outlet />
         </div>
       </main>

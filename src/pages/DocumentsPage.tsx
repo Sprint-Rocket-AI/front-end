@@ -18,7 +18,7 @@ export const DocumentsPage = () => {
   } = useDocumentFilters(documents);
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6" style={{ width: '80%', margin: '0 auto' }}>
       <div className="panel space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
           <div>

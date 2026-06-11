@@ -41,7 +41,7 @@ export const ContextBuilderPage = () => {
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6" style={{ width: '80%', margin: '0 auto' }}>
       <section className="space-y-6">
         <div className="w-full">
           <div className="panel space-y-5">

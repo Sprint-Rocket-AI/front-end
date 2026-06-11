@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const mockDiagrams = [
+export const mockDiagrams = [
     {
         id: '1',
         title: 'Mapa Mental APV-123',

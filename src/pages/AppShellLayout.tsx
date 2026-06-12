@@ -1,6 +1,7 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AppMenuBar } from "../components/AppMenuBar";
+import { AppFooter } from "../components/AppFooter";
 import { ThemeContext } from "../commons/context/ThemeContext";
 
 export const AppShellLayout = () => {
@@ -8,21 +9,62 @@ export const AppShellLayout = () => {
     if (typeof window === 'undefined') return true;
     return window.localStorage.getItem('theme-mode') !== 'light';
   });
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
     window.localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  useEffect(() => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    const wsUrl = import.meta.env.VITE_CHECKPOINT_WS_URL ?? 'ws://localhost:8082/ws/reminders?userId=dev-001';
+    const ws = new WebSocket(wsUrl);
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'reminder.triggered') {
+          if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+            new Notification('⏰ ¡RECORDATORIO!', { body: data.payload.titulo });
+          } else {
+            alert(`⏰ ¡RECORDATORIO!\n\n${data.payload.titulo}`);
+          }
+        }
+      } catch (e) {
+        console.error("Error procesando mensaje WebSocket", e);
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
   const toggle = () => setIsDark((v) => !v);
 
   return (
     <ThemeContext.Provider value={{ isDark, toggle }}>
-      <main className="flex min-h-screen w-full flex-col gap-6">
+      <main className="flex min-h-screen w-full flex-col">
         <AppMenuBar isDark={isDark} onToggleTheme={toggle} />
-        <div className="mx-auto flex w-full flex-1 flex-col px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
+        <div className="mx-auto flex w-full flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8">
           <Outlet />
         </div>
+        <AppFooter />
+        {location.pathname !== '/chat' && (
+          <button
+            type="button"
+            onClick={() => navigate('/chat')}
+            className="fixed bottom-8 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-assistant-gradient text-2xl text-white shadow-glow-assistant transition-transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-assistant-500/40"
+            title="Abrir Chat IA"
+          >
+            🚀
+          </button>
+        )}
       </main>
     </ThemeContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 interface AppMenuBarProps {
@@ -6,94 +6,91 @@ interface AppMenuBarProps {
   onToggleTheme: () => void;
 }
 
+const navItems = [
+  { to: "/", label: "Inicio", end: true },
+  { to: "/diagrams", label: "Diagramas", end: false },
+  { to: "/checkpoint", label: "Checkpoint", end: false },
+];
+
 const documentSubmenuItems = [
   { to: "/documents/builder", label: "Builder" },
   { to: "/documents/view", label: "Ver documentos" },
 ];
 
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  ["nav-link", isActive ? "nav-link-active" : ""].join(" ");
+
 export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   const location = useLocation();
   const isDocumentsSection = location.pathname.startsWith("/documents");
   const [isDocumentsMenuOpen, setIsDocumentsMenuOpen] = useState(false);
+  const docsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsDocumentsMenuOpen(false);
   }, [location.pathname]);
 
+  // Cerrar el menú al hacer click fuera
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (docsRef.current && !docsRef.current.contains(e.target as Node)) {
+        setIsDocumentsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-20 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:max-w-[80vw] lg:flex-row lg:items-center lg:justify-between lg:px-8 2xl:max-w-[1600px]">
-        <div className="flex min-w-0 flex-col gap-4 lg:flex-1 lg:flex-row lg:items-center lg:gap-8">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-orange-500">Sprint Rocket.AI</p>
-            <h1 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100 sm:text-xl">Workspace DUOC</h1>
-          </div>
+    <header className="sticky top-0 z-30 w-full border-b border-accent-500/10 bg-ink-950/95 backdrop-blur-lg">
+      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        {/* Marca */}
+        <div className="flex min-w-0 items-center gap-8">
+          <NavLink to="/" className="flex flex-col leading-tight">
+            <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-orange-500">
+              Sprint Rocket.AI
+            </span>
+            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              Workspace DUOC
+            </span>
+          </NavLink>
 
-          <nav className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="flex flex-wrap items-center gap-2">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  [
-                    "inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm font-semibold transition",
-                    isActive
-                      ? "border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200"
-                      : "border-slate-200 bg-slate-50 text-slate-600 hover:border-orange-200 hover:text-orange-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/20 dark:hover:text-orange-200",
-                  ].join(" ")
-                }
-              >
-                Inicio
+          {/* Navegación */}
+          <nav className="hidden items-center gap-6 lg:flex">
+            {navItems.map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
+                {item.label}
               </NavLink>
-              
-              <NavLink
-                to="/diagrams"
-                className={({ isActive }) =>
-                  [
-                    "inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm font-semibold transition",
-                    isActive
-                      ? "border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200"
-                      : "border-slate-200 bg-slate-50 text-slate-600 hover:border-orange-200 hover:text-orange-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/20 dark:hover:text-orange-200",
-                  ].join(" ")
-                }
-              >
-                Diagramas
-              </NavLink>
-            </div>
+            ))}
 
-            <div className="relative">
+            <div className="relative" ref={docsRef}>
               <button
                 type="button"
-                className={[
-                  "inline-flex w-full items-center justify-between gap-3 rounded-full border px-4 py-2 text-sm font-semibold transition sm:w-auto",
-                  isDocumentsSection || isDocumentsMenuOpen
-                    ? "border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200"
-                    : "border-slate-200 bg-slate-50 text-slate-600 hover:border-orange-200 hover:text-orange-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/20 dark:hover:text-orange-200",
-                ].join(" ")}
-                onClick={() => setIsDocumentsMenuOpen((value) => !value)}
+                onClick={() => setIsDocumentsMenuOpen((v) => !v)}
                 aria-expanded={isDocumentsMenuOpen}
                 aria-haspopup="menu"
+                className={["nav-link gap-1.5", isDocumentsSection ? "nav-link-active" : ""].join(" ")}
               >
-                <span>Documentos</span>
-                <span className="text-[10px] opacity-70">{isDocumentsMenuOpen ? "▲" : "▼"}</span>
+                Documentos
+                <span className="text-[9px] opacity-60">{isDocumentsMenuOpen ? "▲" : "▼"}</span>
               </button>
 
               {isDocumentsMenuOpen && (
-                <div className="mt-2 flex flex-col gap-2 rounded-[1.25rem] border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-800 dark:bg-slate-950 sm:absolute sm:left-0 sm:mt-3 sm:min-w-[220px] sm:p-3">
+                <div className="absolute left-0 top-full mt-3 flex min-w-[220px] flex-col gap-1 rounded-2xl border border-accent-500/20 bg-ink-900/95 p-2 shadow-elevated backdrop-blur-xl animate-fade-in">
                   {documentSubmenuItems.map((item) => (
                     <NavLink
                       key={item.to}
                       to={item.to}
                       className={({ isActive }) =>
                         [
-                          "inline-flex items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition",
+                          "rounded-xl px-4 py-2.5 text-sm font-medium transition",
                           isActive
-                            ? "border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-200"
-                            : "border-slate-200 bg-slate-50 text-slate-600 hover:border-orange-200 hover:text-orange-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/20 dark:hover:text-orange-200",
+                            ? "bg-accent-500/15 text-accent-300"
+                            : "text-slate-300 hover:bg-white/5 hover:text-slate-100",
                         ].join(" ")
                       }
                     >
-                      <span>{item.label}</span>
+                      {item.label}
                     </NavLink>
                   ))}
                 </div>
@@ -102,12 +99,47 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
           </nav>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between lg:justify-end">
-          <button type="button" className="action-secondary w-full sm:w-auto" onClick={onToggleTheme}>
-            {isDark ? "Cambiar a claro" : "Cambiar a oscuro"}
+        {/* Acciones derecha */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="action-ghost"
+            title={isDark ? "Cambiar a claro" : "Cambiar a oscuro"}
+          >
+            {isDark ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            )}
+            <span className="hidden sm:inline">{isDark ? "Cambiar a claro" : "Cambiar a oscuro"}</span>
           </button>
+
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-assistant-gradient text-sm font-bold text-white shadow-glow-assistant">
+            JD
+          </div>
         </div>
       </div>
+
+      {/* Navegación móvil */}
+      <nav className="flex items-center gap-5 overflow-x-auto border-t border-accent-500/10 px-4 py-2 lg:hidden">
+        {navItems.map((item) => (
+          <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
+            {item.label}
+          </NavLink>
+        ))}
+        <NavLink to="/documents/builder" className={navLinkClass}>
+          Documentos
+        </NavLink>
+      </nav>
     </header>
   );
 };

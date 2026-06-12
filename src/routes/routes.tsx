@@ -5,9 +5,11 @@ import { DiagramPage } from "../pages/DiagramPage";
 import { DiagramsListPage } from "../pages/DiagramsListPage";
 import { HomePage } from "../pages/HomePage";
 import { AppShellLayout } from "../pages/AppShellLayout";
+import { ChatIAPage } from "../pages/ChatIAPage";
 import { AuthRoute } from "./AuthRoute";
 
 const ContextBuilderModule = lazy(() => import("../modules/context-builder/ContextBuilderModule"));
+const CheckpointModule = lazy(() => import("../modules/checkpoint/CheckpointModule"));
 
 export const routes = [
   {
@@ -21,6 +23,20 @@ export const routes = [
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "checkpoint",
+        element: (
+          <Suspense
+            fallback={
+              <div className="panel flex min-h-[240px] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-300">
+                Cargando Checkpoint...
+              </div>
+            }
+          >
+            <CheckpointModule />
+          </Suspense>
+        ),
       },
       {
         path: "documents/builder",
@@ -47,6 +63,10 @@ export const routes = [
       {
         path: "diagram/:id",
         element: <DiagramPage />,
+      },
+      {
+        path: "chat",
+        element: <ChatIAPage />,
       }
     ],
   },

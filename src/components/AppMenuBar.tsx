@@ -9,7 +9,6 @@ interface AppMenuBarProps {
 const navItems = [
   { to: "/", label: "Inicio", end: true },
   { to: "/diagrams", label: "Diagramas", end: false },
-  { to: "/checkpoint", label: "Checkpoint", end: false },
 ];
 
 const documentSubmenuItems = [

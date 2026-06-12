@@ -42,7 +42,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-accent-500/10 bg-ink-950/95 backdrop-blur-lg">
+    <header className="sticky top-0 z-30 w-full border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-colors duration-300 dark:border-accent-500/10 dark:bg-ink-950/95">
       <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         {/* Marca */}
         <div className="flex min-w-0 items-center gap-8">
@@ -76,7 +76,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
               </button>
 
               {isDocumentsMenuOpen && (
-                <div className="absolute left-0 top-full mt-3 flex min-w-[220px] flex-col gap-1 rounded-2xl border border-accent-500/20 bg-ink-900/95 p-2 shadow-elevated backdrop-blur-xl animate-fade-in">
+                <div className="absolute left-0 top-full mt-3 flex min-w-[220px] flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg backdrop-blur-xl transition-colors duration-300 dark:border-accent-500/20 dark:bg-ink-900/95 dark:shadow-elevated animate-fade-in">
                   {documentSubmenuItems.map((item) => (
                     <NavLink
                       key={item.to}
@@ -85,8 +85,8 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
                         [
                           "rounded-xl px-4 py-2.5 text-sm font-medium transition",
                           isActive
-                            ? "bg-accent-500/15 text-accent-300"
-                            : "text-slate-300 hover:bg-white/5 hover:text-slate-100",
+                            ? "bg-orange-50 text-orange-600 dark:bg-accent-500/15 dark:text-accent-300"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-slate-100",
                         ].join(" ")
                       }
                     >
@@ -104,7 +104,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
           <button
             type="button"
             onClick={onToggleTheme}
-            className="action-ghost"
+            className="action-ghost !border-slate-200 !text-slate-600 hover:!bg-slate-50 dark:!border-white/10 dark:!bg-white/5 dark:!text-slate-200 dark:hover:!border-accent-500/40 dark:hover:!bg-white/10"
             title={isDark ? "Cambiar a claro" : "Cambiar a oscuro"}
           >
             {isDark ? (
@@ -130,7 +130,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
       </div>
 
       {/* Navegación móvil */}
-      <nav className="flex items-center gap-5 overflow-x-auto border-t border-accent-500/10 px-4 py-2 lg:hidden">
+      <nav className="flex items-center gap-5 overflow-x-auto border-t border-slate-200 px-4 py-2 transition-colors duration-300 dark:border-accent-500/10 lg:hidden">
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
             {item.label}

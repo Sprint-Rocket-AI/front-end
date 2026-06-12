@@ -6,7 +6,7 @@ const footerLinks = [
 
 export const AppFooter = () => {
   return (
-    <footer className="mt-auto w-full border-t border-accent-500/10 bg-ink-950/60 backdrop-blur-sm">
+    <footer className="mt-auto w-full border-t border-slate-200 bg-white/60 backdrop-blur-sm transition-colors duration-300 dark:border-accent-500/10 dark:bg-ink-950/60">
       <div className="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-2 px-4 py-5 text-sm sm:flex-row sm:px-6 lg:px-8">
         <p className="text-slate-500 dark:text-slate-400">
           <span className="font-bold uppercase tracking-[0.18em] text-orange-500">Sprint Rocket AI</span>

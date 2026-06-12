@@ -25,20 +25,6 @@ export const routes = [
         element: <HomePage />,
       },
       {
-        path: "checkpoint",
-        element: (
-          <Suspense
-            fallback={
-              <div className="panel flex min-h-[240px] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-300">
-                Cargando Checkpoint...
-              </div>
-            }
-          >
-            <CheckpointModule />
-          </Suspense>
-        ),
-      },
-      {
         path: "documents/builder",
         element: (
           <Suspense

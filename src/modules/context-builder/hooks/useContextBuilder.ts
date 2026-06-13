@@ -6,6 +6,7 @@ import { removeDocument, upsertDocument } from "../../../store/slices/documentsS
 import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
 import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import { createEmptyDocumentByType, createFallbackFromRawText, mergeAiResult } from "../templates/documentTemplates";
+import { DocumentServiceFactory } from "../../../services/DocumentServiceFactory";
 
 export const useContextBuilder = () => {
   const feedbackInitial = "Selecciona un tipo de documento para comenzar a construir el contexto.";
@@ -103,47 +104,99 @@ export const useContextBuilder = () => {
     setFeedback("Formulario vacío.");
   };
 
-  const saveCurrentDocument = () => {
+  const saveCurrentDocument = async () => {
     if (!tipo || !formData) {
       setFeedback("Genera o crea un formulario antes de guardar.");
       return;
     }
 
-    const timestamp = new Date().toISOString();
-    const id = editingId ?? crypto.randomUUID();
-    const nextData = {
-      ...formData,
-      id,
-      createdAt: formData.createdAt ?? timestamp,
-      updatedAt: timestamp,
-    };
+    setIsGenerating(true);
+    try {
+      const service = DocumentServiceFactory.getDocumentServiceByType(tipo);
+      let response;
+      const isEdit = mode === "edit" && editingId;
 
-    dispatch(
-      upsertDocument({
+      if (isEdit) {
+        response = await service.update(editingId, formData as any);
+      } else {
+        response = await service.create(formData as any);
+      }
+
+      const savedData = response.data;
+      const timestamp = new Date().toISOString();
+      const id = savedData.id || editingId || crypto.randomUUID();
+      const nextData = {
+        ...savedData,
         id,
-        tipo,
-        origin: isAI ? "AI" : "MANUAL",
-        data: nextData,
-      }),
-    );
+        createdAt: savedData.createdAt || formData.createdAt || timestamp,
+        updatedAt: timestamp,
+      };
 
-    setFormData(nextData);
-    setInitialState(nextData);
-    setEditingId(id);
-    setMode("edit");
-    setFeedback(`Documento ${nextData.titulo || id} guardado con éxito.`);
+      dispatch(
+        upsertDocument({
+          id,
+          tipo,
+          data: nextData,
+        }),
+      );
+
+      setFormData(nextData);
+      setInitialState(nextData);
+      setEditingId(id);
+      setMode("edit");
+      setFeedback(`Documento "${nextData.titulo || id}" guardado con éxito en el servidor.`);
+    } catch (error) {
+      console.error(error);
+      setFeedback("Error al guardar en el servidor. Se guardó localmente en Redux.");
+
+      const timestamp = new Date().toISOString();
+      const id = editingId ?? crypto.randomUUID();
+      const nextData = {
+        ...formData,
+        id,
+        createdAt: formData.createdAt ?? timestamp,
+        updatedAt: timestamp,
+      };
+
+      dispatch(
+        upsertDocument({
+          id,
+          tipo,
+          data: nextData,
+        }),
+      );
+
+      setFormData(nextData);
+      setInitialState(nextData);
+      setEditingId(id);
+      setMode("edit");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const beginEdit = (record: DocumentRecordInterface) => {
+  const beginEdit = async (record: DocumentRecordInterface) => {
     setTipo(record.tipo);
-    setRawText(record.data.contenido);
-    setFormData(record.data);
-    setInitialState(record.data);
-    setShowStructuredForm(true);
-    setIsAI(record.origin === "AI");
     setMode("edit");
     setEditingId(record.id);
-    setFeedback(`Editing ${record.data.titulo}.`);
+    setShowStructuredForm(true);
+    setFeedback(`Cargando documento "${record.data.titulo || record.id}" desde el servidor...`);
+
+    try {
+      const service = DocumentServiceFactory.getDocumentServiceByType(record.tipo);
+      const response = await service.getById(record.id);
+      const serverData = response.data;
+      setFormData(serverData);
+      setInitialState(serverData);
+      setRawText(serverData.contenido);
+      setFeedback(`Editando ${serverData.titulo}.`);
+    } catch (error) {
+      console.error(error);
+      setFormData(record.data);
+      setInitialState(record.data);
+      setRawText(record.data.contenido);
+      setFeedback(`Editando ${record.data.titulo} (datos locales).`);
+    }
   };
 
   const deleteById = (id: string) => {

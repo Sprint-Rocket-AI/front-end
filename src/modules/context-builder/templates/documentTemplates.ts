@@ -1,6 +1,5 @@
 import type { BaseDocumentInterface } from "../interfaces/BaseDocumentInterface";
 import type { ColumnaInterface } from "../interfaces/ColumnaInterface";
-import { DocumentEstadoEnum } from "../interfaces/DocumentEstadoEnum";
 import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
 import type { TablaInterface } from "../interfaces/TablaInterface";

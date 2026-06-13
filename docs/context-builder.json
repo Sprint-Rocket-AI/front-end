@@ -1,0 +1,1362 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "OpenAPI definition",
+        "version": "v0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080/context-builder",
+            "description": "Generated server url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Documentos de Negocio",
+            "description": "API para la gestión de documentos de negocio."
+        },
+        {
+            "name": "Documentos DDL",
+            "description": "API para la gestión de documentos DDL (modelos de datos)."
+        },
+        {
+            "name": "Documentos Sistemas",
+            "description": "API para la gestión de documentos sistemas."
+        },
+        {
+            "name": "Documentos Lineamientos",
+            "description": "API para la gestión de documentos de lineamientos (base de conocimiento para RAG)."
+        }
+    ],
+    "paths": {
+        "/api/documentos-sistemas/{id}": {
+            "get": {
+                "tags": [
+                    "Documentos Sistemas"
+                ],
+                "summary": "Obtener un documento sistema por su ID",
+                "operationId": "getById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a obtener",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoSistemaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoSistemaResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Documentos Sistemas"
+                ],
+                "summary": "Actualizar un documento sistema existente",
+                "operationId": "update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoSistemaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Documento actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoSistemaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoSistemaResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-negocio/{id}": {
+            "get": {
+                "tags": [
+                    "Documentos de Negocio"
+                ],
+                "summary": "Obtener un documento de negocio por su ID",
+                "operationId": "getById_1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a obtener",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoNegocioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoNegocioResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Documentos de Negocio"
+                ],
+                "summary": "Actualizar un documento de negocio existente",
+                "operationId": "update_1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoNegocioRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Documento actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoNegocioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoNegocioResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-lineamientos/{id}": {
+            "get": {
+                "tags": [
+                    "Documentos Lineamientos"
+                ],
+                "summary": "Obtener un documento lineamiento por su ID",
+                "operationId": "getById_2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a obtener",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Documentos Lineamientos"
+                ],
+                "summary": "Actualizar un documento lineamiento existente",
+                "operationId": "update_2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoLineamientoRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Documento actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-ddl/{id}": {
+            "get": {
+                "tags": [
+                    "Documentos DDL"
+                ],
+                "summary": "Obtener un documento DDL por su ID",
+                "operationId": "getById_3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a obtener",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Documentos DDL"
+                ],
+                "summary": "Actualizar un documento DDL existente",
+                "operationId": "update_3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del documento a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoDDLRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Documento actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-sistemas": {
+            "post": {
+                "tags": [
+                    "Documentos Sistemas"
+                ],
+                "summary": "Crear un nuevo documento sistema",
+                "operationId": "create",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoSistemaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Documento creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoSistemaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoSistemaResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-negocio": {
+            "post": {
+                "tags": [
+                    "Documentos de Negocio"
+                ],
+                "summary": "Crear un nuevo documento de negocio",
+                "operationId": "create_1",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoNegocioRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Documento creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoNegocioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoNegocioResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-lineamientos": {
+            "post": {
+                "tags": [
+                    "Documentos Lineamientos"
+                ],
+                "summary": "Crear un nuevo documento lineamiento",
+                "operationId": "create_2",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoLineamientoRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Documento creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoLineamientoResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos-ddl": {
+            "post": {
+                "tags": [
+                    "Documentos DDL"
+                ],
+                "summary": "Crear un nuevo documento DDL",
+                "operationId": "create_3",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoDDLRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Documento creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDDLResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DocumentoSistemaRequest": {
+                "type": "object",
+                "description": "DTO para la creación de un nuevo Documento Sistema.",
+                "example": {
+                    "titulo": "Diseño de la Arquitectura de Microservicios",
+                    "contenido": "El servicio de usuarios se comunicará con el servicio de pedidos a través de eventos asíncronos.",
+                    "tipo": "SISTEMA",
+                    "urlRepos": [
+                        "https://github.com/empresa/usuarios-service"
+                    ],
+                    "stack": [
+                        "spring-boot",
+                        "mongodb"
+                    ],
+                    "devs": [
+                        "ana.perez",
+                        "carlos.rojas"
+                    ]
+                },
+                "properties": {
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del documento.",
+                        "example": "Diseño de la Arquitectura de Microservicios",
+                        "maxLength": 200,
+                        "minLength": 0
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Contenido del documento en formato Markdown o texto plano.",
+                        "example": "El servicio de usuarios se comunicará con el servicio de pedidos a través de eventos...",
+                        "minLength": 1
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "description": "Tipo de documento.",
+                        "enum": [
+                            "SISTEMA",
+                            "NEGOCIO",
+                            "DDL",
+                            "LINEAMIENTO"
+                        ],
+                        "example": "SISTEMA"
+                    },
+                    "urlRepos": {
+                        "type": "array",
+                        "description": "URLs de repositorios asociados al documento.",
+                        "example": [
+                            "https://github.com/empresa/usuarios-service"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "stack": {
+                        "type": "array",
+                        "description": "Stack tecnologico del sistema.",
+                        "example": [
+                            "spring-boot",
+                            "mongodb"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "devs": {
+                        "type": "array",
+                        "description": "Equipo de desarrollo asociado.",
+                        "example": [
+                            "ana.perez",
+                            "carlos.rojas"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "contenido",
+                    "tipo",
+                    "titulo"
+                ]
+            },
+            "DocumentoSistemaResponse": {
+                "type": "object",
+                "description": "DTO para la respuesta de un Documento Sistema.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID único del documento.",
+                        "example": "6653d50711312d1174a61517"
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del documento.",
+                        "example": "Diseño de la Arquitectura"
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Contenido del documento.",
+                        "example": "El sistema seguirá un patrón de microservicios..."
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "description": "Tipo de documento.",
+                        "enum": [
+                            "SISTEMA",
+                            "NEGOCIO",
+                            "DDL",
+                            "LINEAMIENTO"
+                        ]
+                    },
+                    "urlRepos": {
+                        "type": "array",
+                        "description": "URLs de repositorios asociados al documento.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "stack": {
+                        "type": "array",
+                        "description": "Stack tecnologico del sistema.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "devs": {
+                        "type": "array",
+                        "description": "Equipo de desarrollo asociado.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "fechaCreacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de creación del documento."
+                    },
+                    "fechaActualizacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de la última actualización del documento."
+                    }
+                }
+            },
+            "DocumentoNegocioRequest": {
+                "type": "object",
+                "description": "DTO para la creación/actualización de un Documento de Negocio.",
+                "example": "{\n  \"titulo\": \"Especificación de Requisitos de Usuario\",\n  \"contenido\": \"El sistema debe permitir a los usuarios registrarse con su correo electrónico.\",\n  \"tags\": [\"onboarding\", \"registro\"],\n  \"criteriosAceptacion\": [\n    \"El usuario debe poder registrarse con email\",\n    \"Se debe validar el correo\"\n  ],\n}\n",
+                "properties": {
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del documento.",
+                        "example": "Especificación de Requisitos de Usuario",
+                        "maxLength": 200,
+                        "minLength": 0
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Contenido del documento en formato Markdown o texto plano.",
+                        "example": "El sistema debe permitir a los usuarios registrarse con su correo electrónico.",
+                        "minLength": 1
+                    },
+                    "tags": {
+                        "type": "array",
+                        "description": "Etiquetas asociadas al documento.",
+                        "example": [
+                            "pagos",
+                            "onboarding"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "criteriosAceptacion": {
+                        "type": "array",
+                        "description": "Criterios de aceptación.",
+                        "example": [
+                            "El usuario debe poder registrarse con email",
+                            "Se debe validar el correo"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "contenido",
+                    "titulo"
+                ]
+            },
+            "DocumentoNegocioResponse": {
+                "type": "object",
+                "description": "DTO de respuesta de un Documento de Negocio.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID único del documento.",
+                        "example": "6653d50711312d1174a61515"
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del documento."
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Contenido del documento."
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "description": "Tipo de documento.",
+                        "enum": [
+                            "SISTEMA",
+                            "NEGOCIO",
+                            "DDL",
+                            "LINEAMIENTO"
+                        ]
+                    },
+                    "tags": {
+                        "type": "array",
+                        "description": "Etiquetas asociadas.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "criteriosAceptacion": {
+                        "type": "array",
+                        "description": "Criterios de aceptación.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "fechaCreacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de creación."
+                    },
+                    "fechaActualizacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de la última actualización."
+                    }
+                }
+            },
+            "DocumentoLineamientoRequest": {
+                "type": "object",
+                "description": "DTO para la creación o actualización de un Documento Lineamiento.",
+                "example": {
+                    "titulo": "Lineamiento de diseño de microservicios",
+                    "contenido": "Cada microservicio debe ser autónomo y desplegable de forma independiente.",
+                    "tags": [
+                        "spring-boot",
+                        "observabilidad"
+                    ]
+                },
+                "properties": {
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del lineamiento.",
+                        "example": "Lineamiento de diseño de microservicios",
+                        "maxLength": 200,
+                        "minLength": 0
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Contenido extendido del lineamiento.",
+                        "example": "Cada microservicio debe ser autónomo y desplegable de forma independiente...",
+                        "minLength": 1
+                    },
+                    "tags": {
+                        "type": "array",
+                        "description": "Etiquetas de búsqueda asociadas al lineamiento.",
+                        "example": [
+                            "spring-boot",
+                            "observabilidad"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "contenido",
+                    "titulo"
+                ]
+            },
+            "DocumentoLineamientoResponse": {
+                "type": "object",
+                "description": "DTO de respuesta de un Documento Lineamiento.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID único del documento.",
+                        "example": "6653d50711312d1174a61517"
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del lineamiento.",
+                        "example": "Lineamiento de diseño de microservicios"
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Contenido del lineamiento.",
+                        "example": "Cada microservicio debe ser autónomo..."
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "description": "Tipo de documento.",
+                        "enum": [
+                            "SISTEMA",
+                            "NEGOCIO",
+                            "DDL",
+                            "LINEAMIENTO"
+                        ]
+                    },
+                    "tags": {
+                        "type": "array",
+                        "description": "Etiquetas de búsqueda.",
+                        "example": [
+                            "spring-boot",
+                            "observabilidad"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "fechaCreacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de creación del documento."
+                    },
+                    "fechaActualizacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de la última actualización."
+                    }
+                }
+            },
+            "ColumnaRequest": {
+                "type": "object",
+                "description": "DTO para una columna del modelo DDL.",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre de la columna.",
+                        "example": "monto",
+                        "minLength": 1
+                    },
+                    "tipoDato": {
+                        "type": "string",
+                        "description": "Tipo de dato SQL.",
+                        "example": "NUMERIC(12,2)",
+                        "minLength": 1
+                    },
+                    "esPk": {
+                        "type": "boolean",
+                        "description": "Indica si la columna es Primary Key.",
+                        "example": false
+                    },
+                    "esFk": {
+                        "type": "boolean",
+                        "description": "Indica si la columna es Foreign Key.",
+                        "example": false
+                    },
+                    "esNullable": {
+                        "type": "boolean",
+                        "description": "Indica si admite NULL.",
+                        "example": false
+                    },
+                    "esUnique": {
+                        "type": "boolean",
+                        "description": "Indica si es UNIQUE.",
+                        "example": false
+                    },
+                    "valorPorDefecto": {
+                        "type": "string",
+                        "description": "Valor por defecto declarado en el DDL.",
+                        "example": "0"
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "description": "Descripción semántica de la columna.",
+                        "example": "Monto del pago en moneda local."
+                    }
+                },
+                "required": [
+                    "nombre",
+                    "tipoDato"
+                ]
+            },
+            "DocumentoDDLRequest": {
+                "type": "object",
+                "description": "DTO para la creación/actualización de un Documento DDL. Recibe la estructura ya modelada (tablas, columnas, relaciones); el cliente puede construirla manualmente o usar el endpoint de interpretación con IA.",
+                "example": {
+                    "titulo": "Modelo de datos - módulo de pagos",
+                    "contenido": "CREATE TABLE pago (id BIGSERIAL PRIMARY KEY, cliente_id BIGINT NOT NULL, monto NUMERIC(12,2) NOT NULL);",
+                    "motorBd": "POSTGRESQL",
+                    "version": "1.0",
+                    "tablas": [
+                        {
+                            "nombre": "pago",
+                            "esquema": "public",
+                            "descripcion": "Registra los pagos realizados por los clientes.",
+                            "columnas": [
+                                {
+                                    "nombre": "id",
+                                    "tipoDato": "BIGSERIAL",
+                                    "esPk": true,
+                                    "esFk": false,
+                                    "esNullable": false,
+                                    "esUnique": true,
+                                    "valorPorDefecto": null,
+                                    "descripcion": "Identificador único del pago."
+                                },
+                                {
+                                    "nombre": "cliente_id",
+                                    "tipoDato": "BIGINT",
+                                    "esPk": false,
+                                    "esFk": true,
+                                    "esNullable": false,
+                                    "esUnique": false,
+                                    "valorPorDefecto": null,
+                                    "descripcion": "FK al cliente que realizó el pago."
+                                },
+                                {
+                                    "nombre": "monto",
+                                    "tipoDato": "NUMERIC(12,2)",
+                                    "esPk": false,
+                                    "esFk": false,
+                                    "esNullable": false,
+                                    "esUnique": false,
+                                    "valorPorDefecto": "0",
+                                    "descripcion": "Monto del pago en moneda local."
+                                }
+                            ],
+                            "relaciones": [
+                                {
+                                    "columnaOrigen": "cliente_id",
+                                    "tablaReferenciada": "cliente",
+                                    "columnaReferenciada": "id",
+                                    "tipoRelacion": "MUCHOS_A_UNO",
+                                    "onDelete": "CASCADE",
+                                    "onUpdate": "NO ACTION"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "properties": {
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del documento.",
+                        "example": "Modelo de datos - módulo de pagos",
+                        "maxLength": 200,
+                        "minLength": 0
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Script SQL DDL crudo (CREATE TABLE, ALTER, etc.).",
+                        "example": "CREATE TABLE pago (id BIGSERIAL PRIMARY KEY, monto NUMERIC(12,2) NOT NULL);",
+                        "minLength": 1
+                    },
+                    "motorBd": {
+                        "type": "string",
+                        "description": "Motor de base de datos.",
+                        "enum": [
+                            "POSTGRESQL",
+                            "MYSQL",
+                            "ORACLE",
+                            "SQLSERVER",
+                            "MARIADB"
+                        ],
+                        "example": "POSTGRESQL"
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Versión del modelo de datos.",
+                        "example": "1.0"
+                    },
+                    "tablas": {
+                        "type": "array",
+                        "description": "Tablas del modelo.",
+                        "items": {
+                            "$ref": "#/components/schemas/TablaRequest"
+                        },
+                        "minItems": 1
+                    }
+                },
+                "required": [
+                    "contenido",
+                    "motorBd",
+                    "tablas",
+                    "titulo"
+                ]
+            },
+            "RelacionRequest": {
+                "type": "object",
+                "description": "DTO para una relación (FK) entre tablas.",
+                "properties": {
+                    "columnaOrigen": {
+                        "type": "string",
+                        "description": "Columna origen (FK).",
+                        "example": "cliente_id",
+                        "minLength": 1
+                    },
+                    "tablaReferenciada": {
+                        "type": "string",
+                        "description": "Tabla referenciada.",
+                        "example": "cliente",
+                        "minLength": 1
+                    },
+                    "columnaReferenciada": {
+                        "type": "string",
+                        "description": "Columna referenciada.",
+                        "example": "id",
+                        "minLength": 1
+                    },
+                    "tipoRelacion": {
+                        "type": "string",
+                        "description": "Tipo de relación.",
+                        "enum": [
+                            "UNO_A_UNO",
+                            "UNO_A_MUCHOS",
+                            "MUCHOS_A_UNO",
+                            "MUCHOS_A_MUCHOS"
+                        ],
+                        "example": "MUCHOS_A_UNO"
+                    },
+                    "onDelete": {
+                        "type": "string",
+                        "description": "Acción ON DELETE.",
+                        "example": "CASCADE"
+                    },
+                    "onUpdate": {
+                        "type": "string",
+                        "description": "Acción ON UPDATE.",
+                        "example": "NO ACTION"
+                    }
+                },
+                "required": [
+                    "columnaOrigen",
+                    "columnaReferenciada",
+                    "tablaReferenciada",
+                    "tipoRelacion"
+                ]
+            },
+            "TablaRequest": {
+                "type": "object",
+                "description": "DTO para una tabla del modelo DDL.",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre de la tabla.",
+                        "example": "pago",
+                        "minLength": 1
+                    },
+                    "esquema": {
+                        "type": "string",
+                        "description": "Esquema al que pertenece.",
+                        "example": "public"
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "description": "Descripción semántica de la tabla.",
+                        "example": "Registra los pagos realizados por los clientes."
+                    },
+                    "columnas": {
+                        "type": "array",
+                        "description": "Columnas de la tabla.",
+                        "items": {
+                            "$ref": "#/components/schemas/ColumnaRequest"
+                        },
+                        "minItems": 1
+                    },
+                    "relaciones": {
+                        "type": "array",
+                        "description": "Relaciones (FKs) salientes.",
+                        "items": {
+                            "$ref": "#/components/schemas/RelacionRequest"
+                        }
+                    }
+                },
+                "required": [
+                    "columnas",
+                    "nombre"
+                ]
+            },
+            "ColumnaResponse": {
+                "type": "object",
+                "description": "Columna de una tabla extraída desde el script DDL.",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre de la columna.",
+                        "example": "monto"
+                    },
+                    "tipoDato": {
+                        "type": "string",
+                        "description": "Tipo de dato SQL.",
+                        "example": "NUMERIC(12,2)"
+                    },
+                    "esPk": {
+                        "type": "boolean",
+                        "description": "Indica si la columna es Primary Key.",
+                        "example": false
+                    },
+                    "esFk": {
+                        "type": "boolean",
+                        "description": "Indica si la columna es Foreign Key.",
+                        "example": false
+                    },
+                    "esNullable": {
+                        "type": "boolean",
+                        "description": "Indica si la columna admite NULL.",
+                        "example": false
+                    },
+                    "esUnique": {
+                        "type": "boolean",
+                        "description": "Indica si la columna es UNIQUE.",
+                        "example": false
+                    },
+                    "valorPorDefecto": {
+                        "type": "string",
+                        "description": "Valor por defecto declarado en el DDL.",
+                        "example": "0"
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "description": "Descripción semántica inferida.",
+                        "example": "Monto del pago en moneda local."
+                    }
+                }
+            },
+            "DocumentoDDLResponse": {
+                "type": "object",
+                "description": "DTO de respuesta de un Documento DDL con su estructura interpretada.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID único del documento.",
+                        "example": "6653d50711312d1174a61515"
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título del documento.",
+                        "example": "Modelo de datos - módulo de pagos"
+                    },
+                    "contenido": {
+                        "type": "string",
+                        "description": "Script DDL crudo enviado por el usuario."
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "description": "Tipo de documento.",
+                        "enum": [
+                            "SISTEMA",
+                            "NEGOCIO",
+                            "DDL",
+                            "LINEAMIENTO"
+                        ]
+                    },
+                    "motorBd": {
+                        "type": "string",
+                        "description": "Motor de base de datos.",
+                        "enum": [
+                            "POSTGRESQL",
+                            "MYSQL",
+                            "ORACLE",
+                            "SQLSERVER",
+                            "MARIADB"
+                        ]
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Versión del modelo de datos inferida.",
+                        "example": "1.0"
+                    },
+                    "tablas": {
+                        "type": "array",
+                        "description": "Tablas detectadas en el script.",
+                        "items": {
+                            "$ref": "#/components/schemas/TablaResponse"
+                        }
+                    },
+                    "fechaCreacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de creación."
+                    },
+                    "fechaActualizacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de última actualización."
+                    }
+                }
+            },
+            "RelacionResponse": {
+                "type": "object",
+                "description": "Relación (Foreign Key) entre tablas del script DDL.",
+                "properties": {
+                    "columnaOrigen": {
+                        "type": "string",
+                        "description": "Columna origen (FK).",
+                        "example": "cliente_id"
+                    },
+                    "tablaReferenciada": {
+                        "type": "string",
+                        "description": "Tabla referenciada.",
+                        "example": "cliente"
+                    },
+                    "columnaReferenciada": {
+                        "type": "string",
+                        "description": "Columna referenciada.",
+                        "example": "id"
+                    },
+                    "tipoRelacion": {
+                        "type": "string",
+                        "description": "Tipo de relación.",
+                        "enum": [
+                            "UNO_A_UNO",
+                            "UNO_A_MUCHOS",
+                            "MUCHOS_A_UNO",
+                            "MUCHOS_A_MUCHOS"
+                        ],
+                        "example": "MUCHOS_A_UNO"
+                    },
+                    "onDelete": {
+                        "type": "string",
+                        "description": "Acción ON DELETE.",
+                        "example": "CASCADE"
+                    },
+                    "onUpdate": {
+                        "type": "string",
+                        "description": "Acción ON UPDATE.",
+                        "example": "NO ACTION"
+                    }
+                }
+            },
+            "TablaResponse": {
+                "type": "object",
+                "description": "Tabla extraída desde el script DDL.",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre de la tabla.",
+                        "example": "pago"
+                    },
+                    "esquema": {
+                        "type": "string",
+                        "description": "Esquema al que pertenece.",
+                        "example": "public"
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "description": "Descripción semántica inferida.",
+                        "example": "Registra los pagos realizados por los clientes."
+                    },
+                    "columnas": {
+                        "type": "array",
+                        "description": "Columnas de la tabla.",
+                        "items": {
+                            "$ref": "#/components/schemas/ColumnaResponse"
+                        }
+                    },
+                    "relaciones": {
+                        "type": "array",
+                        "description": "Relaciones (FKs) salientes.",
+                        "items": {
+                            "$ref": "#/components/schemas/RelacionResponse"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

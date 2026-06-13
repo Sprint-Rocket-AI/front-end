@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppSelector } from "../../../commons/hooks/useAppSelector";
 import type { DocumentRecordInterface } from "../../../commons/interfaces/DocumentRecordInterface";
 import { ContextTypeSelector } from "../components/ContextTypeSelector";
@@ -11,7 +11,7 @@ import { DynamicDocumentViewer } from "../components/DynamicDocumentViewer";
 
 export const ContextBuilderPage = () => {
   const documents = useAppSelector((state) => state.documents.items);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [viewingRecord, setViewingRecord] = useState<DocumentRecordInterface | null>(null);
   const {
     tipo,
@@ -33,11 +33,31 @@ export const ContextBuilderPage = () => {
     mode,
   } = useContextBuilder();
 
-  const handleSave = () => {
-    saveCurrentDocument();
-    setShowStructuredForm(false);
-    const docTitle = formData?.titulo || "Documento sin título";
-    setToastMessage(`El documento "${docTitle}" ha sido guardado.`);
+  useEffect(() => {
+    const handleApiError = (event: Event) => {
+      const customEvent = event as CustomEvent<string>;
+      setToast({
+        message: customEvent.detail || "Hubo un error, reintentar más tarde",
+        type: "error",
+      });
+    };
+
+    window.addEventListener("api-error", handleApiError);
+    return () => {
+      window.removeEventListener("api-error", handleApiError);
+    };
+  }, []);
+
+  const handleSave = async () => {
+    const success = await saveCurrentDocument();
+    if (success) {
+      setShowStructuredForm(false);
+      const docTitle = formData?.titulo || "Documento sin título";
+      setToast({
+        message: `El documento "${docTitle}" ha sido guardado.`,
+        type: "success",
+      });
+    }
   };
 
   return (
@@ -88,8 +108,8 @@ export const ContextBuilderPage = () => {
         />
       </section>
 
-      {toastMessage && (
-        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
 
       <DynamicDocumentViewer

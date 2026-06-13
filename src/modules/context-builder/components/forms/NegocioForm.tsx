@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import type { DocumentoNegocioRequestInterface } from "../../interfaces/DocumentoNegocioRequestInterface";
 import { CommonDocumentFields } from "./CommonDocumentFields";
 
@@ -7,13 +8,21 @@ interface NegocioFormProps {
 }
 
 export const NegocioForm = ({ data, onChange }: NegocioFormProps) => {
-  const updateField = <K extends keyof DocumentoNegocioRequestInterface>(
-    field: K,
-    value: DocumentoNegocioRequestInterface[K],
-  ) => {
+  const [localCriterios, setLocalCriterios] = useState(() => data.criteriosAceptacion.join("\n"));
+
+  useEffect(() => {
+    const currentVal = data.criteriosAceptacion.join("\n");
+    if (localCriterios !== currentVal) {
+      setLocalCriterios(currentVal);
+    }
+  }, [data.criteriosAceptacion]);
+
+  const handleCriteriosChange = (val: string) => {
+    setLocalCriterios(val);
+    const lines = val.split(/\r?\n/);
     onChange({
       ...data,
-      [field]: value,
+      criteriosAceptacion: lines,
     });
   };
 
@@ -29,16 +38,8 @@ export const NegocioForm = ({ data, onChange }: NegocioFormProps) => {
           <textarea
             id="criteriosAceptacion"
             className="field min-h-28"
-            value={data.criteriosAceptacion.join("\n")}
-            onChange={(event) =>
-              updateField(
-                "criteriosAceptacion",
-                event.target.value
-                  .split(/\r?\n/)
-                  .map((item) => item.trim())
-                  .filter(Boolean),
-              )
-            }
+            value={localCriterios}
+            onChange={(event) => handleCriteriosChange(event.target.value)}
             placeholder="Un criterio por línea"
           />
         </div>

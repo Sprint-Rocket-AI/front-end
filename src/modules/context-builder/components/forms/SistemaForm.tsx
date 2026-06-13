@@ -21,30 +21,28 @@ export const SistemaForm = ({ data, onChange }: SistemaFormProps) => {
   return (
     <div className="space-y-6">
       <CommonDocumentFields data={data} onChange={onChange} />
-
-      <div className="grid gap-4 md:grid-cols-3">
+      <TagListInput
+        id="repos"
+        label="Repositorios"
+        values={data.urlRepos}
+        onChange={(nextValues) => updateField("urlRepos", nextValues)}
+        placeholder="Escribe un repositorio y presiona Enter"
+      />
+      <div className="grid gap-4 md:grid-cols-2">
         <TagListInput
-            id="repos"
-            label="Repositorios"
-            values={data.urlRepos}
-            onChange={(nextValues) => updateField("urlRepos", nextValues)}
-            placeholder="Escribe un repositorio y presiona Enter"
+          id="stack"
+          label="Stack"
+          values={data.stack}
+          onChange={(nextValues) => updateField("stack", nextValues)}
+          placeholder="Escribe una tecnología y presiona Enter"
         />
 
         <TagListInput
-            id="stack"
-            label="Stack"
-            values={data.stack}
-            onChange={(nextValues) => updateField("stack", nextValues)}
-            placeholder="Escribe una tecnología y presiona Enter"
-        />
-
-        <TagListInput
-            id="devs"
-            label="Developers"
-            values={data.devs}
-            onChange={(nextValues) => updateField("devs", nextValues)}
-            placeholder="Escribe un nombre y presiona Enter"
+          id="devs"
+          label="Developers"
+          values={data.devs}
+          onChange={(nextValues) => updateField("devs", nextValues)}
+          placeholder="Escribe un nombre y presiona Enter"
         />
       </div>
     </div>

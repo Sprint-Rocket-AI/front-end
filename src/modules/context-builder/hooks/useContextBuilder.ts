@@ -104,10 +104,10 @@ export const useContextBuilder = () => {
     setFeedback("Formulario vacío.");
   };
 
-  const saveCurrentDocument = async () => {
+  const saveCurrentDocument = async (): Promise<boolean> => {
     if (!tipo || !formData) {
       setFeedback("Genera o crea un formulario antes de guardar.");
-      return;
+      return false;
     }
 
     setIsGenerating(true);
@@ -145,31 +145,11 @@ export const useContextBuilder = () => {
       setEditingId(id);
       setMode("edit");
       setFeedback(`Documento "${nextData.titulo || id}" guardado con éxito en el servidor.`);
+      return true;
     } catch (error) {
       console.error(error);
-      setFeedback("Error al guardar en el servidor. Se guardó localmente en Redux.");
-
-      const timestamp = new Date().toISOString();
-      const id = editingId ?? crypto.randomUUID();
-      const nextData = {
-        ...formData,
-        id,
-        createdAt: formData.createdAt ?? timestamp,
-        updatedAt: timestamp,
-      };
-
-      dispatch(
-        upsertDocument({
-          id,
-          tipo,
-          data: nextData,
-        }),
-      );
-
-      setFormData(nextData);
-      setInitialState(nextData);
-      setEditingId(id);
-      setMode("edit");
+      setFeedback("Error al guardar en el servidor.");
+      return false;
     } finally {
       setIsGenerating(false);
     }

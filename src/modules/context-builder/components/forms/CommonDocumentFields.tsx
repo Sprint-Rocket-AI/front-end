@@ -27,36 +27,6 @@ export const CommonDocumentFields = <T extends BaseDocumentInterface>({
         <input id="titulo" className="field" value={data.titulo} onChange={(event) => updateField("titulo", event.target.value)} />
       </div>
 
-      <div>
-        <label className="label" htmlFor="proyectoId">
-          Proyecto ID
-        </label>
-        <input
-          id="proyectoId"
-          className="field"
-          value={data.proyectoId}
-          onChange={(event) => updateField("proyectoId", event.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="label" htmlFor="estado">
-          Estado
-        </label>
-        <select
-          id="estado"
-          className="field"
-          value={data.estado}
-          onChange={(event) => updateField("estado", event.target.value as DocumentEstadoEnum)}
-        >
-          {Object.values(DocumentEstadoEnum).map((estado) => (
-            <option key={estado} value={estado}>
-              {estado}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <div className="md:col-span-2">
         <label className="label" htmlFor="contenido">
           Contenido

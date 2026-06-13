@@ -14,20 +14,6 @@ const cleanLines = (value: string) =>
     .map((line) => line.trim())
     .filter(Boolean);
 
-const normalizeStringList = (value: string | string[] | undefined) => {
-  if (Array.isArray(value)) {
-    return value.map((item) => item.trim()).filter(Boolean);
-  }
-
-  if (typeof value === "string") {
-    return value
-      .split(/\r?\n|,/)
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-
-  return [];
-};
 
 const extractTags = (rawText: string) =>
   Array.from(
@@ -43,8 +29,6 @@ const extractTags = (rawText: string) =>
 const createBaseDocument = (rawText = ""): BaseDocumentInterface => ({
   titulo: cleanLines(rawText)[0] ?? "",
   contenido: rawText,
-  proyectoId: "",
-  estado: DocumentEstadoEnum.BORRADOR,
   tags: extractTags(rawText),
   createdAt: getNow(),
   updatedAt: getNow(),
@@ -99,9 +83,6 @@ export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnion
     case DocumentTipoEnum.LINEAMIENTO:
       return {
         ...base,
-        lineamiento: "",
-        dominio: [],
-        categoria: [],
       };
   }
 };
@@ -153,9 +134,6 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
       return {
         ...createEmptyDocumentByType(tipo),
         ...base,
-        lineamiento: createExcerpt(rawText),
-        dominio: ["Arquitectura"],
-        categoria: ["General"],
       };
   }
 };

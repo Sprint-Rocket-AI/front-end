@@ -22,7 +22,7 @@ export const DynamicDocumentViewer = ({ tipo, data, isOpen, onClose }: DynamicDo
   return (
     <div className="fixed inset-0 z-40 overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-[2px] sm:p-6 flex items-center justify-center">
       <div className="w-full max-w-3xl rounded-[1.75rem] border border-slate-200 bg-white/95 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-slate-900/95 max-h-[85vh] overflow-y-auto space-y-6 animate-fade-in">
-        
+
         {/* Header */}
         <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 dark:border-slate-800 md:flex-row md:items-start md:justify-between">
           <div>
@@ -30,11 +30,6 @@ export const DynamicDocumentViewer = ({ tipo, data, isOpen, onClose }: DynamicDo
             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 sm:text-2xl mt-1">
               {data.titulo || "Documento sin título"}
             </h2>
-            {data.proyectoId && (
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                Proyecto: <span className="font-semibold text-slate-600 dark:text-slate-300">{data.proyectoId}</span>
-              </p>
-            )}
           </div>
           <button
             type="button"
@@ -55,7 +50,6 @@ export const DynamicDocumentViewer = ({ tipo, data, isOpen, onClose }: DynamicDo
 
         {/* Footer Meta */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500">
-          <div>Estado: <span className="font-semibold text-orange-500 uppercase tracking-wider">{data.estado}</span></div>
           {data.updatedAt && (
             <div>Actualizado: {new Date(data.updatedAt).toLocaleString("es-CL")}</div>
           )}

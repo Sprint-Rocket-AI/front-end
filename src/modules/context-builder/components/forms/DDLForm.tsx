@@ -44,9 +44,10 @@ export const DDLForm = ({ data, onChange }: DDLFormProps) => {
           <select
             id="motorBd"
             className="field"
-            value={data.motorBd}
+            value={data.motorBd || ""}
             onChange={(event) => updateField("motorBd", event.target.value as DocumentoDDLRequestInterface["motorBd"])}
           >
+            <option value="" disabled>Elija una opción</option>
             <option value="POSTGRESQL">POSTGRESQL</option>
             <option value="MYSQL">MYSQL</option>
             <option value="ORACLE">ORACLE</option>
@@ -75,7 +76,7 @@ export const DDLForm = ({ data, onChange }: DDLFormProps) => {
         </div>
 
         {data.tablas.map((table, tableIndex) => (
-          <article key={`${tableIndex}-${table.nombre || "tabla"}`} className="rounded-3xl border border-slate-200/80 p-4 dark:border-slate-700 sm:p-5">
+          <article key={tableIndex} className="rounded-3xl border border-slate-200/80 p-4 dark:border-slate-700 sm:p-5">
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <label className="label">Nombre tabla</label>
@@ -127,76 +128,98 @@ export const DDLForm = ({ data, onChange }: DDLFormProps) => {
                 </div>
               </div>
 
-              {table.columnas.map((column, columnIndex) => (
-                <div key={`${tableIndex}-${columnIndex}-${column.nombre || "col"}`} className="grid gap-3 rounded-2xl bg-slate-100/70 p-4 dark:bg-slate-800/60 xl:grid-cols-6">
-                  <input
-                    className="field xl:col-span-2"
-                    value={column.nombre}
-                    onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, nombre: event.target.value })}
-                    placeholder="nombre"
-                  />
-                  <input
-                    className="field"
-                    value={column.tipoDato}
-                    onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, tipoDato: event.target.value })}
-                    placeholder="tipoDato"
-                  />
-                  <input
-                    className="field xl:col-span-2"
-                    value={column.descripcion ?? ""}
-                    onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, descripcion: event.target.value })}
-                    placeholder="descripcion"
-                  />
-                  <button
-                    type="button"
-                    className="action-secondary w-full xl:w-auto"
-                    onClick={() =>
-                      updateTable(tableIndex, {
-                        ...table,
-                        columnas: table.columnas.filter((_, index) => index !== columnIndex),
-                      })
-                    }
-                    disabled={table.columnas.length === 1}
-                  >
-                    Eliminar
-                  </button>
+              <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
+                {table.columnas.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex flex-col gap-4 rounded-2xl bg-slate-100/70 p-4 dark:bg-slate-800/60">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <div className="flex-1">
+                        <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Nombre</label>
+                        <input
+                          className="field w-full"
+                          value={column.nombre}
+                          onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, nombre: event.target.value })}
+                          placeholder="Ej: id_usuario"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Tipo de Dato</label>
+                        <input
+                          className="field w-full"
+                          value={column.tipoDato}
+                          onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, tipoDato: event.target.value })}
+                          placeholder="Ej: uuid, varchar(50)"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Descripción</label>
+                      <input
+                        className="field w-full"
+                        value={column.descripcion ?? ""}
+                        onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, descripcion: event.target.value })}
+                        placeholder="Propósito de la columna..."
+                      />
+                    </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2 xl:col-span-5 xl:grid-cols-4">
-                    <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <input
-                        type="checkbox"
-                        checked={column.esPk}
-                        onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esPk: event.target.checked })}
-                      />
-                      PK
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <input
-                        type="checkbox"
-                        checked={column.esFk}
-                        onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esFk: event.target.checked })}
-                      />
-                      FK
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <input
-                        type="checkbox"
-                        checked={column.esNullable}
-                        onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esNullable: event.target.checked })}
-                      />
-                      Nullable
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <input
-                        type="checkbox"
-                        checked={column.esUnique}
-                        onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esUnique: event.target.checked })}
-                      />
-                      Unique
-                    </label>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2 pt-3 border-t border-slate-200 dark:border-slate-700/50">
+                      <div className="flex flex-wrap gap-4">
+                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={column.esPk}
+                            onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esPk: event.target.checked })}
+                            className="rounded border-slate-300 text-orange-500 focus:ring-orange-500 dark:border-slate-600 dark:bg-slate-700"
+                          />
+                          PK
+                        </label>
+                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={column.esFk}
+                            onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esFk: event.target.checked })}
+                            className="rounded border-slate-300 text-orange-500 focus:ring-orange-500 dark:border-slate-600 dark:bg-slate-700"
+                          />
+                          FK
+                        </label>
+                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={column.esNullable}
+                            onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esNullable: event.target.checked })}
+                            className="rounded border-slate-300 text-orange-500 focus:ring-orange-500 dark:border-slate-600 dark:bg-slate-700"
+                          />
+                          Nullable
+                        </label>
+                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={column.esUnique}
+                            onChange={(event) => updateColumn(tableIndex, columnIndex, { ...column, esUnique: event.target.checked })}
+                            className="rounded border-slate-300 text-orange-500 focus:ring-orange-500 dark:border-slate-600 dark:bg-slate-700"
+                          />
+                          Unique
+                        </label>
+                      </div>
+                      
+                      <button
+                        type="button"
+                        className="text-sm font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() =>
+                          updateTable(tableIndex, {
+                            ...table,
+                            columnas: table.columnas.filter((_, index) => index !== columnIndex),
+                          })
+                        }
+                        disabled={table.columnas.length === 1}
+                        title="Eliminar columna"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </article>
         ))}

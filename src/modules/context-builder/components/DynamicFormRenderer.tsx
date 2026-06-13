@@ -63,8 +63,8 @@ export const DynamicFormRenderer = ({
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <p className="text-sm text-slate-500 dark:text-slate-400">Modo: {modeLabel}</p>
-              <button type="button" className="action-secondary w-full sm:w-auto" onClick={onClose}>
-                Cerrar
+              <button type="button" className="action-secondary self-start md:self-auto py-2 px-4" onClick={onClose}>
+                ❌
               </button>
             </div>
           </div>

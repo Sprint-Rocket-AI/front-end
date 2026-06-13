@@ -4,6 +4,5 @@ import { DocumentTipoEnum } from "../../modules/context-builder/interfaces/Docum
 export interface DocumentRecordInterface {
   id: string;
   tipo: DocumentTipoEnum;
-  origin: "AI" | "MANUAL";
   data: DocumentUnionType;
 }

@@ -67,10 +67,7 @@ export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnion
     case DocumentTipoEnum.NEGOCIO:
       return {
         ...base,
-        fuente: "" as any,
-        urlFuente: "",
         criteriosAceptacion: [],
-        resumen: "",
       };
     case DocumentTipoEnum.SISTEMA:
       return {
@@ -119,7 +116,6 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
       return {
         ...createEmptyDocumentByType(tipo),
         ...base,
-        resumen: createExcerpt(rawText),
         criteriosAceptacion: cleanLines(rawText).slice(0, 4),
       };
     case DocumentTipoEnum.SISTEMA:

@@ -36,7 +36,7 @@ export const DynamicDocumentViewer = ({ tipo, data, isOpen, onClose }: DynamicDo
             className="action-secondary self-start md:self-auto py-2 px-4 text-xs"
             onClick={onClose}
           >
-            Cerrar
+            ❌
           </button>
         </div>
 

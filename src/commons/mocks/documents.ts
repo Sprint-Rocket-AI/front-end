@@ -1,12 +1,10 @@
 import type { DocumentRecordInterface } from "../interfaces/DocumentRecordInterface";
-import { DocumentEstadoEnum } from "../../modules/context-builder/interfaces/DocumentEstadoEnum";
 import { DocumentTipoEnum } from "../../modules/context-builder/interfaces/DocumentTipoEnum";
 
 export const mockDocuments: DocumentRecordInterface[] = [
   {
     id: "demo-negocio-1",
     tipo: DocumentTipoEnum.NEGOCIO,
-    origin: "AI",
     data: {
       id: "demo-negocio-1",
       titulo: "Flujo de onboarding digital",
@@ -14,19 +12,15 @@ export const mockDocuments: DocumentRecordInterface[] = [
       tags: ["onboarding", "cliente"],
       createdAt: "2026-06-05T10:00:00.000Z",
       updatedAt: "2026-06-05T10:00:00.000Z",
-      fuente: "CONFLUENCE",
-      urlFuente: "https://confluence.local/onboarding",
       criteriosAceptacion: [
         "El usuario completa identidad en menos de 3 minutos.",
         "La evidencia queda disponible para auditoría.",
       ],
-      resumen: "Documento base para el flujo de onboarding y firma electrónica.",
     },
   },
   {
     id: "demo-sistema-1",
     tipo: DocumentTipoEnum.SISTEMA,
-    origin: "MANUAL",
     data: {
       id: "demo-sistema-1",
       titulo: "Portal Context Builder",

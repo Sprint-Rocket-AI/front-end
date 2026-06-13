@@ -6,36 +6,14 @@ interface NegocioViewerProps {
 
 export const NegocioViewer = ({ data }: NegocioViewerProps) => (
   <div className="space-y-4">
-    {data.resumen && (
+    {data.contenido && (
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Resumen del Requerimiento</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Contenido del Documento</p>
         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50/50 p-4 rounded-2xl border border-slate-100 dark:bg-slate-900/30 dark:border-slate-800">
-          {data.resumen}
+          {data.contenido}
         </p>
       </div>
     )}
-
-    <div className="grid gap-4 sm:grid-cols-2">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Fuente de Origen</p>
-        <span className="inline-block mt-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-orange-500/10 text-orange-500 dark:bg-orange-500/20">
-          {data.fuente || "OTRO"}
-        </span>
-      </div>
-      {data.urlFuente && (
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Enlace de Referencia</p>
-          <a
-            href={data.urlFuente}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-1 text-xs font-medium text-blue-500 hover:underline truncate max-w-full"
-          >
-            {data.urlFuente}
-          </a>
-        </div>
-      )}
-    </div>
 
     {data.criteriosAceptacion && data.criteriosAceptacion.length > 0 && (
       <div className="space-y-2">

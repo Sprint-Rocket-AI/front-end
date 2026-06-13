@@ -104,7 +104,6 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
             type="button"
             onClick={onToggleTheme}
             className="action-ghost !border-slate-200 !text-slate-600 hover:!bg-slate-50 dark:!border-white/10 dark:!bg-white/5 dark:!text-slate-200 dark:hover:!border-accent-500/40 dark:hover:!bg-white/10"
-            title={isDark ? "Cambiar a claro" : "Cambiar a oscuro"}
           >
             {isDark ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -119,7 +118,6 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             )}
-            <span className="hidden sm:inline">{isDark ? "Cambiar a claro" : "Cambiar a oscuro"}</span>
           </button>
 
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-assistant-gradient text-sm font-bold text-white shadow-glow-assistant">

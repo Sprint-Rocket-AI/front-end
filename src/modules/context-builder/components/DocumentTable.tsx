@@ -34,14 +34,6 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
                 <p className="mt-1 text-slate-700 dark:text-slate-200">{record.tipo}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Origen</p>
-                <p className="mt-1 text-slate-700 dark:text-slate-200">{record.origin}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Estado</p>
-                <p className="mt-1 text-slate-700 dark:text-slate-200">{record.data.estado}</p>
-              </div>
-              <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Actualizado</p>
                 <p className="mt-1 text-slate-700 dark:text-slate-200">{record.data.updatedAt?.slice(0, 10) ?? "-"}</p>
               </div>
@@ -85,8 +77,6 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
           <tr className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             <th className="px-4">Título</th>
             <th className="px-4">Tipo</th>
-            <th className="px-4">Estado</th>
-            <th className="px-4">Origen</th>
             <th className="px-4">Actualizado</th>
             <th className="px-4">Acciones</th>
           </tr>
@@ -96,8 +86,6 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
             <tr key={record.id} className="rounded-2xl bg-slate-100/90 text-slate-700 dark:bg-slate-800/70 dark:text-slate-100">
               <td className="rounded-l-2xl px-4 py-4 font-medium">{record.data.titulo}</td>
               <td className="px-4 py-4">{record.tipo}</td>
-              <td className="px-4 py-4">{record.data.estado}</td>
-              <td className="px-4 py-4">{record.origin}</td>
               <td className="px-4 py-4">{record.data.updatedAt?.slice(0, 10) ?? "-"}</td>
               <td className="rounded-r-2xl px-4 py-4">
                 <div className="flex items-center gap-2">

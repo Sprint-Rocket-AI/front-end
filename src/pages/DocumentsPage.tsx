@@ -50,17 +50,6 @@ export const DocumentsPage = () => {
                     {record.data.contenido?.slice(0, 140) || "Sin contenido disponible."}
                   </p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Estado</p>
-                    <p className="mt-1 text-slate-700 dark:text-slate-200">{record.data.estado}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Origen</p>
-                    <p className="mt-1 text-slate-700 dark:text-slate-200">{record.origin}</p>
-                  </div>
-                </div>
               </div>
 
               <button

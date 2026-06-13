@@ -50,8 +50,8 @@ export const DynamicDocumentViewer = ({ tipo, data, isOpen, onClose }: DynamicDo
 
         {/* Footer Meta */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500">
-          {data.updatedAt && (
-            <div>Actualizado: {new Date(data.updatedAt).toLocaleString("es-CL")}</div>
+          {data.fechaActualizacion && (
+            <div>Actualizado: {new Date(data.fechaActualizacion).toLocaleString("es-CL")}</div>
           )}
         </div>
       </div>

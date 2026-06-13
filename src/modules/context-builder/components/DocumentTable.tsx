@@ -11,7 +11,7 @@ interface DocumentTableProps {
 export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentTableProps) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const filteredDocs = useMemo(() => {
     if (!search) return documents;
@@ -67,7 +67,7 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Actualizado</p>
-                    <p className="mt-1 text-slate-700 dark:text-slate-200">{record.data.updatedAt?.slice(0, 10) ?? "-"}</p>
+                    <p className="mt-1 text-slate-700 dark:text-slate-200">{record.data.fechaActualizacion?.slice(0, 10) ?? "-"}</p>
                   </div>
                 </div>
 
@@ -110,6 +110,7 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
             <tr className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
               <th className="px-4">Título</th>
               <th className="px-4">Tipo</th>
+              <th className="px-4">Creado</th>
               <th className="px-4">Actualizado</th>
               <th className="px-4">Acciones</th>
             </tr>
@@ -126,7 +127,8 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
                 <tr key={record.id} className="rounded-2xl bg-slate-100/90 text-slate-700 dark:bg-slate-800/70 dark:text-slate-100">
                   <td className="rounded-l-2xl px-4 py-4 font-medium">{record.data.titulo}</td>
                   <td className="px-4 py-4">{record.tipo}</td>
-                  <td className="px-4 py-4">{record.data.updatedAt?.slice(0, 10) ?? "-"}</td>
+                  <td className="px-4 py-4">{record.data.fechaCreacion?.slice(0, 10) ?? "-"}</td>
+                  <td className="px-4 py-4">{record.data.fechaActualizacion?.slice(0, 10) ?? "-"}</td>
                   <td className="rounded-r-2xl px-4 py-4">
                     <div className="flex items-center gap-2">
                       <button
@@ -169,12 +171,30 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Página <span className="font-semibold text-slate-700 dark:text-slate-300">{page}</span> de <span className="font-semibold text-slate-700 dark:text-slate-300">{totalPages}</span>
-          </p>
-          <div className="flex items-center gap-2">
+      {(totalPages > 1 || filteredDocs.length > 5) && (
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Página <span className="font-semibold text-slate-700 dark:text-slate-300">{page}</span> de <span className="font-semibold text-slate-700 dark:text-slate-300">{totalPages}</span>
+            </p>
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <span>Mostrar:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="field text-xs py-1 pl-2 pr-6 rounded-md bg-transparent border-slate-200 dark:border-slate-700 focus:ring-1"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}

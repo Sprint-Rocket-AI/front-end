@@ -3,4 +3,5 @@ export enum DocumentTipoEnum {
   NEGOCIO = "NEGOCIO",
   SISTEMA = "SISTEMA",
   LINEAMIENTO = "LINEAMIENTO",
+  PDF = "PDF",
 }

@@ -185,8 +185,8 @@ Todos los documentos comparten una base común:
 - `proyectoId`
 - `estado`
 - `tags?`
-- `createdAt?`
-- `updatedAt?`
+- `fechaCreacion?`
+- `fechaActualizacion?`
 
 Los tipos soportados actualmente están definidos en `DocumentTipoEnum`:
 

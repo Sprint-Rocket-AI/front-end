@@ -30,5 +30,16 @@ export const LineamientoViewer = ({ data }: LineamientoViewerProps) => (
         </div>
       </div>
     )}
+
+    {(data.fechaCreacion || data.fechaActualizacion) && (
+      <div className="flex flex-wrap items-center gap-4 pt-4 mt-6 text-xs text-slate-400 dark:text-slate-500">
+        {data.fechaCreacion && (
+          <div>Creado: {new Date(data.fechaCreacion).toLocaleString("es-CL")}</div>
+        )}
+        {data.fechaActualizacion && (
+          <div>Actualizado: {new Date(data.fechaActualizacion).toLocaleString("es-CL")}</div>
+        )}
+      </div>
+    )}
   </div>
 );

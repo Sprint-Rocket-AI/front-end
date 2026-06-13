@@ -4,6 +4,6 @@ export interface BaseDocumentInterface {
   titulo: string;
   contenido: string;
   tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
+  fechaCreacion?: string;
+  fechaActualizacion?: string;
 }

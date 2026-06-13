@@ -7,6 +7,7 @@ import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
 import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import { createEmptyDocumentByType, createFallbackFromRawText, mergeAiResult } from "../templates/documentTemplates";
 import { DocumentServiceFactory } from "../../../services/DocumentServiceFactory";
+import { DocumentoContextService } from "../../../services/DocumentoContextService";
 
 export const useContextBuilder = () => {
   const feedbackInitial = "Selecciona un tipo de documento para comenzar a construir el contexto.";
@@ -116,20 +117,20 @@ export const useContextBuilder = () => {
       let response;
       const isEdit = mode === "edit" && editingId;
 
+      const { fechaCreacion, fechaActualizacion, ...payloadToSend } = formData as any;
+
       if (isEdit) {
-        response = await service.update(editingId, formData as any);
+        response = await service.update(editingId, payloadToSend);
       } else {
-        response = await service.create(formData as any);
+        response = await service.create(payloadToSend);
       }
 
       const savedData = response.data;
-      const timestamp = new Date().toISOString();
       const id = savedData.id || editingId || crypto.randomUUID();
       const nextData = {
         ...savedData,
         id,
-        createdAt: savedData.createdAt || formData.createdAt || timestamp,
-        updatedAt: timestamp,
+        fechaCreacion: savedData.fechaCreacion,
       };
 
       dispatch(
@@ -179,20 +180,26 @@ export const useContextBuilder = () => {
     }
   };
 
-  const deleteById = (id: string) => {
-    dispatch(removeDocument(id));
+  const deleteById = async (id: string) => {
+    try {
+      await DocumentoContextService.deleteById(id);
+      dispatch(removeDocument(id));
 
-    if (editingId === id) {
-      setEditingId(null);
-      setMode("create");
-      setShowStructuredForm(false);
-      setFormData(tipo ? createEmptyDocumentByType(tipo) : null);
-      setInitialState(null);
-      setFeedback("Deleted document and cleared the active editor.");
-      return;
+      if (editingId === id) {
+        setEditingId(null);
+        setMode("create");
+        setShowStructuredForm(false);
+        setFormData(tipo ? createEmptyDocumentByType(tipo) : null);
+        setInitialState(null);
+        setFeedback("Deleted document and cleared the active editor.");
+        return;
+      }
+
+      setFeedback("Document deleted.");
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      setFeedback("Error al eliminar el documento en el servidor.");
     }
-
-    setFeedback("Document deleted.");
   };
 
 

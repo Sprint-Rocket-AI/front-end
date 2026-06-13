@@ -10,6 +10,7 @@ const options = [
   DocumentTipoEnum.DDL,
   DocumentTipoEnum.SISTEMA,
   DocumentTipoEnum.LINEAMIENTO,
+  DocumentTipoEnum.PDF,
 ];
 
 export const ContextTypeSelector = ({ value, onChange }: ContextTypeSelectorProps) => (

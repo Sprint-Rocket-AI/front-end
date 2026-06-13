@@ -14,6 +14,9 @@ const documentsSlice = createSlice({
   name: "documents",
   initialState,
   reducers: {
+    setDocuments: (state, action: PayloadAction<DocumentRecordInterface[]>) => {
+      state.items = action.payload;
+    },
     upsertDocument: (state, action: PayloadAction<DocumentRecordInterface>) => {
       const index = state.items.findIndex((item) => item.id === action.payload.id);
 
@@ -30,5 +33,5 @@ const documentsSlice = createSlice({
   },
 });
 
-export const { removeDocument, upsertDocument } = documentsSlice.actions;
+export const { removeDocument, upsertDocument, setDocuments } = documentsSlice.actions;
 export default documentsSlice.reducer;

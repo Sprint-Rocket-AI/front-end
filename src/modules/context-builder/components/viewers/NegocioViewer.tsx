@@ -28,5 +28,29 @@ export const NegocioViewer = ({ data }: NegocioViewerProps) => (
         </ul>
       </div>
     )}
+
+    {data.tags && data.tags.length > 0 && (
+      <div className="space-y-2 pt-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Tags</p>
+        <div className="flex flex-wrap gap-2">
+          {data.tags.map((tag, idx) => (
+            <span key={idx} className="inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-medium text-orange-600 ring-1 ring-inset ring-orange-500/20 dark:bg-orange-500/10 dark:text-orange-400 dark:ring-orange-500/20">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {(data.fechaCreacion || data.fechaActualizacion) && (
+      <div className="flex flex-wrap items-center gap-4 pt-4 mt-6 text-xs text-slate-400 dark:text-slate-500">
+        {data.fechaCreacion && (
+          <div>Creado: {new Date(data.fechaCreacion).toLocaleString("es-CL")}</div>
+        )}
+        {data.fechaActualizacion && (
+          <div>Actualizado: {new Date(data.fechaActualizacion).toLocaleString("es-CL")}</div>
+        )}
+      </div>
+    )}
   </div>
 );

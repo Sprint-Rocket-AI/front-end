@@ -34,7 +34,7 @@ export const DDLViewer = ({ data }: DDLViewerProps) => (
                 <p className="text-xs italic text-slate-500 dark:text-slate-400">{tabla.descripcion}</p>
               )}
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full text-xs font-mono">
                 <thead>
@@ -75,6 +75,17 @@ export const DDLViewer = ({ data }: DDLViewerProps) => (
       </div>
     ) : (
       <p className="text-sm text-slate-400">No hay tablas especificadas.</p>
+    )}
+
+    {(data.fechaCreacion || data.fechaActualizacion) && (
+      <div className="flex flex-wrap items-center gap-4 pt-4 mt-6 text-xs text-slate-400 dark:text-slate-500">
+        {data.fechaCreacion && (
+          <div>Creado: {new Date(data.fechaCreacion).toLocaleString("es-CL")}</div>
+        )}
+        {data.fechaActualizacion && (
+          <div>Actualizado: {new Date(data.fechaActualizacion).toLocaleString("es-CL")}</div>
+        )}
+      </div>
     )}
   </div>
 );

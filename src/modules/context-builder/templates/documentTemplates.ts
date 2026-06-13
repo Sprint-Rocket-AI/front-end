@@ -29,8 +29,8 @@ const createBaseDocument = (rawText = ""): BaseDocumentInterface => ({
   titulo: cleanLines(rawText)[0] ?? "",
   contenido: rawText,
   tags: extractTags(rawText),
-  createdAt: getNow(),
-  updatedAt: getNow(),
+  fechaCreacion: getNow(),
+  fechaActualizacion: getNow(),
 });
 
 export const createEmptyColumn = (): ColumnaInterface => ({

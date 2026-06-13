@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAppSelector } from "../../../commons/hooks/useAppSelector";
+import { useAppDispatch } from "../../../commons/hooks/useAppDispatch";
+import { setDocuments } from "../../../store/slices/documentsSlice";
+import { DocumentoContextService } from "../../../services/DocumentoContextService";
 import type { DocumentRecordInterface } from "../../../commons/interfaces/DocumentRecordInterface";
 import { ContextTypeSelector } from "../components/ContextTypeSelector";
 import { DocumentTable } from "../components/DocumentTable";
@@ -8,11 +11,16 @@ import { RawInputArea } from "../components/RawInputArea";
 import { useContextBuilder } from "../hooks/useContextBuilder";
 import { Toast } from "../components/Toast";
 import { DynamicDocumentViewer } from "../components/DynamicDocumentViewer";
+import { ConfirmModal } from "../../../commons/components/ConfirmModal";
+import { PdfUploader } from "../components/PdfUploader";
+import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 
 export const ContextBuilderPage = () => {
   const documents = useAppSelector((state) => state.documents.items);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const dispatch = useAppDispatch();
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const [viewingRecord, setViewingRecord] = useState<DocumentRecordInterface | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const {
     tipo,
     setTipo,
@@ -32,6 +40,27 @@ export const ContextBuilderPage = () => {
     isGenerating,
     mode,
   } = useContextBuilder();
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await DocumentoContextService.getAll();
+        const mappedDocuments = response.data.map((doc: any) => ({
+          id: doc.id,
+          tipo: doc.tipo,
+          data: {
+            ...doc,
+            fechaCreacion: doc.fechaCreacion,
+            fechaActualizacion: doc.fechaActualizacion,
+          },
+        }));
+        dispatch(setDocuments(mappedDocuments));
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+      }
+    };
+    fetchDocuments();
+  }, [dispatch]);
 
   useEffect(() => {
     const handleApiError = (event: Event) => {
@@ -72,14 +101,21 @@ export const ContextBuilderPage = () => {
 
             <ContextTypeSelector value={tipo} onChange={setTipo} />
 
-            <RawInputArea
-              value={rawText}
-              onChange={setRawText}
-              onGenerate={generateFromAI}
-              onCreateManual={startManualForm}
-              isGenerating={isGenerating}
-              disabled={!tipo}
-            />
+            {tipo === DocumentTipoEnum.PDF ? (
+              <PdfUploader
+                onSuccess={(msg) => setToast({ message: msg, type: "success" })}
+                onError={(msg) => setToast({ message: msg, type: "error" })}
+              />
+            ) : (
+              <RawInputArea
+                value={rawText}
+                onChange={setRawText}
+                onGenerate={generateFromAI}
+                onCreateManual={startManualForm}
+                isGenerating={isGenerating}
+                disabled={!tipo}
+              />
+            )}
 
             <div className="rounded-2xl border border-orange-200/50 bg-orange-50 px-4 py-3 text-sm text-slate-700 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-100">
               {feedback}
@@ -104,12 +140,12 @@ export const ContextBuilderPage = () => {
           documents={documents}
           onView={(record) => setViewingRecord(record)}
           onEdit={beginEdit}
-          onDelete={deleteById}
+          onDelete={(id) => setDeletingId(id)}
         />
       </section>
 
       {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        <Toast message={toast.message} onClose={() => setToast(null)} />
       )}
 
       <DynamicDocumentViewer
@@ -117,6 +153,21 @@ export const ContextBuilderPage = () => {
         data={viewingRecord?.data ?? null}
         isOpen={Boolean(viewingRecord)}
         onClose={() => setViewingRecord(null)}
+      />
+
+      <ConfirmModal
+        isOpen={Boolean(deletingId)}
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este documento? Esta acción no se puede deshacer."
+        confirmText="Sí, eliminar"
+        onConfirm={async () => {
+          if (deletingId) {
+            await deleteById(deletingId);
+            setDeletingId(null);
+            setToast({ message: "Documento eliminado con éxito.", type: "success" });
+          }
+        }}
+        onCancel={() => setDeletingId(null)}
       />
     </section>
   );

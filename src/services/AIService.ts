@@ -14,3 +14,14 @@ export const mapWithAI = (content: string, template: Record<string, any>) =>
     content,
     template,
   });
+
+export const indexPdf = (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  
+  return apiClient.post("/ai-engine/index/pdf", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};

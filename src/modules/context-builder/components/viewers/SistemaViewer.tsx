@@ -6,14 +6,15 @@ interface SistemaViewerProps {
 
 export const SistemaViewer = ({ data }: SistemaViewerProps) => (
   <div className="space-y-4">
-    <div className="grid gap-4 sm:grid-cols-2">
+    {data.contenido && (
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Tipo de Sistema</p>
-        <span className="inline-block mt-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-orange-500/10 text-orange-500 dark:bg-orange-500/20">
-          {data.tipo || "No especificado"}
-        </span>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Descripción / Propósito</p>
+        <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed bg-slate-50/80 p-4 rounded-xl border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800">
+          {data.contenido}
+        </p>
       </div>
-    </div>
+    )}
+
 
     {data.stack && data.stack.length > 0 && (
       <div>

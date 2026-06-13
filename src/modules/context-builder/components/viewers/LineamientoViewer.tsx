@@ -14,5 +14,21 @@ export const LineamientoViewer = ({ data }: LineamientoViewerProps) => (
         </p>
       </div>
     )}
+
+    {data.tags && data.tags.length > 0 && (
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Etiquetas</p>
+        <div className="flex flex-wrap gap-2">
+          {data.tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className="px-2.5 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100/50 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
   </div>
 );

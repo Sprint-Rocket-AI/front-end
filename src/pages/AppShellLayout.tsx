@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AppMenuBar } from "../components/AppMenuBar";
 import { AppFooter } from "../components/AppFooter";
 import { ThemeContext } from "../commons/context/ThemeContext";
+import { useRemindersWebSocket } from "../commons/hooks/useRemindersWebSocket";
 
 export const AppShellLayout = () => {
   const [isDark, setIsDark] = useState(() => {
@@ -12,38 +13,12 @@ export const AppShellLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+ useRemindersWebSocket();
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
     window.localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
   }, [isDark]);
-
-  useEffect(() => {
-    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-
-    const wsUrl = import.meta.env.VITE_CHECKPOINT_WS_URL ?? 'ws://localhost:8082/ws/reminders?userId=dev-001';
-    const ws = new WebSocket(wsUrl);
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'reminder.triggered') {
-          if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-            new Notification('⏰ ¡RECORDATORIO!', { body: data.payload.titulo });
-          } else {
-            alert(`⏰ ¡RECORDATORIO!\n\n${data.payload.titulo}`);
-          }
-        }
-      } catch (e) {
-        console.error("Error procesando mensaje WebSocket", e);
-      }
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
 
   const toggle = () => setIsDark((v) => !v);
 

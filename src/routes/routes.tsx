@@ -9,7 +9,6 @@ import { ChatIAPage } from "../pages/ChatIAPage";
 import { AuthRoute } from "./AuthRoute";
 
 const ContextBuilderModule = lazy(() => import("../modules/context-builder/ContextBuilderModule"));
-const CheckpointModule = lazy(() => import("../modules/checkpoint/CheckpointModule"));
 
 export const routes = [
   {
@@ -50,11 +49,15 @@ export const routes = [
         path: "diagram/:id",
         element: <DiagramPage />,
       },
-      {
-        path: "chat",
-        element: <ChatIAPage />,
-      }
     ],
+  },
+  {
+    path: "/chat",
+    element: (
+      <AuthRoute>
+        <ChatIAPage />
+      </AuthRoute>
+    ),
   },
 ];
 

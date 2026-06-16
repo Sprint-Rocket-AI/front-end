@@ -13,7 +13,7 @@ export interface ActividadInterface {
   ticketJira?: string;
   fechaVencimiento?: string; // ISO date YYYY-MM-DD
   etiquetas?: string[];
-  notas?: string;
+  descripcion?: string;
   origen?: OrigenActividad;
   vencida?: boolean; // flag del backend en la response
 }
@@ -26,5 +26,5 @@ export interface CrearActividadRequest {
   ticketJira?: string;
   fechaVencimiento?: string;
   etiquetas?: string[];
-  notas?: string;
+  descripcion?: string;
 }

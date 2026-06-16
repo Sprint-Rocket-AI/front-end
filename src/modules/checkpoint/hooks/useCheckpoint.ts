@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type {
   ActividadInterface,
   CrearActividadRequest,
+ EstadoActividad,
 } from '../interfaces/ActividadInterface';
 import type {
   RecordatorioInterface,
@@ -19,25 +20,19 @@ import {
   getRecordatoriosByDesarrollador,
   eliminarRecordatorio,
   getSugerenciasIA,
+  actualizarRecordatorio,
 } from '../../../services/CheckpointService';
 
-// DEV_ID fijo mientras no hay auth; sustituir por el del store de usuario
 const DEV_ID = 'dev-001';
 
 export interface CheckpointState {
-  // Actividades confirmadas (guardadas en backend)
   actividades: ActividadInterface[];
-  // Borrador local antes de confirmar
-  borradores: CrearActividadRequest[];
-  // Recordatorios
   recordatorios: RecordatorioInterface[];
-  // Sugerencias IA (actividades diarias, via botón IA del panel de creación)
   sugerenciasActividad: ActividadSugerida[];
   sugerenciasSeleccionadas: Set<number>;
-  // Sugerencias IA desde contexto JIRA/GitHub
   sugerenciasContexto: ActividadSugerida[];
   sugerenciasContextoSeleccionadas: Set<number>;
-  // UI state
+
   loadingActividades: boolean;
   loadingRecordatorios: boolean;
   loadingSugerencias: boolean;
@@ -49,7 +44,6 @@ export interface CheckpointState {
 
 const initialState: CheckpointState = {
   actividades: [],
-  borradores: [],
   recordatorios: [],
   sugerenciasActividad: [],
   sugerenciasSeleccionadas: new Set(),
@@ -90,44 +84,7 @@ export const useCheckpoint = () => {
     }
   }, []);
 
-  const addBorrador = useCallback((actividad: CrearActividadRequest) => {
-    setState((s) => ({
-      ...s,
-      borradores: [...s.borradores, actividad],
-      feedback: null,
-    }));
-  }, []);
-
-  const removeBorrador = useCallback((index: number) => {
-    setState((s) => ({
-      ...s,
-      borradores: s.borradores.filter((_, i) => i !== index),
-    }));
-  }, []);
-
-  const confirmarBorradores = useCallback(async () => {
-    if (state.borradores.length === 0) return;
-    setState((s) => ({ ...s, loadingConfirmar: true }));
-    try {
-      const requests = state.borradores.map((b) =>
-        crearActividad({ ...b, userId: DEV_ID }),
-      );
-      const results = await Promise.all(requests);
-      const nuevas = results.map((r) => r.data);
-      setState((s) => ({
-        ...s,
-        actividades: [...s.actividades, ...nuevas],
-        borradores: [],
-        loadingConfirmar: false,
-      }));
-      setFeedback(`${nuevas.length} actividad(es) guardada(s) correctamente.`);
-    } catch {
-      setState((s) => ({ ...s, loadingConfirmar: false }));
-      setError('Error al guardar las actividades. Intenta nuevamente.');
-    }
-  }, [state.borradores]);
-
-  const actualizarEstadoActividad = useCallback(async (id: string, estado: string) => {
+  const actualizarEstadoActividad = useCallback(async (id: string, estado: EstadoActividad) => {
     try {
       await actualizarActividad(id, { estado } as any);
       setState((s) => ({
@@ -258,7 +215,7 @@ export const useCheckpoint = () => {
     } catch {
       setError('Error al gestionar el recordatorio.');
     }
-  }, []);
+  },[state.recordatorios]);
 
   // ─── Sugerencias IA desde contexto JIRA / GitHub ────────────────────────────
 
@@ -319,12 +276,25 @@ export const useCheckpoint = () => {
     }
   }, [state.sugerenciasContexto, state.sugerenciasContextoSeleccionadas]);
 
+  const crearActividadDirecta = useCallback(async (actividad: CrearActividadRequest) => {
+     setState((s) => ({ ...s, loadingConfirmar: true }));
+     try {
+       const result = await crearActividad({ ...actividad, userId: DEV_ID });
+       setState((s) => ({
+         ...s,
+         actividades: [...s.actividades, result.data],
+         loadingConfirmar: false,
+       }));
+       setFeedback('Actividad guardada correctamente.');
+     } catch {
+       setState((s) => ({ ...s, loadingConfirmar: false }));
+       setError('Error al guardar la actividad.');
+     }
+  }, []);
+
   return {
     ...state,
     cargarActividades,
-    addBorrador,
-    removeBorrador,
-    confirmarBorradores,
     actualizarEstadoActividad,
     pedirSugerenciasActividad,
     toggleSugerenciaActividad,
@@ -335,5 +305,6 @@ export const useCheckpoint = () => {
     pedirSugerenciasContexto,
     toggleSugerenciaContexto,
     guardarSugerenciasContexto,
+    crearActividadDirecta,
   };
 };

@@ -117,7 +117,7 @@ export const useContextBuilder = () => {
       let response;
       const isEdit = mode === "edit" && editingId;
 
-      const { fechaCreacion, fechaActualizacion, ...payloadToSend } = formData as any;
+      const { fechaCreacion, fechaActualizacion, ...payloadToSend } = formData;
 
       if (isEdit) {
         response = await service.update(editingId, payloadToSend);

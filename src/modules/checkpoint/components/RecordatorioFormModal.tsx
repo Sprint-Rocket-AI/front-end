@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import type { CrearRecordatorioRequest, TipoRecordatorio } from '../interfaces/RecordatorioInterface';
-import { DayPicker } from 'react-day-picker';
-import 'react-day-picker/style.css';
+import type { CrearRecordatorioRequest } from '../interfaces/RecordatorioInterface';
+import { DateTimePicker } from '../../../commons/components/DateTimePicker';
 
 interface RecordatorioFormModalProps {
   onAdd: (data: Omit<CrearRecordatorioRequest, 'userId'>) => void;
@@ -12,10 +11,10 @@ interface RecordatorioFormModalProps {
 export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalProps) => {
   const [titulo, setTitulo] = useState('');
   const [horaActivacion, setHoraActivacion] = useState('08:30');
-  const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | undefined>(undefined);
-  const fechaExpiracion = fechaSeleccionada
-    ? fechaSeleccionada.toISOString().split('T')[0]
-    : undefined;
+  const [fechaExpiracion, setFechaExpiracion] = useState<string | undefined>(undefined);
+  const minDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0];
 
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -61,17 +60,14 @@ export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalP
 
           <div className="flex flex-col gap-3">
             <label className="label">Fecha y hora de activación</label>
-            <DayPicker
-              mode="single"
-              selected={fechaSeleccionada}
-              onSelect={setFechaSeleccionada}
-              disabled={{ before: new Date() }}
-            />
-            <input
-              type="time"
-              className="field"
-              value={horaActivacion}
-              onChange={(e) => setHoraActivacion(e.target.value)}
+            <DateTimePicker
+              dateLabel="Fecha"
+              timeLabel="Hora"
+              dateValue={fechaExpiracion}
+              timeValue={horaActivacion}
+              minDate={minDate}
+              onDateChange={setFechaExpiracion}
+              onTimeChange={setHoraActivacion}
             />
           </div>
 

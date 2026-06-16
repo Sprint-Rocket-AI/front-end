@@ -145,7 +145,7 @@ export const ContextBuilderPage = () => {
       </section>
 
       {toast && (
-        <Toast message={toast.message} onClose={() => setToast(null)} />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
 
       <DynamicDocumentViewer

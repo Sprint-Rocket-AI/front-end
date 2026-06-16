@@ -5,7 +5,7 @@ import { DiagramPage } from "../pages/DiagramPage";
 import { DiagramsListPage } from "../pages/DiagramsListPage";
 import { HomePage } from "../pages/HomePage";
 import { AppShellLayout } from "../pages/AppShellLayout";
-import { ChatIAPage } from "../pages/ChatIAPage";
+import { ChatIAPage } from "../modules/chat/pages/ChatIAPage";
 import { AuthRoute } from "./AuthRoute";
 
 const ContextBuilderModule = lazy(() => import("../modules/context-builder/ContextBuilderModule"));

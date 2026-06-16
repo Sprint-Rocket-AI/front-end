@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ActividadFormModal } from "../modules/checkpoint/components/ActividadFormModal";
-import { RecordatorioItem } from "../modules/checkpoint/components/RecordatorioItem";
-import { RecordatorioFormModal } from "../modules/checkpoint/components/RecordatorioFormModal";
-import { useCheckpoint } from "../modules/checkpoint/hooks/useCheckpoint";
-import type { EstadoActividad } from "../modules/checkpoint/interfaces/ActividadInterface";
+import { ActividadFormModal } from "../../checkpoint/components/ActividadFormModal";
+import { RecordatorioFormModal } from "../../checkpoint/components/RecordatorioFormModal";
+import { RecordatoriosPanel } from "../components/RecordatoriosPanel";
+import { ActividadesPanel } from "../components/ActividadesPanel";
+import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 
 type ChatRole = "assistant" | "user";
 
@@ -104,25 +104,11 @@ export const ChatIAPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getEstadoEstilo = (estado: EstadoActividad | undefined) => {
-    switch (estado) {
-      case "COMPLETADA":
-        return "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300";
-      case "CANCELADA":
-        return "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300";
-      case "EN_PROCESO":
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300";
-      default:
-        return "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400";
-    }
-  };
-
   return (
     <section className="dark fixed inset-0 z-40 flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
       <aside
-        className={`hidden shrink-0 border-r border-slate-900 bg-slate-900/40 transition-all duration-300 md:flex md:flex-col ${
-          isHistoryVisible ? "w-72" : "w-14"
-        }`}
+        className={`hidden shrink-0 border-r border-slate-900 bg-slate-900/40 transition-all duration-300 md:flex md:flex-col overflow-hidden ${isHistoryVisible ? "w-72" : "w-14"
+          }`}
       >
         {!isHistoryVisible ? (
           <div className="flex h-full items-start justify-center py-4">
@@ -136,11 +122,11 @@ export const ChatIAPage = () => {
             </button>
           </div>
         ) : (
-          <>
+          <div className="w-72 flex flex-col h-full shrink-0">
             <div className="flex items-center justify-between border-b border-slate-900 px-4 py-4">
               <button
                 type="button"
-                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors whitespace-nowrap"
               >
                 + Nuevo chat
               </button>
@@ -167,11 +153,10 @@ export const ChatIAPage = () => {
                     key={thread.id}
                     type="button"
                     onClick={() => setActiveThreadId(thread.id)}
-                    className={`mb-1 w-full rounded-2xl px-3 py-2 text-left transition ${
-                      isActive
+                    className={`mb-1 w-full rounded-full px-4 py-2.5 text-left transition ${isActive
                         ? "bg-slate-900 text-slate-100 border border-slate-800"
                         : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
-                    }`}
+                      }`}
                   >
                     <p className="truncate text-sm font-medium">{thread.title}</p>
                     <p className="mt-0.5 text-xs text-slate-500">{thread.updatedAt}</p>
@@ -179,7 +164,7 @@ export const ChatIAPage = () => {
                 );
               })}
             </div>
-          </>
+          </div>
         )}
       </aside>
 
@@ -291,19 +276,15 @@ export const ChatIAPage = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
-          <div className="mx-auto w-full max-w-3xl space-y-4">
+          <div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
             {activeThread.messages.map((message) => (
               <article
                 key={message.id}
-                className={`rounded-2xl border px-4 py-3 text-sm leading-relaxed ${
-                  message.role === "assistant"
-                    ? "border-slate-900 bg-slate-900/40 text-slate-300"
-                    : "border-slate-800/50 bg-slate-900/10 text-slate-200"
-                }`}
+                className={`text-sm leading-relaxed ${message.role === "assistant"
+                    ? "bg-transparent border-transparent px-0 py-2 text-slate-300 w-full"
+                    : "rounded-3xl border border-slate-700/50 bg-slate-800/80 text-slate-200 px-5 py-3 w-fit max-w-[85%] ml-auto"
+                  }`}
               >
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  {message.role === "assistant" ? "Assistant" : "Tu"}
-                </p>
                 <p>{message.content}</p>
               </article>
             ))}
@@ -344,88 +325,20 @@ export const ChatIAPage = () => {
         />
       )}
 
-      {showRecordatoriosPanel && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={(e) => e.target === e.currentTarget && setShowRecordatoriosPanel(false)}
-        >
-          <div className="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-200">Recordatorios</h3>
-              <button
-                type="button"
-                onClick={() => setShowRecordatoriosPanel(false)}
-                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
-              >
-                Cerrar
-              </button>
-            </div>
-            <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
-              {hook.loadingRecordatorios ? (
-                <p className="text-sm text-slate-500">Cargando recordatorios...</p>
-              ) : hook.recordatorios.length > 0 ? (
-                hook.recordatorios.map((rec) => (
-                  <RecordatorioItem
-                    key={rec.id ?? rec.titulo}
-                    recordatorio={rec}
-                    onStateChange={hook.gestionarEstadoRecordatorio}
-                  />
-                ))
-              ) : (
-                <p className="text-sm text-slate-500">No hay recordatorios para mostrar.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <RecordatoriosPanel
+        isOpen={showRecordatoriosPanel}
+        onClose={() => setShowRecordatoriosPanel(false)}
+        loading={hook.loadingRecordatorios}
+        recordatorios={hook.recordatorios}
+        onStateChange={hook.gestionarEstadoRecordatorio}
+      />
 
-      {showActividadesPanel && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={(e) => e.target === e.currentTarget && setShowActividadesPanel(false)}
-        >
-          <div className="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-200">Actividades</h3>
-              <button
-                type="button"
-                onClick={() => setShowActividadesPanel(false)}
-                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
-              >
-                Cerrar
-              </button>
-            </div>
-            <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
-              {hook.loadingActividades ? (
-                <p className="text-sm text-slate-500">Cargando actividades...</p>
-              ) : hook.actividades.length > 0 ? (
-                hook.actividades.map((act) => (
-                  <div
-                    key={act.id ?? act.titulo}
-                    className="flex items-center justify-between gap-2 rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3"
-                  >
-                    <div className="flex min-w-0 flex-col">
-                      <span className="truncate text-sm font-medium text-slate-200">
-                        {act.titulo}
-                      </span>
-                      {act.descripcion && (
-                        <span className="text-xs text-slate-400">{act.descripcion}</span>
-                      )}
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${getEstadoEstilo(act.estado)}`}
-                    >
-                      {act.estado ?? "PENDIENTE"}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-slate-500">No hay actividades para mostrar.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <ActividadesPanel
+        isOpen={showActividadesPanel}
+        onClose={() => setShowActividadesPanel(false)}
+        loading={hook.loadingActividades}
+        actividades={hook.actividades}
+      />
     </section>
   );
 };

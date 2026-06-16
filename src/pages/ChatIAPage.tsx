@@ -118,9 +118,9 @@ export const ChatIAPage = () => {
   };
 
   return (
-    <section className="fixed inset-0 z-40 flex h-screen w-screen overflow-hidden bg-white dark:bg-slate-950">
+    <section className="dark fixed inset-0 z-40 flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
       <aside
-        className={`hidden shrink-0 border-r border-slate-200 bg-slate-50 transition-all duration-300 md:flex md:flex-col dark:border-slate-800 dark:bg-slate-900 ${
+        className={`hidden shrink-0 border-r border-slate-900 bg-slate-900/40 transition-all duration-300 md:flex md:flex-col ${
           isHistoryVisible ? "w-72" : "w-14"
         }`}
       >
@@ -129,7 +129,7 @@ export const ChatIAPage = () => {
             <button
               type="button"
               onClick={() => setIsHistoryVisible(true)}
-              className="rounded-md p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+              className="rounded-full p-2 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
               title="Mostrar historial"
             >
               ▶
@@ -137,17 +137,17 @@ export const ChatIAPage = () => {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-900 px-4 py-4">
               <button
                 type="button"
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
               >
                 + Nuevo chat
               </button>
               <button
                 type="button"
                 onClick={() => setIsHistoryVisible(false)}
-                className="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                className="rounded-full p-2 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
                 title="Ocultar historial"
               >
                 ◀
@@ -155,7 +155,7 @@ export const ChatIAPage = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-2">
-              <p className="px-2 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <p className="px-2 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Historial
               </p>
 
@@ -167,14 +167,14 @@ export const ChatIAPage = () => {
                     key={thread.id}
                     type="button"
                     onClick={() => setActiveThreadId(thread.id)}
-                    className={`mb-1 w-full rounded-lg px-3 py-2 text-left transition ${
+                    className={`mb-1 w-full rounded-2xl px-3 py-2 text-left transition ${
                       isActive
-                        ? "bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                        : "text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800/70"
+                        ? "bg-slate-900 text-slate-100 border border-slate-800"
+                        : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
                     }`}
                   >
                     <p className="truncate text-sm font-medium">{thread.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{thread.updatedAt}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{thread.updatedAt}</p>
                   </button>
                 );
               })}
@@ -183,17 +183,20 @@ export const ChatIAPage = () => {
         )}
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col bg-white dark:bg-slate-950">
-        <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
-          <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-w-0 flex-1 flex-col bg-slate-950">
+        <header className="flex items-center justify-between border-b border-slate-900 px-4 py-3 bg-slate-950">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
               onClick={() => navigate("/")}
-              className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+              title="Ir al inicio"
             >
-              Home
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+              </svg>
             </button>
-            <h1 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">{activeThread.title}</h1>
+            <h1 className="truncate text-base font-semibold text-slate-200">{activeThread.title}</h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -204,22 +207,25 @@ export const ChatIAPage = () => {
                   setShowRecordatorioOptions((v) => !v);
                   setShowActividadOptions(false);
                 }}
-                className="group relative rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="group relative rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                title="Recordatorios"
               >
-                🔔
-                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100 dark:bg-slate-100 dark:text-slate-900">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                </svg>
+                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[11px] text-slate-300 opacity-0 transition group-hover:opacity-100">
                   Recordatorios
                 </span>
               </button>
               {showRecordatorioOptions && (
-                <div className="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                <div className="absolute right-0 z-20 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-900 p-1 shadow-lg">
                   <button
                     type="button"
                     onClick={() => {
                       setShowRecordatorioModal(true);
                       setShowRecordatorioOptions(false);
                     }}
-                    className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800"
                   >
                     Crear recordatorio
                   </button>
@@ -230,7 +236,7 @@ export const ChatIAPage = () => {
                       setShowActividadesPanel(false);
                       setShowRecordatorioOptions(false);
                     }}
-                    className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800"
                   >
                     Ver recordatorios
                   </button>
@@ -245,22 +251,25 @@ export const ChatIAPage = () => {
                   setShowActividadOptions((v) => !v);
                   setShowRecordatorioOptions(false);
                 }}
-                className="group relative rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="group relative rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                title="Actividades"
               >
-                📋
-                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100 dark:bg-slate-100 dark:text-slate-900">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.481A26.253 26.253 0 0 1 12 15.75c.647-.006 1.295-.014 1.94-.025m-4.399 2.507A26.012 26.012 0 0 1 7.5 18a26.25 26.25 0 0 1 1.94-.025M7.5 18a2.25 2.25 0 0 1-2.25-2.25V6.108c0-1.135.845-2.098 1.976-2.192a48.424 48.424 0 0 1 1.123-.08" />
+                </svg>
+                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[11px] text-slate-300 opacity-0 transition group-hover:opacity-100">
                   Actividades
                 </span>
               </button>
               {showActividadOptions && (
-                <div className="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                <div className="absolute right-0 z-20 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-900 p-1 shadow-lg">
                   <button
                     type="button"
                     onClick={() => {
                       setShowActividadModal(true);
                       setShowActividadOptions(false);
                     }}
-                    className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800"
                   >
                     Crear actividad
                   </button>
@@ -271,7 +280,7 @@ export const ChatIAPage = () => {
                       setShowRecordatoriosPanel(false);
                       setShowActividadOptions(false);
                     }}
-                    className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800"
                   >
                     Ver actividades
                   </button>
@@ -282,17 +291,17 @@ export const ChatIAPage = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
-          <div className="mx-auto w-full max-w-3xl space-y-6">
+          <div className="mx-auto w-full max-w-3xl space-y-4">
             {activeThread.messages.map((message) => (
               <article
                 key={message.id}
-                className={`rounded-xl border px-4 py-3 text-sm leading-relaxed ${
+                className={`rounded-2xl border px-4 py-3 text-sm leading-relaxed ${
                   message.role === "assistant"
-                    ? "border-slate-200 bg-slate-50 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                    : "border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    ? "border-slate-900 bg-slate-900/40 text-slate-300"
+                    : "border-slate-800/50 bg-slate-900/10 text-slate-200"
                 }`}
               >
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {message.role === "assistant" ? "Assistant" : "Tu"}
                 </p>
                 <p>{message.content}</p>
@@ -301,18 +310,21 @@ export const ChatIAPage = () => {
           </div>
         </div>
 
-        <footer className="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
-          <div className="mx-auto flex w-full max-w-3xl items-end gap-2">
+        <footer className="border-t border-slate-900 px-4 py-4 bg-slate-950">
+          <div className="mx-auto flex w-full max-w-3xl items-center gap-2">
             <textarea
               rows={1}
               placeholder="Escribe un mensaje..."
-              className="field min-h-[44px] resize-none rounded-lg border-slate-300 py-2.5 text-sm dark:border-slate-700"
+              className="flex-1 min-h-[44px] max-h-[120px] resize-none rounded-full border border-slate-800 bg-slate-900/60 px-5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:border-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-700"
             />
             <button
               type="button"
-              className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="flex h-11 w-11 items-center justify-center shrink-0 rounded-full border border-slate-700 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+              title="Enviar mensaje"
             >
-              Enviar
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
             </button>
           </div>
         </footer>
@@ -334,23 +346,23 @@ export const ChatIAPage = () => {
 
       {showRecordatoriosPanel && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onClick={(e) => e.target === e.currentTarget && setShowRecordatoriosPanel(false)}
         >
-          <div className="panel w-full max-w-3xl">
+          <div className="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Recordatorios</h3>
+              <h3 className="text-base font-bold text-slate-200">Recordatorios</h3>
               <button
                 type="button"
                 onClick={() => setShowRecordatoriosPanel(false)}
-                className="rounded-md border border-slate-300 px-2.5 py-1 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
               >
                 Cerrar
               </button>
             </div>
             <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
               {hook.loadingRecordatorios ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">Cargando recordatorios...</p>
+                <p className="text-sm text-slate-500">Cargando recordatorios...</p>
               ) : hook.recordatorios.length > 0 ? (
                 hook.recordatorios.map((rec) => (
                   <RecordatorioItem
@@ -360,7 +372,7 @@ export const ChatIAPage = () => {
                   />
                 ))
               ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400">No hay recordatorios para mostrar.</p>
+                <p className="text-sm text-slate-500">No hay recordatorios para mostrar.</p>
               )}
             </div>
           </div>
@@ -369,35 +381,35 @@ export const ChatIAPage = () => {
 
       {showActividadesPanel && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onClick={(e) => e.target === e.currentTarget && setShowActividadesPanel(false)}
         >
-          <div className="panel w-full max-w-3xl">
+          <div className="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Actividades</h3>
+              <h3 className="text-base font-bold text-slate-200">Actividades</h3>
               <button
                 type="button"
                 onClick={() => setShowActividadesPanel(false)}
-                className="rounded-md border border-slate-300 px-2.5 py-1 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
               >
                 Cerrar
               </button>
             </div>
             <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
               {hook.loadingActividades ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">Cargando actividades...</p>
+                <p className="text-sm text-slate-500">Cargando actividades...</p>
               ) : hook.actividades.length > 0 ? (
                 hook.actividades.map((act) => (
                   <div
                     key={act.id ?? act.titulo}
-                    className="flex items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/5"
+                    className="flex items-center justify-between gap-2 rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3"
                   >
                     <div className="flex min-w-0 flex-col">
-                      <span className="truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                      <span className="truncate text-sm font-medium text-slate-200">
                         {act.titulo}
                       </span>
                       {act.descripcion && (
-                        <span className="text-xs text-accent-400">{act.descripcion}</span>
+                        <span className="text-xs text-slate-400">{act.descripcion}</span>
                       )}
                     </div>
                     <span
@@ -408,7 +420,7 @@ export const ChatIAPage = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400">No hay actividades para mostrar.</p>
+                <p className="text-sm text-slate-500">No hay actividades para mostrar.</p>
               )}
             </div>
           </div>

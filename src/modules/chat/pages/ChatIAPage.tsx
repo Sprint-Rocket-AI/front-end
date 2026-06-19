@@ -1,108 +1,56 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { ActividadFormModal } from "../../checkpoint/components/ActividadFormModal";
 import { RecordatorioFormModal } from "../../checkpoint/components/RecordatorioFormModal";
 import { RecordatoriosPanel } from "../components/RecordatoriosPanel";
 import { ActividadesPanel } from "../components/ActividadesPanel";
-import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
-
-type ChatRole = "assistant" | "user";
-
-interface ChatMessage {
-  id: string;
-  role: ChatRole;
-  content: string;
-}
-
-interface ChatThread {
-  id: string;
-  title: string;
-  updatedAt: string;
-  messages: ChatMessage[];
-}
-
-const initialThreads: ChatThread[] = [
-  {
-    id: "thread-1",
-    title: "Prioridades de hoy",
-    updatedAt: "Hace 5 min",
-    messages: [
-      {
-        id: "m-1",
-        role: "assistant",
-        content: "Hola. Puedo ayudarte a priorizar tareas y resumir avances del sprint.",
-      },
-      {
-        id: "m-2",
-        role: "user",
-        content: "Cuales son las tareas mas urgentes para hoy?",
-      },
-      {
-        id: "m-3",
-        role: "assistant",
-        content: "Te recomiendo empezar por SPRINT-42 (bug de login) y luego SPRINT-45 (migracion DB).",
-      },
-    ],
-  },
-  {
-    id: "thread-2",
-    title: "Resumen de PR",
-    updatedAt: "Ayer",
-    messages: [
-      {
-        id: "m-4",
-        role: "user",
-        content: "Resume los cambios del PR-102 en bullets.",
-      },
-      {
-        id: "m-5",
-        role: "assistant",
-        content: "1) Refactor de auth service. 2) Manejo centralizado de errores HTTP. 3) Mejoras de tipado.",
-      },
-    ],
-  },
-  {
-    id: "thread-3",
-    title: "SQL optimization",
-    updatedAt: "Hace 2 dias",
-    messages: [
-      {
-        id: "m-6",
-        role: "user",
-        content: "Dame ideas para optimizar una consulta con JOINs pesados.",
-      },
-      {
-        id: "m-7",
-        role: "assistant",
-        content: "Primero revisa indices compuestos y luego analiza el plan de ejecucion para detectar full scans.",
-      },
-    ],
-  },
-];
+import { LoadingSpinner } from "../../../commons/components/LoadingSpinner";
+import { useChat } from "../hooks/useChat";
 
 export const ChatIAPage = () => {
-  const navigate = useNavigate();
-  const hook = useCheckpoint();
-  const [threads] = useState<ChatThread[]>(initialThreads);
-  const [activeThreadId, setActiveThreadId] = useState(initialThreads[0].id);
-  const [isHistoryVisible, setIsHistoryVisible] = useState(true);
-  const [showRecordatorioModal, setShowRecordatorioModal] = useState(false);
-  const [showActividadModal, setShowActividadModal] = useState(false);
-  const [showRecordatorioOptions, setShowRecordatorioOptions] = useState(false);
-  const [showActividadOptions, setShowActividadOptions] = useState(false);
-  const [showRecordatoriosPanel, setShowRecordatoriosPanel] = useState(false);
-  const [showActividadesPanel, setShowActividadesPanel] = useState(false);
-
-  const activeThread = useMemo(
-    () => threads.find((thread) => thread.id === activeThreadId) ?? threads[0],
-    [threads, activeThreadId],
-  );
+  const {
+    threads,
+    loadingThreads,
+    loadingMessages,
+    inputValue,
+    setInputValue,
+    activeThread,
+    sessionId,
+    isHistoryVisible,
+    setIsHistoryVisible,
+    showRecordatorioModal,
+    setShowRecordatorioModal,
+    showActividadModal,
+    setShowActividadModal,
+    showRecordatorioOptions,
+    setShowRecordatorioOptions,
+    showActividadOptions,
+    setShowActividadOptions,
+    showRecordatoriosPanel,
+    setShowRecordatoriosPanel,
+    showActividadesPanel,
+    setShowActividadesPanel,
+    handleSendMessage,
+    checkpoint,
+    navigate,
+    cargarChats,
+    cargarMensajes,
+  } = useChat();
 
   useEffect(() => {
-    hook.cargarActividades();
-    hook.cargarRecordatorios();
+    checkpoint.cargarActividades();
+    checkpoint.cargarRecordatorios();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    cargarChats();
+  }, [cargarChats]);
+
+  useEffect(() => {
+    if (sessionId) {
+      cargarMensajes(sessionId);
+    }
+  }, [sessionId, cargarMensajes]);
 
   return (
     <section className="dark fixed inset-0 z-40 flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -127,19 +75,21 @@ export const ChatIAPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => navigate("/")}
+                  onClick={() => checkpoint.cargarActividades()}
                   className="rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
-                  title="Ir al inicio"
+                  title="Recargar actividades"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                   </svg>
                 </button>
                 <button
                   type="button"
+                  onClick={() => checkpoint.cargarRecordatorios()}
                   className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors whitespace-nowrap"
+                  title="Recargar recordatorios"
                 >
-                  + Nuevo chat
+                  Sincronizar Checkpoint
                 </button>
               </div>
               <button
@@ -153,28 +103,45 @@ export const ChatIAPage = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-2">
-              <p className="px-2 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Historial
-              </p>
+              <div className="flex items-center justify-between px-2 py-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Historial de Chats
+                </p>
+                <button
+                  type="button"
+                  onClick={() => checkpoint.cargarActividades()}
+                  className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                >
+                  + Nuevo
+                </button>
+              </div>
 
-              {threads.map((thread) => {
-                const isActive = thread.id === activeThread.id;
+              {loadingThreads ? (
+                <div className="py-4"><LoadingSpinner /></div>
+              ) : (
+                threads.map((thread) => {
+                  const isActive = thread.sessionId === sessionId;
 
-                return (
-                  <button
-                    key={thread.id}
-                    type="button"
-                    onClick={() => setActiveThreadId(thread.id)}
-                    className={`mb-1 w-full rounded-full px-4 py-2.5 text-left transition ${isActive
-                        ? "bg-slate-900 text-slate-100 border border-slate-800"
-                        : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
-                      }`}
-                  >
-                    <p className="truncate text-sm font-medium">{thread.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">{thread.updatedAt}</p>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={thread.sessionId}
+                      type="button"
+                      onClick={() => navigate(`/chat/${thread.sessionId}`)}
+                      className={`mb-1 w-full rounded-full px-4 py-2.5 text-left transition ${isActive
+                          ? "bg-slate-900 text-slate-100 border border-slate-800"
+                          : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
+                        }`}
+                    >
+                      <p className="truncate text-sm font-medium">{thread.title || "Nuevo Chat"}</p>
+                      {thread.createdAt && (
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {new Date(thread.createdAt).toLocaleDateString()}
+                        </p>
+                      )}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
         )}
@@ -183,7 +150,7 @@ export const ChatIAPage = () => {
       <div className="flex min-w-0 flex-1 flex-col bg-slate-950">
         <header className="flex items-center justify-between border-b border-slate-900 px-4 py-3 bg-slate-950">
           <div className="flex min-w-0 items-center gap-3">
-            <h1 className="truncate text-base font-semibold text-slate-200">{activeThread.title}</h1>
+            <h1 className="truncate text-base font-semibold text-slate-200">{activeThread?.title || "Nuevo Chat"}</h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -279,17 +246,25 @@ export const ChatIAPage = () => {
 
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
           <div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
-            {activeThread.messages.map((message) => (
-              <article
-                key={message.id}
-                className={`text-sm leading-relaxed ${message.role === "assistant"
-                    ? "bg-transparent border-transparent px-0 py-2 text-slate-300 w-full"
-                    : "rounded-3xl border border-slate-700/50 bg-slate-800/80 text-slate-200 px-5 py-3 w-fit max-w-[85%] ml-auto"
-                  }`}
-              >
-                <p>{message.content}</p>
-              </article>
-            ))}
+            {loadingMessages ? (
+              <div className="mt-10"><LoadingSpinner /></div>
+            ) : activeThread?.messages && activeThread.messages.length > 0 ? (
+              activeThread.messages.map((message, index) => (
+                <article
+                  key={`${message.timestamp || index}-${index}`}
+                  className={`text-sm leading-relaxed ${message.role === "ASSISTANT" || message.role === "SYSTEM"
+                      ? "bg-transparent border-transparent px-0 py-2 text-slate-300 w-full"
+                      : "rounded-3xl border border-slate-700/50 bg-slate-800/80 text-slate-200 px-5 py-3 w-fit max-w-[85%] ml-auto"
+                    }`}
+                >
+                  <p>{message.content}</p>
+                </article>
+              ))
+            ) : (
+              <div className="text-center text-slate-500 mt-10">
+                Aún no hay mensajes. Escribe algo para empezar.
+              </div>
+            )}
           </div>
         </div>
 
@@ -297,11 +272,20 @@ export const ChatIAPage = () => {
           <div className="mx-auto flex w-full max-w-3xl items-center gap-2">
             <textarea
               rows={1}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
               placeholder="Escribe un mensaje..."
               className="flex-1 min-h-[44px] max-h-[120px] resize-none rounded-full border border-slate-800 bg-slate-900/60 px-5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:border-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-700"
             />
             <button
               type="button"
+              onClick={handleSendMessage}
               className="flex h-11 w-11 items-center justify-center shrink-0 rounded-full border border-slate-700 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
               title="Enviar mensaje"
             >
@@ -315,14 +299,14 @@ export const ChatIAPage = () => {
 
       {showRecordatorioModal && (
         <RecordatorioFormModal
-          onAdd={hook.nuevoRecordatorio}
+          onAdd={checkpoint.nuevoRecordatorio}
           onClose={() => setShowRecordatorioModal(false)}
         />
       )}
 
       {showActividadModal && (
         <ActividadFormModal
-          onAdd={hook.crearActividadDirecta}
+          onAdd={checkpoint.crearActividadDirecta}
           onClose={() => setShowActividadModal(false)}
         />
       )}
@@ -330,16 +314,16 @@ export const ChatIAPage = () => {
       <RecordatoriosPanel
         isOpen={showRecordatoriosPanel}
         onClose={() => setShowRecordatoriosPanel(false)}
-        loading={hook.loadingRecordatorios}
-        recordatorios={hook.recordatorios}
-        onStateChange={hook.gestionarEstadoRecordatorio}
+        loading={checkpoint.loadingRecordatorios}
+        recordatorios={checkpoint.recordatorios}
+        onStateChange={checkpoint.gestionarEstadoRecordatorio}
       />
 
       <ActividadesPanel
         isOpen={showActividadesPanel}
         onClose={() => setShowActividadesPanel(false)}
-        loading={hook.loadingActividades}
-        actividades={hook.actividades}
+        loading={checkpoint.loadingActividades}
+        actividades={checkpoint.actividades}
       />
     </section>
   );

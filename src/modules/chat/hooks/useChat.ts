@@ -1,12 +1,13 @@
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { chatService, type ChatResponse, type ChatMessage } from "../../../services/ChatService";
+import { chatService, type ChatMessage } from "../../../services/ChatService";
 import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { 
-  setChats, 
-  setMessages, 
-  addMessage
+import {
+  setChats,
+  setMessages,
+  addMessage,
+  deleteChat
 } from "../../../store/slices/chatSlice";
 
 export const useChat = () => {
@@ -89,7 +90,7 @@ export const useChat = () => {
         content: messageContent,
         timestamp: new Date().toISOString()
       };
-      
+
       dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg }));
 
       setLoadingMessages(true);
@@ -103,6 +104,18 @@ export const useChat = () => {
       }
     }
   }, [inputValue, sessionId, navigate, cargarChats, cargarMensajes, dispatch]);
+
+  const handleDeleteChat = useCallback(async (sid: string) => {
+    try {
+      await chatService.deleteChatBySessionId(sid);
+      dispatch(deleteChat(sid));
+      if (sid === sessionId) {
+        navigate("/chat");
+      }
+    } catch (error) {
+      console.error("Error eliminando chat", error);
+    }
+  }, [dispatch, sessionId, navigate]);
 
   return {
     threads,
@@ -131,5 +144,6 @@ export const useChat = () => {
     navigate,
     cargarChats,
     cargarMensajes,
+    handleDeleteChat,
   };
 };

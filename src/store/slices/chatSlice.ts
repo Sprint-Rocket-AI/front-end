@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ChatResponse, ChatMessage } from "../../services/ChatService";
 
 interface ChatState {
@@ -32,13 +32,17 @@ const chatSlice = createSlice({
         thread.messages.push(action.payload.message);
       }
     },
+    deleteChat(state, action: PayloadAction<string>) {
+      state.threads = state.threads.filter((t) => t.sessionId !== action.payload);
+    },
   },
 });
 
 export const { 
   setChats, 
   setMessages, 
-  addMessage 
+  addMessage,
+  deleteChat
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

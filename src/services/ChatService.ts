@@ -36,6 +36,10 @@ class ChatService {
     });
     return response.data.answer;
   }
+
+  async deleteChatBySessionId(sessionId: string): Promise<void> {
+    await apiClient.delete(`/ai-engine/chat/${sessionId}`);
+  }
 }
 
 export const chatService = new ChatService();

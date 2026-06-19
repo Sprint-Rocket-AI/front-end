@@ -1,13 +1,12 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { DocumentRecordInterface } from "../../commons/interfaces/DocumentRecordInterface";
-import { mockDocuments } from "../../commons/mocks/documents";
 
 interface DocumentsState {
   items: DocumentRecordInterface[];
 }
 
 const initialState: DocumentsState = {
-  items: mockDocuments,
+  items: [],
 };
 
 const documentsSlice = createSlice({

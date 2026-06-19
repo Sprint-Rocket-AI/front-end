@@ -118,7 +118,7 @@ export const DocumentTable = ({ documents, onView, onEdit, onDelete }: DocumentT
           <tbody>
             {currentDocs.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                <td colSpan={5} className="text-center py-6 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
                   No se encontraron documentos.
                 </td>
               </tr>

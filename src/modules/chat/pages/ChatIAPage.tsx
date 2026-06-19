@@ -124,12 +124,24 @@ export const ChatIAPage = () => {
         ) : (
           <div className="w-72 flex flex-col h-full shrink-0">
             <div className="flex items-center justify-between border-b border-slate-900 px-4 py-4">
-              <button
-                type="button"
-                className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors whitespace-nowrap"
-              >
-                + Nuevo chat
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                  title="Ir al inicio"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors whitespace-nowrap"
+                >
+                  + Nuevo chat
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsHistoryVisible(false)}
@@ -171,16 +183,6 @@ export const ChatIAPage = () => {
       <div className="flex min-w-0 flex-1 flex-col bg-slate-950">
         <header className="flex items-center justify-between border-b border-slate-900 px-4 py-3 bg-slate-950">
           <div className="flex min-w-0 items-center gap-3">
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
-              title="Ir al inicio"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-              </svg>
-            </button>
             <h1 className="truncate text-base font-semibold text-slate-200">{activeThread.title}</h1>
           </div>
 

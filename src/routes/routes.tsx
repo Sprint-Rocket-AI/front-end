@@ -52,7 +52,7 @@ export const routes = [
     ],
   },
   {
-    path: "/chat",
+    path: "/chat/:sessionId?",
     element: (
       <AuthRoute>
         <ChatIAPage />

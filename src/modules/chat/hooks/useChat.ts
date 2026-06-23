@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { chatService, type ChatMessage } from "../../../services/ChatService";
-import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
+
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import {
   setChats,
@@ -13,20 +13,14 @@ import {
 export const useChat = () => {
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId: string }>();
-  const checkpoint = useCheckpoint();
+
   const dispatch = useAppDispatch();
   const threads = useAppSelector((state) => state.chat.threads);
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const [isHistoryVisible, setIsHistoryVisible] = useState(true);
-  const [showRecordatorioModal, setShowRecordatorioModal] = useState(false);
-  const [showActividadModal, setShowActividadModal] = useState(false);
-  const [showRecordatorioOptions, setShowRecordatorioOptions] = useState(false);
-  const [showActividadOptions, setShowActividadOptions] = useState(false);
-  const [showRecordatoriosPanel, setShowRecordatoriosPanel] = useState(false);
-  const [showActividadesPanel, setShowActividadesPanel] = useState(false);
 
   const defaultUserId = "1";
 
@@ -49,7 +43,10 @@ export const useChat = () => {
     }
   }, [dispatch]);
 
-  const cargarMensajes = useCallback(async (sid: string) => {
+  const isSendingMessage = useRef(false);
+
+  const cargarMensajes = useCallback(async (sid: string, force = false) => {
+    if (isSendingMessage.current && !force) return;
     setLoadingMessages(true);
     try {
       const msgs = await chatService.getMessagesBySessionId(sid);
@@ -57,7 +54,9 @@ export const useChat = () => {
     } catch (error) {
       console.error("Error cargando mensajes", error);
     } finally {
-      setLoadingMessages(false);
+      if (!isSendingMessage.current) {
+        setLoadingMessages(false);
+      }
     }
   }, [dispatch]);
 
@@ -72,35 +71,63 @@ export const useChat = () => {
     let currentSessionId = sessionId;
 
     if (!currentSessionId) {
-      const title = messageContent.split(" ").slice(0, 10).join(" ");
+      isSendingMessage.current = true;
+      setIsSending(true);
+
       try {
-        currentSessionId = await chatService.createChat(defaultUserId, title);
+        const response = await chatService.createChat(defaultUserId, messageContent);
+        currentSessionId = response.sessionId;
+
+        const tempUserMsg: ChatMessage = {
+          role: "USER",
+          content: messageContent,
+          timestamp: new Date().toISOString()
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg, title: response.title }));
+
+        const tempAssistantMsg: ChatMessage = {
+          role: "ASSISTANT",
+          content: response.answer,
+          timestamp: new Date().toISOString()
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
+
         navigate(`/chat/${currentSessionId}`);
-        await cargarChats();
       } catch (error) {
         console.error("Error creando chat", error);
-        return;
+      } finally {
+        isSendingMessage.current = false;
+        setIsSending(false);
       }
+      return;
     }
 
     if (currentSessionId) {
-      // Add local message immediately
       const tempUserMsg: ChatMessage = {
         role: "USER",
         content: messageContent,
         timestamp: new Date().toISOString()
       };
 
-      dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg }));
+      const title = messageContent.split(" ").slice(0, 10).join(" ");
+      dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg, title }));
 
-      setLoadingMessages(true);
+      isSendingMessage.current = true;
+      setIsSending(true);
       try {
-        await chatService.sendRAGQuery(currentSessionId, messageContent);
-        await cargarMensajes(currentSessionId);
+        const aiResponse = await chatService.sendRAGQuery(currentSessionId, messageContent);
+
+        const tempAssistantMsg: ChatMessage = {
+          role: "ASSISTANT",
+          content: aiResponse.answer,
+          timestamp: new Date().toISOString()
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
       } catch (error) {
         console.error("Error enviando consulta RAG", error);
       } finally {
-        setLoadingMessages(false);
+        isSendingMessage.current = false;
+        setIsSending(false);
       }
     }
   }, [inputValue, sessionId, navigate, cargarChats, cargarMensajes, dispatch]);
@@ -121,26 +148,12 @@ export const useChat = () => {
     threads,
     loadingThreads,
     loadingMessages,
+    isSending,
     inputValue,
     setInputValue,
     activeThread,
     sessionId,
-    isHistoryVisible,
-    setIsHistoryVisible,
-    showRecordatorioModal,
-    setShowRecordatorioModal,
-    showActividadModal,
-    setShowActividadModal,
-    showRecordatorioOptions,
-    setShowRecordatorioOptions,
-    showActividadOptions,
-    setShowActividadOptions,
-    showRecordatoriosPanel,
-    setShowRecordatoriosPanel,
-    showActividadesPanel,
-    setShowActividadesPanel,
     handleSendMessage,
-    checkpoint,
     navigate,
     cargarChats,
     cargarMensajes,

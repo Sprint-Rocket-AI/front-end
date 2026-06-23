@@ -13,32 +13,42 @@ export interface ChatResponse {
   messages?: ChatMessage[];
 }
 
+export interface AIResponse {
+  answer: string;
+}
+export interface CreateChatResponse {
+  sessionId: string;
+  title: string;
+  answer: string;
+  createdAt: string;
+}
+
 class ChatService {
   async getChatsByUserId(userId: string): Promise<ChatResponse[]> {
-    const response = await apiClient.post<ChatResponse[]>("/ai-engine/chat/list", { userId });
+    const response = await apiClient.post<ChatResponse[]>("/ai-engine/api/chat/list", { userId });
     return response.data;
   }
 
-  async createChat(userId: string, title: string): Promise<string> {
-    const response = await apiClient.post<string>("/ai-engine/chat", { userId, title });
+  async createChat(userId: string, content: string): Promise<CreateChatResponse> {
+    const response = await apiClient.post<CreateChatResponse>("/ai-engine/api/chat", { userId, content });
     return response.data;
   }
 
   async getMessagesBySessionId(sessionId: string): Promise<ChatMessage[]> {
-    const response = await apiClient.get<ChatMessage[]>(`/ai-engine/chat/${sessionId}/messages`);
+    const response = await apiClient.get<ChatMessage[]>(`/ai-engine/api/chat/${sessionId}/messages`);
     return response.data;
   }
 
-  async sendRAGQuery(sessionId: string, userPrompt: string): Promise<string> {
-    const response = await apiClient.post<{ answer: string }>("/ai-engine/api/rag/query", {
+  async sendRAGQuery(sessionId: string, userPrompt: string): Promise<AIResponse> {
+    const response = await apiClient.post<AIResponse>("/ai-engine/api/rag/query", {
       sessionId,
       userPrompt,
     });
-    return response.data.answer;
+    return response.data;
   }
 
   async deleteChatBySessionId(sessionId: string): Promise<void> {
-    await apiClient.delete(`/ai-engine/chat/${sessionId}`);
+    await apiClient.delete(`/ai-engine/api/chat/${sessionId}`);
   }
 }
 

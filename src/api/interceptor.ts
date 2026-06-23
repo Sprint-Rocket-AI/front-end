@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
-    timeout: 30000,
+    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8081",
+    timeout: 3000000,
 });
 
 apiClient.interceptors.response.use(

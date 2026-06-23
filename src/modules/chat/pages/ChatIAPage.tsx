@@ -1,12 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ActividadFormModal } from "../../checkpoint/components/ActividadFormModal";
 import { RecordatorioFormModal } from "../../checkpoint/components/RecordatorioFormModal";
 import { RecordatoriosPanel } from "../components/RecordatoriosPanel";
 import { ActividadesPanel } from "../components/ActividadesPanel";
 import { LoadingSpinner } from "../../../commons/components/LoadingSpinner";
+import { ConfirmModal } from "../../../commons/components/ConfirmModal";
+import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useChat } from "../hooks/useChat";
 
 export const ChatIAPage = () => {
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
+  const checkpoint = useCheckpoint();
+  
+  const [isHistoryVisible, setIsHistoryVisible] = useState(true);
+  const [showRecordatorioModal, setShowRecordatorioModal] = useState(false);
+  const [showActividadModal, setShowActividadModal] = useState(false);
+  const [showRecordatorioOptions, setShowRecordatorioOptions] = useState(false);
+  const [showActividadOptions, setShowActividadOptions] = useState(false);
+  const [showRecordatoriosPanel, setShowRecordatoriosPanel] = useState(false);
+  const [showActividadesPanel, setShowActividadesPanel] = useState(false);
+
   const {
     threads,
     loadingThreads,
@@ -15,25 +28,12 @@ export const ChatIAPage = () => {
     setInputValue,
     activeThread,
     sessionId,
-    isHistoryVisible,
-    setIsHistoryVisible,
-    showRecordatorioModal,
-    setShowRecordatorioModal,
-    showActividadModal,
-    setShowActividadModal,
-    showRecordatorioOptions,
-    setShowRecordatorioOptions,
-    showActividadOptions,
-    setShowActividadOptions,
-    showRecordatoriosPanel,
-    setShowRecordatoriosPanel,
-    showActividadesPanel,
-    setShowActividadesPanel,
     handleSendMessage,
-    checkpoint,
     navigate,
     cargarChats,
     cargarMensajes,
+    handleDeleteChat,
+    isSending
   } = useChat();
 
   useEffect(() => {
@@ -47,10 +47,10 @@ export const ChatIAPage = () => {
   }, [cargarChats]);
 
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && (!activeThread || !activeThread.messages || activeThread.messages.length === 0)) {
       cargarMensajes(sessionId);
     }
-  }, [sessionId, cargarMensajes]);
+  }, [sessionId, cargarMensajes, activeThread?.messages?.length]);
 
   return (
     <section className="dark fixed inset-0 z-40 flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -101,7 +101,7 @@ export const ChatIAPage = () => {
                 </p>
                 <button
                   type="button"
-                  onClick={() => checkpoint.cargarActividades()}
+                  onClick={() => navigate("/chat")}
                   className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                 >
                   + Nuevo
@@ -115,22 +115,39 @@ export const ChatIAPage = () => {
                   const isActive = thread.sessionId === sessionId;
 
                   return (
-                    <button
+                    <div
                       key={thread.sessionId}
-                      type="button"
-                      onClick={() => navigate(`/chat/${thread.sessionId}`)}
-                      className={`mb-1 w-full rounded-full px-4 py-2.5 text-left transition ${isActive
-                          ? "bg-slate-900 text-slate-100 border border-slate-800"
-                          : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
+                      className={`mb-1 flex w-full items-center justify-between rounded-full px-4 py-2.5 transition ${isActive
+                        ? "bg-slate-900 text-slate-100 border border-slate-800"
+                        : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
                         }`}
                     >
-                      <p className="truncate text-sm font-medium">{thread.title || "Nuevo Chat"}</p>
-                      {thread.createdAt && (
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          {new Date(thread.createdAt).toLocaleDateString()}
-                        </p>
-                      )}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/chat/${thread.sessionId}`)}
+                        className="flex-1 text-left min-w-0"
+                      >
+                        <p className="truncate text-sm font-medium">{thread.title || "Nuevo Chat"}</p>
+                        {thread.createdAt && (
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            {new Date(thread.createdAt).toLocaleDateString()}
+                          </p>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setChatToDelete(thread.sessionId);
+                        }}
+                        className="ml-2 flex-shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+                        title="Eliminar chat"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+                      </button>
+                    </div>
                   );
                 })
               )}
@@ -241,17 +258,28 @@ export const ChatIAPage = () => {
             {loadingMessages ? (
               <div className="mt-10"><LoadingSpinner /></div>
             ) : activeThread?.messages && activeThread.messages.length > 0 ? (
-              activeThread.messages.map((message, index) => (
-                <article
-                  key={`${message.timestamp || index}-${index}`}
-                  className={`text-sm leading-relaxed ${message.role === "ASSISTANT" || message.role === "SYSTEM"
+              <>
+                {activeThread.messages.map((message, index) => (
+                  <article
+                    key={`${message.timestamp || index}-${index}`}
+                    className={`text-sm leading-relaxed ${message.role === "ASSISTANT" || message.role === "SYSTEM"
                       ? "bg-transparent border-transparent px-0 py-2 text-slate-300 w-full"
                       : "rounded-3xl border border-slate-700/50 bg-slate-800/80 text-slate-200 px-5 py-3 w-fit max-w-[85%] ml-auto"
-                    }`}
-                >
-                  <p>{message.content}</p>
-                </article>
-              ))
+                      }`}
+                  >
+                    <p>{message.content}</p>
+                  </article>
+                ))}
+                {isSending && (
+                  <article className="bg-transparent border-transparent px-0 py-2 text-slate-300 w-full text-sm leading-relaxed">
+                    <div className="flex gap-2 items-center h-6">
+                      <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-pulse"></span>
+                      <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                  </article>
+                )}
+              </>
             ) : (
               <div className="text-center text-slate-500 mt-10">
                 Aún no hay mensajes. Escribe algo para empezar.
@@ -316,6 +344,20 @@ export const ChatIAPage = () => {
         onClose={() => setShowActividadesPanel(false)}
         loading={checkpoint.loadingActividades}
         actividades={checkpoint.actividades}
+      />
+
+      <ConfirmModal
+        isOpen={chatToDelete !== null}
+        title="Eliminar Chat"
+        message="¿Estás seguro de que deseas eliminar este chat? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        onConfirm={() => {
+          if (chatToDelete) {
+            handleDeleteChat(chatToDelete);
+            setChatToDelete(null);
+          }
+        }}
+        onCancel={() => setChatToDelete(null)}
       />
     </section>
   );

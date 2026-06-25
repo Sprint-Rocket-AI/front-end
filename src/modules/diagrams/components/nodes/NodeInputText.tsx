@@ -1,8 +1,8 @@
 import { useCallback, useRef } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
-export function NodeInputText({ id, data }) {
-    const spanRef = useRef(null);
+export function NodeInputText({ id, data }: any) {
+    const spanRef = useRef<HTMLSpanElement>(null);
     const isEditing = useRef(false);
 
     const enterEditMode = useCallback(() => {

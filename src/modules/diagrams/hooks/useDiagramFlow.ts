@@ -22,7 +22,7 @@ const initialEdges = [
     { id: 'n1-n2', source: 'n1', target: 'n2', animated: true, type: 'edgeInputText', label: 'connects with' }
 ];
 
-export const useDiagramFlow = () => {
+export const useDiagramFlow = (active = true) => {
     const [nodes, setNodes] = useState<Node[]>(initialNodes);
     const [edges, setEdges] = useState<Edge[]>(initialEdges);
     const [isAddingNode, setIsAddingNode] = useState(false);
@@ -35,14 +35,24 @@ export const useDiagramFlow = () => {
     const redo = useCallback(() => { redoNodes(); redoEdges(); }, [redoNodes, redoEdges]);
 
     useEffect(() => {
+        if (!active) return;
         const handler = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            if (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable
+            ) {
+                return;
+            }
             if (!(e.ctrlKey || e.metaKey)) return;
             if (e.key === 'z') { e.preventDefault(); undo(); }
             if (e.key === 'y') { e.preventDefault(); redo(); }
         };
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
-    }, [undo, redo]);
+    }, [undo, redo, active]);
+
 
     const { screenToFlowPosition } = useReactFlow();
 

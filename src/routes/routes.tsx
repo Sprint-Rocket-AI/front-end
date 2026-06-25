@@ -19,9 +19,9 @@ export const routes = [
   {
     path: "/",
     element: (
-      <AuthRoute>
-        <AppShellLayout />
-      </AuthRoute>
+      // <AuthRoute>
+      <AppShellLayout />
+      // </AuthRoute>
     ),
     children: [
       {

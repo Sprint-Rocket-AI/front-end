@@ -412,7 +412,7 @@ export const useMapaMental = (active = true) => {
     const onConnect = useCallback((params: Connection) => {
         setEdges((eds) => {
             const nextEdges = addEdge({ ...params, type: 'default', animated: false }, eds);
-            
+
             // Re-render layout and update Markdown
             setNodes((nds) => {
                 const parentIds = new Set(nextEdges.map(e => e.source));
@@ -422,7 +422,7 @@ export const useMapaMental = (active = true) => {
                 }));
                 const positioned = layoutNodes(updatedNds, nextEdges);
                 const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
-                
+
                 // Sync markdown state
                 setTimeout(() => syncMarkdownFromFlow(visibleNodes, nextEdges), 0);
                 return visibleNodes;
@@ -435,7 +435,7 @@ export const useMapaMental = (active = true) => {
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
         setEdges((eds) => {
             const nextEdges = eds.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
-            
+
             // Recalculate children flags, layout and markdown
             setNodes((nds) => {
                 const parentIds = new Set(nextEdges.map(e => e.source));
@@ -457,19 +457,19 @@ export const useMapaMental = (active = true) => {
         if (!connectionState.isValid) {
             const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
             const position = screenToFlowPosition({ x: clientX, y: clientY });
-            
+
             const nextId = `n-${Date.now()}`;
-            const newEdge = { 
-                id: `e-${connectionState.fromNode.id}-${nextId}`, 
-                source: connectionState.fromNode.id, 
-                target: nextId, 
-                type: 'default', 
-                animated: false 
+            const newEdge = {
+                id: `e-${connectionState.fromNode.id}-${nextId}`,
+                source: connectionState.fromNode.id,
+                target: nextId,
+                type: 'default',
+                animated: false
             };
 
             setEdges((eds) => {
                 const nextEdges = [...eds, newEdge];
-                
+
                 setNodes((nds) => {
                     const newNode: Node = {
                         id: nextId,
@@ -538,10 +538,10 @@ export const useMapaMental = (active = true) => {
 
         setNodes((nds) => {
             const nextNodes = nds.filter(n => !toDelete.has(n.id));
-            
+
             setEdges((eds) => {
                 const nextEdges = eds.filter(e => !toDelete.has(e.source) && !toDelete.has(e.target));
-                
+
                 // Update parents hasChildren flag
                 const parentIds = new Set(nextEdges.map(e => e.source));
                 const updatedNds = nextNodes.map(n => ({
@@ -554,7 +554,7 @@ export const useMapaMental = (active = true) => {
 
                 const positioned = layoutNodes(updatedNds, nextEdges);
                 const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
-                
+
                 setTimeout(() => syncMarkdownFromFlow(visibleNodes, nextEdges), 0);
                 return nextEdges;
             });
@@ -577,7 +577,7 @@ export const useMapaMental = (active = true) => {
                 }
                 return n;
             });
-            
+
             const positioned = layoutNodes(updated, edges);
             const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
             setEdges(visibleEdges);
@@ -604,7 +604,7 @@ export const useMapaMental = (active = true) => {
         });
     }, [edges, syncMarkdownFromFlow]);
 
-    // Toggle all: collapse or expand all nodes
+    // Toggle all: abre y cierra todos los nodos
     const onToggleAll = useCallback(() => {
         const isAny = nodes.some(n => n.data?.collapsed === true);
 

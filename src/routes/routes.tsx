@@ -7,10 +7,15 @@ import { HomePage } from "../pages/HomePage";
 import { AppShellLayout } from "../pages/AppShellLayout";
 import { ChatIAPage } from "../modules/chat/pages/ChatIAPage";
 import { AuthRoute } from "./AuthRoute";
+import { LoginPage } from "../modules/auth/pages/LoginPage";
 
 const ContextBuilderModule = lazy(() => import("../modules/context-builder/ContextBuilderModule"));
 
 export const routes = [
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
   {
     path: "/",
     element: (

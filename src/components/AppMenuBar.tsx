@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
+import { cognitoAuthConfig, cognitoDomain, logoutUri } from "../modules/auth/config/cognitoConfig";
 
 interface AppMenuBarProps {
   isDark: boolean;
@@ -25,6 +27,29 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   const isDocumentsSection = location.pathname.startsWith("/documents");
   const [isDocumentsMenuOpen, setIsDocumentsMenuOpen] = useState(false);
   const docsRef = useRef<HTMLDivElement>(null);
+  
+  const auth = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const handleSignOut = () => {
+    const clientId = cognitoAuthConfig.client_id;
+    auth.removeUser();
+    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+  };
+
+  const getUserInitials = (nameOrEmail: string): string => {
+    if (!nameOrEmail) return "U";
+    if (nameOrEmail.includes("@")) {
+      const part = nameOrEmail.split("@")[0];
+      return part.slice(0, 2).toUpperCase();
+    }
+    const parts = nameOrEmail.split(" ");
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return nameOrEmail.slice(0, 2).toUpperCase();
+  };
 
   useEffect(() => {
     setIsDocumentsMenuOpen(false);
@@ -35,6 +60,17 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
     const handler = (e: MouseEvent) => {
       if (docsRef.current && !docsRef.current.contains(e.target as Node)) {
         setIsDocumentsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Cerrar el menú de usuario al hacer click fuera
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -121,9 +157,42 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
             )}
           </button>
 
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-assistant-gradient text-sm font-bold text-white shadow-glow-assistant">
-            JD
-          </div>
+          {auth.isAuthenticated && (
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setIsUserMenuOpen((v) => !v)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-assistant-gradient text-sm font-bold text-white shadow-glow-assistant transition hover:scale-105 focus:outline-none"
+              >
+                {getUserInitials(auth.user?.profile?.email || auth.user?.profile?.name || "U")}
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="absolute right-0 top-full mt-3 flex min-w-[240px] flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg backdrop-blur-xl transition-colors duration-300 dark:border-accent-500/20 dark:bg-ink-900/95 dark:shadow-elevated animate-fade-in">
+                  <div className="px-4 py-2.5 border-b border-slate-100 dark:border-white/5">
+                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                      Usuario
+                    </p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate mt-0.5" title={auth.user?.profile?.email || auth.user?.profile?.name}>
+                      {auth.user?.profile?.email || auth.user?.profile?.name || "Usuario"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2 rounded-xl px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 transition"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

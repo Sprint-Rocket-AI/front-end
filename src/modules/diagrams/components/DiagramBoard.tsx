@@ -97,6 +97,8 @@ export const DiagramBoard = () => {
                         setExpanded={isMentalMap ? (() => { }) as any : defaultFlow.setExpanded}
                         showCloseAll={isMentalMap}
                         onCloseAll={isMentalMap ? (mentalMapFlow as any).onCloseAll : undefined}
+                        isAnyCollapsed={isMentalMap ? (mentalMapFlow as any).isAnyCollapsed : false}
+                        showAddNode={!isMentalMap}
                         showEditorToggle={isMentalMap}
                         isEditorOpen={isMentalMap ? mentalMapFlow.isMdPanelOpen : false}
                         onToggleEditor={isMentalMap ? () => mentalMapFlow.setIsMdPanelOpen(!mentalMapFlow.isMdPanelOpen) : undefined}

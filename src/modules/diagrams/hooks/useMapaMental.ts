@@ -604,21 +604,17 @@ export const useMapaMental = (active = true) => {
         });
     }, [edges, syncMarkdownFromFlow]);
 
-    // Close all: collapse all nodes except root nodes
-    const onCloseAll = useCallback(() => {
-        // Roots are nodes without parent
-        const parentMap = new Map<string, string>();
-        edges.forEach(e => parentMap.set(e.target, e.source));
+    // Toggle all: collapse or expand all nodes
+    const onToggleAll = useCallback(() => {
+        const isAny = nodes.some(n => n.data?.collapsed === true);
 
         setNodes((nds) => {
             const updated = nds.map(n => {
-                // Collapse if it is a root (main category) and has children
-                const isRoot = !parentMap.has(n.id);
                 return {
                     ...n,
                     data: {
                         ...n.data,
-                        collapsed: isRoot ? true : n.data.collapsed
+                        collapsed: !isAny
                     }
                 };
             });
@@ -628,7 +624,11 @@ export const useMapaMental = (active = true) => {
             setEdges(visibleEdges);
             return visibleNodes;
         });
-    }, [edges]);
+    }, [nodes, edges]);
+
+    const isAnyCollapsed = useMemo(() => {
+        return nodes.some(n => n.data?.collapsed === true);
+    }, [nodes]);
 
     // Update diagram structure when user types in the MD editor
     const updateFromMarkdown = useCallback((newMarkdown: string) => {
@@ -689,8 +689,8 @@ export const useMapaMental = (active = true) => {
         onStatusChange,
         onDeleteNode,
         onToggleCollapse,
-        onLabelChange,
-        onCloseAll,
+        onCloseAll: onToggleAll,
+        isAnyCollapsed,
         updateFromMarkdown,
         onAddNode,
         undo,

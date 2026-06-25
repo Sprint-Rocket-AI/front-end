@@ -11,6 +11,8 @@ interface Props {
     showEditorToggle?: boolean;
     isEditorOpen?: boolean;
     onToggleEditor?: () => void;
+    isAnyCollapsed?: boolean;
+    showAddNode?: boolean;
 }
 
 export const DiagramHeaderPanel = ({
@@ -22,7 +24,9 @@ export const DiagramHeaderPanel = ({
     title = 'Mapa Mental APV-123',
     showEditorToggle = false,
     isEditorOpen = false,
-    onToggleEditor
+    onToggleEditor,
+    isAnyCollapsed = false,
+    showAddNode = true
 }: Props) => {
     return (
         <Panel position="top-left" className="bg-transparent shadow-none">
@@ -37,12 +41,14 @@ export const DiagramHeaderPanel = ({
                         >
                             {expanded ? 'Ocultar detalle' : 'Ver detalle'}
                         </button>
-                        <button
-                            onClick={() => setIsAddingNode(true)}
-                            className="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-md shadow hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
-                        >
-                            ➕ Nodo
-                        </button>
+                        {showAddNode && (
+                            <button
+                                onClick={() => setIsAddingNode(true)}
+                                className="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-md shadow hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+                              >
+                                  ➕ Nodo
+                            </button>
+                        )}
                     </div>
 
                     {/* Fila 2 */}
@@ -64,7 +70,7 @@ export const DiagramHeaderPanel = ({
                                     onClick={onCloseAll}
                                     className="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-md shadow hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
                                 >
-                                    Cerrar todo
+                                    {isAnyCollapsed ? 'Abrir todo' : 'Cerrar todo'}
                                 </button>
                             )}
                         </div>

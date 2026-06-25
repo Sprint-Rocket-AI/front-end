@@ -355,8 +355,8 @@ export const useMapaMental = (active = true) => {
     const [nodes, setNodes] = useState<Node[]>(initialFlow.nodes);
     const [edges, setEdges] = useState<Edge[]>(initialFlow.edges);
 
-    const { undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
-    const { undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
+    const { push: pushNodes, undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
+    const { push: pushEdges, undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
 
     const undo = useCallback(() => { undoNodes(); undoEdges(); }, [undoNodes, undoEdges]);
     const redo = useCallback(() => { redoNodes(); redoEdges(); }, [redoNodes, redoEdges]);
@@ -410,48 +410,38 @@ export const useMapaMental = (active = true) => {
     );
 
     const onConnect = useCallback((params: Connection) => {
-        setEdges((eds) => {
-            const nextEdges = addEdge({ ...params, type: 'default', animated: false }, eds);
-
-            // Re-render layout and update Markdown
-            setNodes((nds) => {
-                const parentIds = new Set(nextEdges.map(e => e.source));
-                const updatedNds = nds.map(n => ({
-                    ...n,
-                    data: { ...n.data, hasChildren: parentIds.has(n.id) }
-                }));
-                const positioned = layoutNodes(updatedNds, nextEdges);
-                const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
-
-                // Sync markdown state
-                setTimeout(() => syncMarkdownFromFlow(visibleNodes, nextEdges), 0);
-                return visibleNodes;
-            });
-
-            return nextEdges;
-        });
-    }, [syncMarkdownFromFlow]);
+        const nextEdges = addEdge({ ...params, type: 'default', animated: false }, edges);
+        
+        // Re-render layout and update Markdown
+        const parentIds = new Set(nextEdges.map(e => e.source));
+        const updatedNds = nodes.map(n => ({
+            ...n,
+            data: { ...n.data, hasChildren: parentIds.has(n.id) }
+        }));
+        const positioned = layoutNodes(updatedNds, nextEdges);
+        const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
+        
+        pushEdges(nextEdges);
+        pushNodes(visibleNodes);
+        syncMarkdownFromFlow(visibleNodes, nextEdges);
+    }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
 
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
-        setEdges((eds) => {
-            const nextEdges = eds.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
+        const nextEdges = edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
 
-            // Recalculate children flags, layout and markdown
-            setNodes((nds) => {
-                const parentIds = new Set(nextEdges.map(e => e.source));
-                const updatedNds = nds.map(n => ({
-                    ...n,
-                    data: { ...n.data, hasChildren: parentIds.has(n.id) }
-                }));
-                const positioned = layoutNodes(updatedNds, nextEdges);
-                const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
-                setTimeout(() => syncMarkdownFromFlow(visibleNodes, nextEdges), 0);
-                return visibleNodes;
-            });
-
-            return nextEdges;
-        });
-    }, [syncMarkdownFromFlow]);
+        // Recalculate children flags, layout and markdown
+        const parentIds = new Set(nextEdges.map(e => e.source));
+        const updatedNds = nodes.map(n => ({
+            ...n,
+            data: { ...n.data, hasChildren: parentIds.has(n.id) }
+        }));
+        const positioned = layoutNodes(updatedNds, nextEdges);
+        const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
+        
+        pushEdges(nextEdges);
+        pushNodes(visibleNodes);
+        syncMarkdownFromFlow(visibleNodes, nextEdges);
+    }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
 
     const onConnectEnd = useCallback((event: any, connectionState: any) => {
         if (!connectionState.isValid) {
@@ -467,60 +457,53 @@ export const useMapaMental = (active = true) => {
                 animated: false
             };
 
-            setEdges((eds) => {
-                const nextEdges = [...eds, newEdge];
+            const nextEdges = [...edges, newEdge];
+            const newNode: Node = {
+                id: nextId,
+                position,
+                type: 'nodeMapaMental',
+                data: {
+                    label: `Nuevo Nodo`,
+                    status: 'PENDIENTE',
+                    statusDetail: '',
+                    collapsed: false,
+                }
+            };
 
-                setNodes((nds) => {
-                    const newNode: Node = {
-                        id: nextId,
-                        position,
-                        type: 'nodeMapaMental',
-                        data: {
-                            label: `Nuevo Nodo`,
-                            status: 'PENDIENTE',
-                            statusDetail: '',
-                            collapsed: false,
-                        }
-                    };
+            const parentIds = new Set(nextEdges.map(e => e.source));
+            const updatedNds = [...nodes, newNode].map(n => ({
+                ...n,
+                data: { ...n.data, hasChildren: parentIds.has(n.id) }
+            }));
 
-                    const parentIds = new Set(nextEdges.map(e => e.source));
-                    const updatedNds = [...nds, newNode].map(n => ({
-                        ...n,
-                        data: { ...n.data, hasChildren: parentIds.has(n.id) }
-                    }));
-
-                    const positioned = layoutNodes(updatedNds, nextEdges);
-                    const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
-                    setTimeout(() => syncMarkdownFromFlow(visibleNodes, nextEdges), 0);
-                    return visibleNodes;
-                });
-
-                return nextEdges;
-            });
+            const positioned = layoutNodes(updatedNds, nextEdges);
+            const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
+            
+            pushEdges(nextEdges);
+            pushNodes(visibleNodes);
+            syncMarkdownFromFlow(visibleNodes, nextEdges);
         }
-    }, [screenToFlowPosition, syncMarkdownFromFlow]);
+    }, [screenToFlowPosition, nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
 
     // Handlers called by the custom NodeMapaMental
 
     const onStatusChange = useCallback((id: string, newStatus: 'PENDIENTE' | 'EN PROCESO' | 'TERMINADO') => {
-        setNodes((nds) => {
-            const updated = nds.map((n) => {
-                if (n.id === id) {
-                    return {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            status: newStatus
-                        }
-                    };
-                }
-                return n;
-            });
-            // Sync markdown state
-            syncMarkdownFromFlow(updated, edges);
-            return updated;
+        const updated = nodes.map((n) => {
+            if (n.id === id) {
+                return {
+                    ...n,
+                    data: {
+                        ...n.data,
+                        status: newStatus
+                    }
+                };
+            }
+            return n;
         });
-    }, [edges, syncMarkdownFromFlow]);
+        
+        pushNodes(updated);
+        syncMarkdownFromFlow(updated, edges);
+    }, [nodes, edges, pushNodes, syncMarkdownFromFlow]);
 
     const onDeleteNode = useCallback((id: string) => {
         // Collect descendants to delete recursively
@@ -536,95 +519,86 @@ export const useMapaMental = (active = true) => {
         const toDelete = new Set<string>([id]);
         collectDescendants(id, edges, toDelete);
 
-        setNodes((nds) => {
-            const nextNodes = nds.filter(n => !toDelete.has(n.id));
+        const nextNodes = nodes.filter(n => !toDelete.has(n.id));
+        const nextEdges = edges.filter(e => !toDelete.has(e.source) && !toDelete.has(e.target));
 
-            setEdges((eds) => {
-                const nextEdges = eds.filter(e => !toDelete.has(e.source) && !toDelete.has(e.target));
+        // Update parents hasChildren flag
+        const parentIds = new Set(nextEdges.map(e => e.source));
+        const updatedNds = nextNodes.map(n => ({
+            ...n,
+            data: {
+                ...n.data,
+                hasChildren: parentIds.has(n.id)
+            }
+        }));
 
-                // Update parents hasChildren flag
-                const parentIds = new Set(nextEdges.map(e => e.source));
-                const updatedNds = nextNodes.map(n => ({
+        const positioned = layoutNodes(updatedNds, nextEdges);
+        const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
+
+        pushEdges(nextEdges);
+        pushNodes(visibleNodes);
+        syncMarkdownFromFlow(visibleNodes, nextEdges);
+    }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
+
+    const onToggleCollapse = useCallback((id: string) => {
+        const updated = nodes.map(n => {
+            if (n.id === id) {
+                return {
                     ...n,
                     data: {
                         ...n.data,
-                        hasChildren: parentIds.has(n.id)
+                        collapsed: !n.data.collapsed
                     }
-                }));
-
-                const positioned = layoutNodes(updatedNds, nextEdges);
-                const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
-
-                setTimeout(() => syncMarkdownFromFlow(visibleNodes, nextEdges), 0);
-                return nextEdges;
-            });
-
-            return nextNodes;
+                };
+            }
+            return n;
         });
-    }, [edges, syncMarkdownFromFlow]);
 
-    const onToggleCollapse = useCallback((id: string) => {
-        setNodes((nds) => {
-            const updated = nds.map(n => {
-                if (n.id === id) {
-                    return {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            collapsed: !n.data.collapsed
-                        }
-                    };
-                }
-                return n;
-            });
-
-            const positioned = layoutNodes(updated, edges);
-            const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
-            setEdges(visibleEdges);
-            return visibleNodes;
-        });
-    }, [edges]);
+        const positioned = layoutNodes(updated, edges);
+        const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
+        
+        pushEdges(visibleEdges);
+        pushNodes(visibleNodes);
+    }, [nodes, edges, pushNodes, pushEdges]);
 
     const onLabelChange = useCallback((id: string, newLabel: string) => {
-        setNodes((nds) => {
-            const updated = nds.map(n => {
-                if (n.id === id) {
-                    return {
-                        ...n,
-                        data: {
-                            ...n.data,
-                            label: newLabel
-                        }
-                    };
-                }
-                return n;
-            });
-            syncMarkdownFromFlow(updated, edges);
-            return updated;
+        const updated = nodes.map(n => {
+            if (n.id === id) {
+                return {
+                    ...n,
+                    data: {
+                        ...n.data,
+                        label: newLabel
+                    }
+                };
+            }
+            return n;
         });
-    }, [edges, syncMarkdownFromFlow]);
+        
+        pushNodes(updated);
+        syncMarkdownFromFlow(updated, edges);
+    }, [nodes, edges, pushNodes, syncMarkdownFromFlow]);
 
     // Toggle all: abre y cierra todos los nodos
     const onToggleAll = useCallback(() => {
         const isAny = nodes.some(n => n.data?.collapsed === true);
 
-        setNodes((nds) => {
-            const updated = nds.map(n => {
-                return {
-                    ...n,
-                    data: {
-                        ...n.data,
-                        collapsed: !isAny
-                    }
-                };
-            });
-
-            const positioned = layoutNodes(updated, edges);
-            const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
-            setEdges(visibleEdges);
-            return visibleNodes;
+        const updated = nodes.map(n => {
+            return {
+                ...n,
+                data: {
+                    ...n.data,
+                    collapsed: !isAny
+                }
+            };
         });
-    }, [nodes, edges]);
+
+        const positioned = layoutNodes(updated, edges);
+        const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
+        
+        pushEdges(visibleEdges);
+        pushNodes(visibleNodes);
+    }, [nodes, edges, pushNodes, pushEdges]);
 
     const isAnyCollapsed = useMemo(() => {
         return nodes.some(n => n.data?.collapsed === true);
@@ -635,12 +609,12 @@ export const useMapaMental = (active = true) => {
         setMarkdown(newMarkdown);
         try {
             const parsed = parseMarkdownToFlow(newMarkdown);
-            setNodes(parsed.nodes);
-            setEdges(parsed.edges);
+            pushNodes(parsed.nodes);
+            pushEdges(parsed.edges);
         } catch (e) {
             console.error('Error parsing markdown', e);
         }
-    }, []);
+    }, [pushNodes, pushEdges]);
 
     // Create a new root node
     const onAddNode = useCallback(() => {

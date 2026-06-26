@@ -3,7 +3,7 @@ import type { DocumentUnionType } from "../modules/context-builder/interfaces/Do
 
 export type DocumentoResponse = DocumentUnionType;
 
-const basePath = "/api/documentos-contexto";
+const basePath = "context-builder/api/documentos-contexto";
 
 export const DocumentoContextService = {
   getAll: () => {

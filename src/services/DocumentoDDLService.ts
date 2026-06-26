@@ -1,7 +1,7 @@
 import apiClient from "../api/interceptor";
 import type { DocumentoDDLRequestInterface } from "../modules/context-builder/interfaces/DocumentoDDLRequestInterface";
 
-const basePath = "/api/documentos-ddl";
+const basePath = "context-builder/api/documentos-ddl";
 
 export const DocumentoDDLService = {
   getById: (id: string) => {

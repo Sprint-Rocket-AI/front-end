@@ -1,7 +1,7 @@
 import apiClient from "../api/interceptor";
 import type { DocumentoLineamientoRequestInterface } from "../modules/context-builder/interfaces/DocumentoLineamientoRequestInterface";
 
-const basePath = "/api/documentos-lineamientos";
+const basePath = "context-builder/api/documentos-lineamientos";
 
 export const DocumentoLineamientoService = {
   getById: (id: string) => {

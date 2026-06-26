@@ -1,7 +1,7 @@
 import apiClient from "../api/interceptor";
 import type { DocumentoSistemaRequestInterface } from "../modules/context-builder/interfaces/DocumentoSistemaRequestInterface";
 
-const basePath = "/api/documentos-sistemas";
+const basePath = "context-builder/api/documentos-sistemas";
 
 export const DocumentoSistemaService = {
   getById: (id: string) => {

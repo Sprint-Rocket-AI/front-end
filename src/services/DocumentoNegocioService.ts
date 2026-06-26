@@ -1,7 +1,7 @@
 import apiClient from "../api/interceptor";
 import type { DocumentoNegocioRequestInterface } from "../modules/context-builder/interfaces/DocumentoNegocioRequestInterface";
 
-const basePath = "/api/documentos-negocio";
+const basePath = "context-builder/api/documentos-negocio";
 
 export const DocumentoNegocioService = {
   getById: (id: string) => {

@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import { DocumentsPage } from "../pages/DocumentsPage";
 import { DiagramPage } from "../pages/DiagramPage";
 import { DiagramsListPage } from "../pages/DiagramsListPage";
@@ -26,6 +26,10 @@ export const routes = [
     children: [
       {
         index: true,
+        element: <Navigate to="home" replace />,
+      },
+      {
+        path: "home",
         element: <HomePage />,
       },
       {

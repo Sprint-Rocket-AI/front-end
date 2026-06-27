@@ -197,9 +197,16 @@ export const useContextBuilder = () => {
     }
   };
 
-  const deleteById = async (id: string) => {
+  const deleteById = async (id: string): Promise<boolean> => {
     try {
-      await DocumentoContextService.deleteById(id);
+      const response = await DocumentoContextService.deleteById(id);
+      const deleted = response.status === 204;
+
+      if (!deleted) {
+        setFeedback("No se pudo eliminar el documento.");
+        return false;
+      }
+
       dispatch(removeDocument(id));
 
       if (editingId === id) {
@@ -208,14 +215,16 @@ export const useContextBuilder = () => {
         setShowStructuredForm(false);
         setFormData(isEditableDocumentTipo(tipo) ? createEmptyDocumentByType(tipo) : null);
         setInitialState(null);
-        setFeedback("Deleted document and cleared the active editor.");
-        return;
+        setFeedback("Eliminación exitosa.");
+        return true;
       }
 
-      setFeedback("Document deleted.");
+      setFeedback("Eliminación exitosa.");
+      return true;
     } catch (error) {
       console.error("Error deleting document:", error);
       setFeedback("Error al eliminar el documento en el servidor.");
+      return false;
     }
   };
 

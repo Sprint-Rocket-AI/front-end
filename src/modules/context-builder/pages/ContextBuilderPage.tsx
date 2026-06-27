@@ -162,9 +162,12 @@ export const ContextBuilderPage = () => {
         confirmText="Sí, eliminar"
         onConfirm={async () => {
           if (deletingId) {
-            await deleteById(deletingId);
+            const deleted = await deleteById(deletingId);
             setDeletingId(null);
-            setToast({ message: "Documento eliminado con éxito.", type: "success" });
+            setToast({
+              message: deleted ? "Eliminación exitosa." : "No se pudo eliminar el documento.",
+              type: deleted ? "success" : "error",
+            });
           }
         }}
         onCancel={() => setDeletingId(null)}

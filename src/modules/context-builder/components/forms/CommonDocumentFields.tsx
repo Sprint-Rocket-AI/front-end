@@ -1,5 +1,4 @@
 import type { BaseDocumentInterface } from "../../interfaces/BaseDocumentInterface";
-import { DocumentEstadoEnum } from "../../interfaces/DocumentEstadoEnum";
 import { TagListInput } from "../TagListInput";
 
 interface CommonDocumentFieldsProps<T extends BaseDocumentInterface> {

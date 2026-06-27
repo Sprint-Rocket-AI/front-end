@@ -15,7 +15,10 @@ export const useDocumentFilters = (documents: DocumentRecordInterface[]) => {
 
       const matchesTitle = record.data.titulo?.toLowerCase().includes(query);
       const matchesId = record.id?.toLowerCase().includes(query);
-      const matchesProjectId = record.data.proyectoId?.toLowerCase().includes(query);
+      const matchesProjectId =
+        "proyectoId" in record.data && typeof record.data.proyectoId === "string"
+          ? record.data.proyectoId.toLowerCase().includes(query)
+          : false;
 
       return matchesType && (matchesTitle || matchesId || matchesProjectId);
     });

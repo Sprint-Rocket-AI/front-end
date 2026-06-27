@@ -6,8 +6,20 @@ import { removeDocument, upsertDocument } from "../../../store/slices/documentsS
 import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
 import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import { createEmptyDocumentByType, createFallbackFromRawText, mergeAiResult } from "../templates/documentTemplates";
-import { DocumentServiceFactory } from "../../../services/DocumentServiceFactory";
 import { DocumentoContextService } from "../../../services/DocumentoContextService";
+import { DocumentoDDLService } from "../../../services/DocumentoDDLService";
+import { DocumentoLineamientoService } from "../../../services/DocumentoLineamientoService";
+import { DocumentoNegocioService } from "../../../services/DocumentoNegocioService";
+import { DocumentoSistemaService } from "../../../services/DocumentoSistemaService";
+import type { DocumentoDDLRequestInterface } from "../interfaces/DocumentoDDLRequestInterface";
+import type { DocumentoLineamientoRequestInterface } from "../interfaces/DocumentoLineamientoRequestInterface";
+import type { DocumentoNegocioRequestInterface } from "../interfaces/DocumentoNegocioRequestInterface";
+import type { DocumentoSistemaRequestInterface } from "../interfaces/DocumentoSistemaRequestInterface";
+
+type EditableDocumentTipo = Exclude<DocumentTipoEnum, DocumentTipoEnum.PDF>;
+
+const isEditableDocumentTipo = (tipo: DocumentTipoEnum | ""): tipo is EditableDocumentTipo =>
+  tipo !== "" && tipo !== DocumentTipoEnum.PDF;
 
 export const useContextBuilder = () => {
   const feedbackInitial = "Selecciona un tipo de documento para comenzar a construir el contexto.";
@@ -30,12 +42,12 @@ export const useContextBuilder = () => {
     setRawText("");
     setShowStructuredForm(false);
     setInitialState(null);
-    setFormData(nextTipo ? createEmptyDocumentByType(nextTipo) : null);
+    setFormData(isEditableDocumentTipo(nextTipo) ? createEmptyDocumentByType(nextTipo) : null);
     setFeedback(nextTipo ? `Listo para modelar un documento ${nextTipo}.` : feedbackInitial);
   };
 
   const generateFromAI = async () => {
-    if (!tipo) {
+    if (!isEditableDocumentTipo(tipo)) {
       setFeedback("Selecciona un tipo de documento antes de generar un formulario estructurado.");
       return;
     }
@@ -69,7 +81,7 @@ export const useContextBuilder = () => {
   };
 
   const startManualForm = () => {
-    if (!tipo) {
+    if (!isEditableDocumentTipo(tipo)) {
       setFeedback("Selecciona un tipo de documento antes de crear un borrador manual.");
       return;
     }
@@ -85,7 +97,7 @@ export const useContextBuilder = () => {
   };
 
   const reset = () => {
-    if (!tipo) {
+    if (!isEditableDocumentTipo(tipo)) {
       return;
     }
 
@@ -106,31 +118,37 @@ export const useContextBuilder = () => {
   };
 
   const saveCurrentDocument = async (): Promise<boolean> => {
-    if (!tipo || !formData) {
+    if (!isEditableDocumentTipo(tipo) || !formData) {
       setFeedback("Genera o crea un formulario antes de guardar.");
       return false;
     }
 
     setIsGenerating(true);
     try {
-      const service = DocumentServiceFactory.getDocumentServiceByType(tipo);
-      let response;
       const isEdit = mode === "edit" && editingId;
 
       const { fechaCreacion, fechaActualizacion, ...payloadToSend } = formData;
+      let responseData: DocumentUnionType;
 
-      if (isEdit) {
-        response = await service.update(editingId, payloadToSend);
+      if (tipo === DocumentTipoEnum.DDL) {
+        const payload = payloadToSend as DocumentoDDLRequestInterface;
+        responseData = isEdit && editingId ? (await DocumentoDDLService.update(editingId, payload)).data : (await DocumentoDDLService.create(payload)).data;
+      } else if (tipo === DocumentTipoEnum.NEGOCIO) {
+        const payload = payloadToSend as DocumentoNegocioRequestInterface;
+        responseData = isEdit && editingId ? (await DocumentoNegocioService.update(editingId, payload)).data : (await DocumentoNegocioService.create(payload)).data;
+      } else if (tipo === DocumentTipoEnum.SISTEMA) {
+        const payload = payloadToSend as DocumentoSistemaRequestInterface;
+        responseData = isEdit && editingId ? (await DocumentoSistemaService.update(editingId, payload)).data : (await DocumentoSistemaService.create(payload)).data;
       } else {
-        response = await service.create(payloadToSend);
+        const payload = payloadToSend as DocumentoLineamientoRequestInterface;
+        responseData = isEdit && editingId ? (await DocumentoLineamientoService.update(editingId, payload)).data : (await DocumentoLineamientoService.create(payload)).data;
       }
 
-      const savedData = response.data;
-      const id = savedData.id || editingId || crypto.randomUUID();
+      const id = responseData.id || editingId || crypto.randomUUID();
       const nextData = {
-        ...savedData,
+        ...responseData,
         id,
-        fechaCreacion: savedData.fechaCreacion,
+        fechaCreacion: responseData.fechaCreacion,
       };
 
       dispatch(
@@ -164,8 +182,7 @@ export const useContextBuilder = () => {
     setFeedback(`Cargando documento "${record.data.titulo || record.id}" desde el servidor...`);
 
     try {
-      const service = DocumentServiceFactory.getDocumentServiceByType(record.tipo);
-      const response = await service.getById(record.id);
+      const response = await DocumentoContextService.getById(record.id);
       const serverData = response.data;
       setFormData(serverData);
       setInitialState(serverData);
@@ -189,7 +206,7 @@ export const useContextBuilder = () => {
         setEditingId(null);
         setMode("create");
         setShowStructuredForm(false);
-        setFormData(tipo ? createEmptyDocumentByType(tipo) : null);
+        setFormData(isEditableDocumentTipo(tipo) ? createEmptyDocumentByType(tipo) : null);
         setInitialState(null);
         setFeedback("Deleted document and cleared the active editor.");
         return;

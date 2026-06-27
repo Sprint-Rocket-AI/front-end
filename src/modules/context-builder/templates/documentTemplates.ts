@@ -4,6 +4,8 @@ import { DocumentTipoEnum } from "../interfaces/DocumentTipoEnum";
 import type { DocumentUnionType } from "../interfaces/DocumentUnionType";
 import type { TablaInterface } from "../interfaces/TablaInterface";
 
+type EditableDocumentTipo = Exclude<DocumentTipoEnum, DocumentTipoEnum.PDF>;
+
 
 const getNow = () => new Date().toISOString();
 
@@ -52,7 +54,7 @@ export const createEmptyTable = (): TablaInterface => ({
   relaciones: [],
 });
 
-export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnionType => {
+export const createEmptyDocumentByType = (tipo: EditableDocumentTipo): DocumentUnionType => {
   const base = createBaseDocument();
 
   switch (tipo) {
@@ -81,17 +83,19 @@ export const createEmptyDocumentByType = (tipo: DocumentTipoEnum): DocumentUnion
         ...base,
       };
   }
+
+  return base as DocumentUnionType;
 };
 
 const createExcerpt = (rawText: string) => cleanLines(rawText).slice(0, 3).join(" ").slice(0, 220);
 
-export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: string): DocumentUnionType => {
+export const createFallbackFromRawText = (tipo: EditableDocumentTipo, rawText: string): DocumentUnionType => {
   const base = createBaseDocument(rawText);
 
   switch (tipo) {
     case DocumentTipoEnum.DDL:
       return {
-        ...createEmptyDocumentByType(tipo),
+        ...createEmptyDocumentByType(DocumentTipoEnum.DDL),
         ...base,
         titulo: base.titulo || "Modelo DDL inicial",
         tablas: [
@@ -113,13 +117,13 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
       };
     case DocumentTipoEnum.NEGOCIO:
       return {
-        ...createEmptyDocumentByType(tipo),
+        ...createEmptyDocumentByType(DocumentTipoEnum.NEGOCIO),
         ...base,
         criteriosAceptacion: cleanLines(rawText).slice(0, 4),
       };
     case DocumentTipoEnum.SISTEMA:
       return {
-        ...createEmptyDocumentByType(tipo),
+        ...createEmptyDocumentByType(DocumentTipoEnum.SISTEMA),
         ...base,
         stack: cleanLines(rawText).slice(0, 4),
         urlRepos: [],
@@ -127,15 +131,17 @@ export const createFallbackFromRawText = (tipo: DocumentTipoEnum, rawText: strin
       };
     case DocumentTipoEnum.LINEAMIENTO:
       return {
-        ...createEmptyDocumentByType(tipo),
+        ...createEmptyDocumentByType(DocumentTipoEnum.LINEAMIENTO),
         ...base,
       };
   }
+
+  return base as DocumentUnionType;
 };
 
 export const mergeAiResult = (tipo: DocumentTipoEnum, partial: Partial<DocumentUnionType>): DocumentUnionType => {
   const merged = {
-    ...createEmptyDocumentByType(tipo),
+    ...createEmptyDocumentByType(tipo === DocumentTipoEnum.PDF ? DocumentTipoEnum.LINEAMIENTO : tipo),
     ...partial,
   } as DocumentUnionType;
 

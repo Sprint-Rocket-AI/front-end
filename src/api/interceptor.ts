@@ -2,7 +2,7 @@ import axios from "axios";
 import { getOidcToken } from "../modules/auth/utils/token";
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
+    baseURL: import.meta.env.VITE_API_BASE_URL ?? "https://rwf5nicdif.execute-api.us-east-1.amazonaws.com/PROD",
     timeout: 3000000,
 });
 

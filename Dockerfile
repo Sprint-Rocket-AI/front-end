@@ -7,7 +7,7 @@ ARG VITE_CHECKPOINT_API_URL=http://localhost:8082/api
 ARG VITE_CHECKPOINT_WS_URL=ws://localhost:8082/ws/reminders?userId=dev-001
 ARG VITE_COGNITO_AUTHORITY=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_Ul4uQi42G
 ARG VITE_COGNITO_CLIENT_ID=425er5pq3u4ehpk6rlrcnkkbiq
-ARG VITE_COGNITO_REDIRECT_URI=https://front-end-vjhf.onrender.com/home
+ARG VITE_COGNITO_REDIRECT_URI=https://front-end-sj2h.onrender.com/home
 ARG VITE_COGNITO_DOMAIN=https://us-east-1ul4uqi42g.auth.us-east-1.amazoncognito.com
 ARG VITE_COGNITO_LOGOUT_URI=https://us-east-1ul4uqi42g.auth.us-east-1.amazoncognito.com/logout?client_id=425er5pq3u4ehpk6rlrcnkkbiq&logout_uri=https://front-end-vjhf.onrender.com/home
 

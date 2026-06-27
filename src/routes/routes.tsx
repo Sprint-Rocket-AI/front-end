@@ -68,6 +68,10 @@ export const routes = [
       </AuthRoute>
     ),
   },
+  {
+    path: "*",
+    element: <Navigate to="/home" replace />,
+  },
 ];
 
 export const AppRouter = () => useRoutes(routes);

@@ -1,12 +1,7 @@
 import { useAuth } from "react-oidc-context";
-import { Navigate } from "react-router-dom";
 
 export const LoginPage = () => {
   const auth = useAuth();
-
-  if (auth.isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
 
   const handleLogin = () => {
     auth.signinRedirect();

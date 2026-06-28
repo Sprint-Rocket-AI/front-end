@@ -13,7 +13,7 @@ export const AppShellLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
- useRemindersWebSocket();
+  useRemindersWebSocket();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);

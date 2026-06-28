@@ -1,12 +1,15 @@
 import type { ReactElement } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
+import { hasAnyRole, type AppRole } from "../modules/auth/utils/roles";
 
 interface AuthRouteProps {
   children: ReactElement;
+  allowedRoles?: AppRole[];
+  redirectTo?: string;
 }
 
-export const AuthRoute = ({ children }: AuthRouteProps) => {
+export const AuthRoute = ({ children, allowedRoles, redirectTo = "/home" }: AuthRouteProps) => {
   const auth = useAuth();
 
   if (auth.isLoading) {
@@ -20,5 +23,13 @@ export const AuthRoute = ({ children }: AuthRouteProps) => {
     );
   }
 
-  return auth.isAuthenticated ? children : <Navigate to="/login" replace />;
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !hasAnyRole(auth.user?.profile as Record<string, unknown> | undefined, allowedRoles)) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  return children;
 };

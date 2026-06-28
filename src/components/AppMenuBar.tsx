@@ -8,17 +8,6 @@ interface AppMenuBarProps {
   onToggleTheme: () => void;
 }
 
-const navItems = [
-  { to: "/", label: "Inicio", end: true },
-  { to: "/diagrams", label: "Diagramas", end: false },
-  { to: "/chat", label: "Chat", end: false },
-];
-
-const documentSubmenuItems = [
-  { to: "/documents/builder", label: "Builder" },
-  { to: "/documents/view", label: "Ver documentos" },
-];
-
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   ["nav-link", isActive ? "nav-link-active" : ""].join(" ");
 
@@ -31,6 +20,16 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   const auth = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const navItems = [
+    { to: "/home", label: "Inicio", end: true },
+    { to: "/diagrams", label: "Diagramas", end: false },
+    { to: "/chat", label: "Chat", end: false },
+  ];
+
+  const documentSubmenuItems = [
+    { to: "/documents/builder", label: "Builder" },
+    { to: "/documents/view", label: "Ver documentos" },
+  ];
 
   const handleSignOut = () => {
     const clientId = cognitoAuthConfig.client_id;
@@ -82,7 +81,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
       <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         {/* Marca */}
         <div className="flex min-w-0 items-center gap-8">
-          <NavLink to="/" className="flex flex-col leading-tight">
+          <NavLink to="/home" className="flex flex-col leading-tight">
             <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-orange-500">
               Sprint Rocket.AI
             </span>

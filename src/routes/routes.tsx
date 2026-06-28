@@ -1,6 +1,5 @@
 import { Suspense, lazy } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
-import { useAuth } from "react-oidc-context";
 import { ChatIAPage } from "../modules/chat/pages/ChatIAPage";
 import { APP_ROLES } from "../modules/auth/utils/roles";
 import { LoginPage } from "../modules/auth/pages/LoginPage";
@@ -10,11 +9,12 @@ import { DiagramsListPage } from "../pages/DiagramsListPage";
 import { DocumentsPage } from "../pages/DocumentsPage";
 import { HomePage } from "../pages/HomePage";
 import { AuthRoute } from "./AuthRoute";
+import { useCognitoSession } from "../modules/auth/services/cognitoAuthService";
 
 const ContextBuilderModule = lazy(() => import("../modules/context-builder/ContextBuilderModule"));
 
 const LoginRoute = () => {
-  const auth = useAuth();
+  const auth = useCognitoSession();
 
   if (auth.isAuthenticated) {
     return <Navigate to="/home" replace />;

@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "react-oidc-context";
-import { hasAnyRole, type AppRole } from "../modules/auth/utils/roles";
+import { useCognitoSession, validateRole } from "../modules/auth/services/cognitoAuthService";
+import { type AppRole } from "../modules/auth/utils/roles";
 
 interface AuthRouteProps {
   children: ReactElement;
@@ -10,7 +10,7 @@ interface AuthRouteProps {
 }
 
 export const AuthRoute = ({ children, allowedRoles, redirectTo = "/home" }: AuthRouteProps) => {
-  const auth = useAuth();
+  const auth = useCognitoSession();
 
   if (auth.isLoading) {
     return (
@@ -27,7 +27,7 @@ export const AuthRoute = ({ children, allowedRoles, redirectTo = "/home" }: Auth
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !hasAnyRole(auth.user?.profile as Record<string, unknown> | undefined, allowedRoles)) {
+  if (allowedRoles && !validateRole(auth.profile, allowedRoles)) {
     return <Navigate to={redirectTo} replace />;
   }
 

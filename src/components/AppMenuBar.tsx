@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { useAuth } from "react-oidc-context";
-import { cognitoAuthConfig, cognitoDomain, logoutUri } from "../modules/auth/config/cognitoConfig";
+import { logout, useCognitoSession } from "../modules/auth/services/cognitoAuthService";
 
 interface AppMenuBarProps {
   isDark: boolean;
@@ -17,7 +16,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   const [isDocumentsMenuOpen, setIsDocumentsMenuOpen] = useState(false);
   const docsRef = useRef<HTMLDivElement>(null);
   
-  const auth = useAuth();
+  const auth = useCognitoSession();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const navItems = [
@@ -32,9 +31,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   ];
 
   const handleSignOut = () => {
-    const clientId = cognitoAuthConfig.client_id;
-    auth.removeUser();
-    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+    logout();
   };
 
   const getUserInitials = (nameOrEmail: string): string => {
@@ -163,7 +160,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
                 onClick={() => setIsUserMenuOpen((v) => !v)}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-assistant-gradient text-sm font-bold text-white shadow-glow-assistant transition hover:scale-105 focus:outline-none"
               >
-                {getUserInitials(auth.user?.profile?.email || auth.user?.profile?.name || "U")}
+                {getUserInitials((auth.profile?.email as string | undefined) || (auth.profile?.name as string | undefined) || "U")}
               </button>
 
               {isUserMenuOpen && (
@@ -172,8 +169,8 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
                     <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Usuario
                     </p>
-                    <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate mt-0.5" title={auth.user?.profile?.email || auth.user?.profile?.name}>
-                      {auth.user?.profile?.email || auth.user?.profile?.name || "Usuario"}
+                    <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate mt-0.5" title={(auth.profile?.email as string | undefined) || (auth.profile?.name as string | undefined)}>
+                      {(auth.profile?.email as string | undefined) || (auth.profile?.name as string | undefined) || "Usuario"}
                     </p>
                   </div>
                   <button

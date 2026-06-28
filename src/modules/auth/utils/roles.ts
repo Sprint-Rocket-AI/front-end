@@ -5,23 +5,9 @@ export const APP_ROLES = {
 
 export type AppRole = (typeof APP_ROLES)[keyof typeof APP_ROLES];
 
-type ProfileValue = string | string[] | undefined | null;
-
-const isAppRole = (value: string): value is AppRole =>
-  value === APP_ROLES.ADMIN || value === APP_ROLES.DEV;
-
-const normalizeRoleValue = (value: string) => value.trim().toUpperCase();
-
-const extractRoleValues = (value: ProfileValue): AppRole[] => {
-  if (!value) {
-    return [];
-  }
-
-  const values = Array.isArray(value) ? value : value.split(",");
-
-  return values
-    .map((role) => normalizeRoleValue(role))
-    .filter((role): role is AppRole => isAppRole(role));
+const GROUP_TO_ROLE: Record<string, AppRole> = {
+  ADMIN_GROUP: APP_ROLES.ADMIN,
+  DEV_GROUP: APP_ROLES.DEV,
 };
 
 export const getUserRoles = (profile?: Record<string, unknown> | null): AppRole[] => {
@@ -29,18 +15,19 @@ export const getUserRoles = (profile?: Record<string, unknown> | null): AppRole[
     return [];
   }
 
-  const roleCandidates = [
-    ...extractRoleValues(profile["cognito:groups"] as ProfileValue),
-    ...extractRoleValues(profile.groups as ProfileValue),
-    ...extractRoleValues(profile.roles as ProfileValue),
-    ...extractRoleValues(profile.role as ProfileValue),
-    ...extractRoleValues(profile["custom:role"] as ProfileValue),
-  ];
+  const groups = profile["cognito:groups"];
+  const groupValues = Array.isArray(groups)
+    ? groups
+    : typeof groups === "string"
+      ? groups.split(",")
+      : [];
 
-  return Array.from(new Set(roleCandidates));
+  return Array.from(
+    new Set(
+      groupValues
+        .map((group) => group.trim().toUpperCase())
+        .map((group) => GROUP_TO_ROLE[group])
+        .filter((role): role is AppRole => Boolean(role))
+    )
+  );
 };
-
-export const hasAnyRole = (
-  profile: Record<string, unknown> | undefined | null,
-  allowedRoles: readonly AppRole[]
-) => getUserRoles(profile).some((role) => allowedRoles.includes(role));

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getOidcToken } from "../modules/auth/utils/token";
+import { getToken } from "../modules/auth/utils/authHelper";
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
@@ -8,7 +8,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
-        const token = getOidcToken();
+        const token = getToken();
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

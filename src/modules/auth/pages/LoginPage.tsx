@@ -1,10 +1,10 @@
-import { useAuth } from "react-oidc-context";
+import { login, useCognitoSession } from "../services/cognitoAuthService";
 
 export const LoginPage = () => {
-  const auth = useAuth();
+  const auth = useCognitoSession();
 
   const handleLogin = () => {
-    auth.signinRedirect();
+    login();
   };
 
   return (
@@ -30,7 +30,7 @@ export const LoginPage = () => {
 
         {auth.error && (
           <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400">
-            <span className="font-semibold">Error al iniciar sesión:</span> {auth.error.message}
+            <span className="font-semibold">Error al iniciar sesión:</span> {auth.error}
           </div>
         )}
 

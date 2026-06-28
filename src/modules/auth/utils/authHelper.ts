@@ -13,24 +13,12 @@ export const getOidcStorageKey = () =>
 export const getStoredOidcUser = (): StoredOidcUser | null => {
   const storedUser = window.localStorage.getItem(getOidcStorageKey());
 
-  console.log("[authHelper] getStoredOidcUser", {
-    storageKey: getOidcStorageKey(),
-    found: Boolean(storedUser),
-  });
-
   if (!storedUser) {
     return null;
   }
 
   try {
     const parsedUser = JSON.parse(storedUser) as StoredOidcUser;
-
-    console.log("[authHelper] parsed OIDC user", {
-      hasAccessToken: Boolean(parsedUser.access_token),
-      hasIdToken: Boolean(parsedUser.id_token),
-      expired: parsedUser.expired,
-      profileKeys: parsedUser.profile ? Object.keys(parsedUser.profile) : [],
-    });
 
     return parsedUser;
   } catch (error) {
@@ -42,11 +30,6 @@ export const getStoredOidcUser = (): StoredOidcUser | null => {
 export const getToken = (): string | null => {
   const storedUser = getStoredOidcUser();
   const token = storedUser?.access_token ?? storedUser?.id_token ?? null;
-
-  console.log("[authHelper] getToken", {
-    hasToken: Boolean(token),
-    tokenSource: storedUser?.access_token ? "access_token" : storedUser?.id_token ? "id_token" : null,
-  });
 
   return token;
 };

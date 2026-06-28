@@ -16,16 +16,7 @@ const ContextBuilderModule = lazy(() => import("../modules/context-builder/Conte
 const LoginRoute = () => {
   const auth = useCognitoSession();
 
-  console.log("[LoginRoute] render", {
-    pathname: window.location.pathname,
-    search: window.location.search,
-    isLoading: auth.isLoading,
-    isAuthenticated: auth.isAuthenticated,
-    profileKeys: auth.profile ? Object.keys(auth.profile) : [],
-  });
-
   if (auth.isAuthenticated) {
-    console.log("[LoginRoute] redirecting to /home");
     return <Navigate to="/home" replace />;
   }
 

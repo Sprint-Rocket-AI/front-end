@@ -4,12 +4,6 @@ export const LoginPage = () => {
   const auth = useCognitoSession();
 
   const handleLogin = () => {
-    console.log("[LoginPage] login clicked", {
-      pathname: window.location.pathname,
-      search: window.location.search,
-      isAuthenticated: auth.isAuthenticated,
-      isLoading: auth.isLoading,
-    });
     login();
   };
 

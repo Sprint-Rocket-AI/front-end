@@ -12,15 +12,6 @@ interface AuthRouteProps {
 export const AuthRoute = ({ children, allowedRoles, redirectTo = "/home" }: AuthRouteProps) => {
   const auth = useCognitoSession();
 
-  console.log("[AuthRoute] render", {
-    pathname: window.location.pathname,
-    search: window.location.search,
-    isLoading: auth.isLoading,
-    isAuthenticated: auth.isAuthenticated,
-    allowedRoles,
-    profileKeys: auth.profile ? Object.keys(auth.profile) : [],
-  });
-
   if (auth.isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-ink-950 text-slate-500 dark:text-slate-300">
@@ -33,17 +24,10 @@ export const AuthRoute = ({ children, allowedRoles, redirectTo = "/home" }: Auth
   }
 
   if (!auth.isAuthenticated) {
-    console.log("[AuthRoute] redirecting to /login", { pathname: window.location.pathname });
     return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles && !validateRole(auth.profile, allowedRoles)) {
-    console.log("[AuthRoute] redirecting by role", {
-      pathname: window.location.pathname,
-      redirectTo,
-      allowedRoles,
-      profile: auth.profile,
-    });
     return <Navigate to={redirectTo} replace />;
   }
 

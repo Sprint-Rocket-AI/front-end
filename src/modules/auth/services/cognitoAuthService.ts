@@ -79,24 +79,42 @@ const initializeSession = () => {
 
   updateSession({ isLoading: true });
 
+  console.log("[cognitoAuthService] initializeSession:start", {
+    pathname: window.location.pathname,
+    search: window.location.search,
+    hasStoredUser: Boolean(storedUser),
+    isSigninCallback: new URLSearchParams(window.location.search).has("code") && new URLSearchParams(window.location.search).has("state"),
+  });
+
   initPromise = userManager.getUser()
     .then((user) => {
+      console.log("[cognitoAuthService] initializeSession:getUser", {
+        hasUser: Boolean(user),
+        expired: user?.expired ?? null,
+        profileKeys: user?.profile ? Object.keys(user.profile) : [],
+      });
+
       currentSession = {
         isAuthenticated: Boolean(user && !user.expired),
         isLoading: false,
         error: null,
         profile: (user?.profile as Record<string, unknown> | undefined) ?? null,
       };
+
+      console.log("[cognitoAuthService] initializeSession:resolved", currentSession);
       initialized = true;
       emitChange();
     })
     .catch((error: unknown) => {
+      console.log("[cognitoAuthService] initializeSession:error", error);
       currentSession = {
         isAuthenticated: false,
         isLoading: false,
         error: error instanceof Error ? error.message : "Error cargando sesión",
         profile: null,
       };
+
+      console.log("[cognitoAuthService] initializeSession:fallback", currentSession);
       initialized = true;
       emitChange();
     });

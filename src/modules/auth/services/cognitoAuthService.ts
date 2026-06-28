@@ -11,9 +11,12 @@ type CognitoSession = {
   profile: Record<string, unknown> | null;
 };
 
+type OidcUser = Awaited<ReturnType<typeof userManager.getUser>>;
+
 const userManager = new UserManager({
   ...cognitoAuthConfig,
   automaticSilentRenew: true,
+  stateStore: new WebStorageStateStore({ store: window.localStorage }),
   userStore: new WebStorageStateStore({ store: window.localStorage }),
 });
 
@@ -28,6 +31,30 @@ const listeners = new Set<() => void>();
 let initialized = false;
 let initPromise: Promise<void> | null = null;
 const storedUser = getStoredOidcUser();
+
+const hasSigninCallback = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  return searchParams.has("code") && searchParams.has("state");
+};
+
+const syncSessionFromUser = (user: OidcUser) => {
+  currentSession = {
+    isAuthenticated: Boolean(user && !user.expired),
+    isLoading: false,
+    error: null,
+    profile: (user?.profile as Record<string, unknown> | undefined) ?? null,
+  };
+};
+
+const resolveCurrentUser = async () => {
+  if (!hasSigninCallback()) {
+    return userManager.getUser();
+  }
+
+  await userManager.signinRedirectCallback(window.location.href);
+  window.history.replaceState({}, document.title, window.location.pathname);
+  return userManager.getUser();
+};
 
 if (storedUser) {
   currentSession = {
@@ -83,29 +110,23 @@ const initializeSession = () => {
     pathname: window.location.pathname,
     search: window.location.search,
     hasStoredUser: Boolean(storedUser),
-    isSigninCallback: new URLSearchParams(window.location.search).has("code") && new URLSearchParams(window.location.search).has("state"),
+    isSigninCallback: hasSigninCallback(),
   });
 
-  initPromise = userManager.getUser()
-    .then((user) => {
+  initPromise = (async () => {
+    try {
+      const user = await resolveCurrentUser();
+
       console.log("[cognitoAuthService] initializeSession:getUser", {
         hasUser: Boolean(user),
         expired: user?.expired ?? null,
         profileKeys: user?.profile ? Object.keys(user.profile) : [],
       });
 
-      currentSession = {
-        isAuthenticated: Boolean(user && !user.expired),
-        isLoading: false,
-        error: null,
-        profile: (user?.profile as Record<string, unknown> | undefined) ?? null,
-      };
+      syncSessionFromUser(user);
 
       console.log("[cognitoAuthService] initializeSession:resolved", currentSession);
-      initialized = true;
-      emitChange();
-    })
-    .catch((error: unknown) => {
+    } catch (error: unknown) {
       console.log("[cognitoAuthService] initializeSession:error", error);
       currentSession = {
         isAuthenticated: false,
@@ -115,9 +136,11 @@ const initializeSession = () => {
       };
 
       console.log("[cognitoAuthService] initializeSession:fallback", currentSession);
+    } finally {
       initialized = true;
       emitChange();
-    });
+    }
+  })();
 
   return initPromise;
 };

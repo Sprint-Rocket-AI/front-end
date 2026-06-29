@@ -29,7 +29,7 @@ export const getStoredOidcUser = (): StoredOidcUser | null => {
 
 export const getToken = (): string => {
   const storedUser = getStoredOidcUser();
-  const token = storedUser?.access_token ?? storedUser?.id_token ?? null;
+  const token =  storedUser?.id_token;
 
   if (!token) {
     throw new Error("No se encontró token");

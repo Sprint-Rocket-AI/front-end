@@ -43,7 +43,6 @@ export const ActividadFormModal = ({ onAdd, onClose }: ActividadFormModalProps) 
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Título */}
           <div>
             <label className="label" htmlFor="act-titulo">Título *</label>
             <input
@@ -57,20 +56,18 @@ export const ActividadFormModal = ({ onAdd, onClose }: ActividadFormModalProps) 
             />
           </div>
 
-          {/* Tipo y Prioridad */}
           <div>
             <label className="label" htmlFor="act-descripcion">Descripción (opcional)</label>
             <input
               id="act-descripcion"
               name="descripcion"
-              className="field"
+              className="field min-h-32 resize-y"
               placeholder="Describe brevemente la actividad..."
               value={form.descripcion ?? ''}
               onChange={handleChange}
             />
           </div>
 
-          {/* Acciones */}
           <div className="flex justify-end pt-1">
             <button type="submit" className="action-primary">
               Guardar actividad

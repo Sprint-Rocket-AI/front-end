@@ -144,7 +144,7 @@ export const useCognitoSession = (): CognitoSession => {
   return useSyncExternalStore(subscribeCognitoSession, getCognitoSessionSnapshot, getCognitoSessionSnapshot);
 };
 
-export const login = () => userManager.signinRedirect();
+export const login = () => userManager.signinRedirect({ extraQueryParams: { lang: "es" } });
 
 export const logout = () =>
   userManager.signoutRedirect({ post_logout_redirect_uri: logoutUri });

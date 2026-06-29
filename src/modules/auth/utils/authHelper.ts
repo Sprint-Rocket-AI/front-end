@@ -27,11 +27,15 @@ export const getStoredOidcUser = (): StoredOidcUser | null => {
   }
 };
 
-export const getToken = (): string | null => {
+export const getToken = (): string => {
   const storedUser = getStoredOidcUser();
   const token = storedUser?.access_token ?? storedUser?.id_token ?? null;
 
-  return token;
+  if (!token) {
+    throw new Error("No se encontró token");
+  }
+
+  return `Bearer ${token}`;
 };
 
 export const getProfile = (): Record<string, unknown> | null => getStoredOidcUser()?.profile ?? null;

@@ -2,7 +2,7 @@ import axios from "axios";
 import { getToken } from "../modules/auth/utils/authHelper";
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 3000000,
 });
 

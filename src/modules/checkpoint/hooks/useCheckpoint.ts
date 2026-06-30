@@ -198,13 +198,13 @@ export const useCheckpoint = () => {
         setFeedback('Recordatorio descartado');
       } else if (accion === 'POSPONER') {
         const recordatorio = state.recordatorios.find((r) => r.id === id);
-        if (recordatorio && recordatorio.horaExpiracion) {
-          const [h, m] = recordatorio.horaExpiracion.split(':').map(Number);
+        if (recordatorio && recordatorio.fechaExpiracion) {
+          const [h, m] = recordatorio.fechaExpiracion.split(':').map(Number);
           const date = new Date();
           date.setHours(h, m + 15);
           const newHora = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 
-          await actualizarRecordatorio(id, { horaExpiracion: newHora });
+          await actualizarRecordatorio(id, { fechaExpiracion: newHora });
           setState((s) => ({
             ...s,
             recordatorios: s.recordatorios.map((r) => r.id === id ? { ...r, horaActivacion: newHora } : r)

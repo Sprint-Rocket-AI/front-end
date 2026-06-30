@@ -3,15 +3,13 @@ import type { CrearRecordatorioRequest } from '../interfaces/RecordatorioInterfa
 import { DateTimePicker } from '../../../commons/components/DateTimePicker';
 
 interface RecordatorioFormModalProps {
-  // Ajustamos la firma para que coincida con el nuevo DTO del Backend
-  onAdd: (data: { titulo: string; fechaExpiracion?: string }) => void;
-  onClose: () => void;
+    onAdd: (data: CrearRecordatorioRequest) => void;
+    onClose: () => void;
 }
 
 export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalProps) => {
   const [titulo, setTitulo] = useState('');
   const [horaExpiracion, setHoraExpiracion] = useState('08:30');
-  // Inicializamos con la fecha de hoy para evitar enviar un string vacío o undefined
   const minDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
     .toISOString()
     .split('T')[0];
@@ -29,6 +27,7 @@ export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalP
     }
 
     onAdd({
+      userId: 'dev-001',
       titulo: titulo.trim(),
       fechaExpiracion: isoDateTime,
     });

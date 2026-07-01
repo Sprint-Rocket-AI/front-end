@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { ReactFlow, Controls, MiniMap, Background, SelectionMode } from '@xyflow/react';
 import { useParams } from 'react-router-dom';
 import { useDiagramFlow } from '../hooks/useDiagramFlow';
@@ -13,6 +13,7 @@ import { EdgeInputText } from './edges/EdgeInputText';
 import { useTheme } from '../../../commons/context/ThemeContext';
 import { diagramService } from '../../../services/DiagramService';
 import { LoadingSpinner } from '../../../commons/components/LoadingSpinner';
+import { ChevronLeftIcon } from '../../../assets/Icons';
 
 const nodeTypes = {
     nodeInputText: NodeInputText,
@@ -37,6 +38,9 @@ export const DiagramBoard = () => {
         handleRename,
         handleDownloadMd
     } = useDiagramBoard({ id });
+
+    const [fullscreenMode, setFullscreenMode] = useState<'none' | 'browser' | 'device'>('none');
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const isMentalMap = activeDiagram?.type === 'mental_map';
 
@@ -67,6 +71,47 @@ export const DiagramBoard = () => {
             isMounted = false;
         };
     }, [id, setActiveDiagram, setLoading]);
+
+    // Escuchador de teclado para salir de pantalla completa del navegador mediante Escape
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setFullscreenMode(prev => prev === 'browser' ? 'none' : prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    // Escuchador de cambio de pantalla completa nativa del dispositivo
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            if (!document.fullscreenElement) {
+                setFullscreenMode(prev => prev === 'device' ? 'none' : prev);
+            }
+        };
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
+    const toggleBrowserFullscreen = () => {
+        setFullscreenMode(prev => prev === 'browser' ? 'none' : 'browser');
+    };
+
+    const toggleDeviceFullscreen = async () => {
+        if (!containerRef.current) return;
+        try {
+            if (!document.fullscreenElement) {
+                await containerRef.current.requestFullscreen();
+                setFullscreenMode('device');
+            } else {
+                await document.exitFullscreen();
+                setFullscreenMode('none');
+            }
+        } catch (err) {
+            console.error("Error al alternar pantalla completa del dispositivo:", err);
+        }
+    };
 
     // Cálculo dinámico de cambios en la fase de renderizado
     const getIsDirty = () => {
@@ -146,7 +191,13 @@ export const DiagramBoard = () => {
     }
 
     return (
-        <section className="w-full h-full flex gap-4">
+        <section 
+            ref={containerRef}
+            className={fullscreenMode !== 'none'
+                ? "fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 p-6 flex gap-4 w-screen h-screen"
+                : "w-full h-full flex gap-4"
+            }
+        >
             {isMentalMap && mentalMapFlow.isMdPanelOpen && (
                 <div className="w-[380px] flex-shrink-0 flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 transition-all">
                     <div className="flex items-center justify-between mb-4">
@@ -155,16 +206,16 @@ export const DiagramBoard = () => {
                         </h2>
                         <button
                             onClick={() => mentalMapFlow.setIsMdPanelOpen(false)}
-                            className="p-1 rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 cursor-pointer"
+                            className="p-1 rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-350 cursor-pointer flex items-center justify-center"
                             title="Ocultar editor"
                         >
-                            ◀
+                            <ChevronLeftIcon size={16} />
                         </button>
                     </div>
                     <textarea
                         value={mentalMapFlow.markdown}
                         onChange={(e) => mentalMapFlow.updateFromMarkdown(e.target.value)}
-                        className="flex-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 font-mono focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500 resize-none"
+                        className="flex-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 font-mono focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500 resize-none"
                         placeholder="# Desarrollo&#10;## Tarea 1&#10;### Tarea 1.1..."
                     />
                     <button
@@ -211,6 +262,10 @@ export const DiagramBoard = () => {
                         description={activeDiagram.description}
                         onRename={handleRename}
                         saveStatus={saveStatus}
+                        isBrowserFullscreen={fullscreenMode === 'browser'}
+                        isDeviceFullscreen={fullscreenMode === 'device'}
+                        onToggleBrowserFullscreen={toggleBrowserFullscreen}
+                        onToggleDeviceFullscreen={toggleDeviceFullscreen}
                     />
                     <DiagramHistoryPanel undo={activeFlow.undo} redo={activeFlow.redo} />
                     <Controls />

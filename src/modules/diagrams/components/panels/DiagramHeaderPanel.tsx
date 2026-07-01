@@ -1,5 +1,13 @@
 import { Panel } from '@xyflow/react';
 import { useDiagramHeaderPanel } from '../../hooks/useDiagramHeaderPanel';
+import { 
+    PlusIcon, 
+    BrowserFullscreenIcon, 
+    DeviceFullscreenIcon, 
+    EyeIcon, 
+    EyeOffIcon, 
+    PencilIcon 
+} from '../../../../assets/Icons';
 
 interface Props {
     isAddingNode: boolean;
@@ -17,6 +25,10 @@ interface Props {
     onRename?: (newTitle: string) => void;
     saveStatus?: 'idle' | 'saving' | 'saved' | 'error';
     description?: string;
+    isBrowserFullscreen?: boolean;
+    isDeviceFullscreen?: boolean;
+    onToggleBrowserFullscreen?: () => void;
+    onToggleDeviceFullscreen?: () => void;
 }
 
 export const DiagramHeaderPanel = ({
@@ -33,7 +45,11 @@ export const DiagramHeaderPanel = ({
     showAddNode = true,
     onRename,
     saveStatus = 'idle',
-    description
+    description,
+    isBrowserFullscreen = false,
+    isDeviceFullscreen = false,
+    onToggleBrowserFullscreen,
+    onToggleDeviceFullscreen
 }: Props) => {
     const {
         isEditingTitle,
@@ -73,7 +89,6 @@ export const DiagramHeaderPanel = ({
         }
     };
 
-    // Si el panel está minimizado, renderizamos solo el botón del ojo en la esquina izquierda
     if (isCollapsed) {
         return (
             <Panel position="top-left" className="bg-transparent shadow-none">
@@ -82,10 +97,7 @@ export const DiagramHeaderPanel = ({
                     className="w-10 h-10 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full border border-slate-200/80 dark:border-slate-800/80 shadow-lg text-slate-500 hover:text-orange-500 hover:scale-105 transition-all cursor-pointer"
                     title="Mostrar panel de control"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                    </svg>
+                    <EyeIcon size={20} />
                 </button>
             </Panel>
         );
@@ -120,9 +132,7 @@ export const DiagramHeaderPanel = ({
                                 className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-orange-500 transition-all cursor-pointer"
                                 title="Editar nombre"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                </svg>
+                                <PencilIcon size={14} />
                             </button>
                         </div>
                     )}
@@ -133,9 +143,7 @@ export const DiagramHeaderPanel = ({
                             className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-350 transition cursor-pointer"
                             title="Ocultar panel"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                            </svg>
+                            <EyeOffIcon size={16} />
                         </button>
                     </div>
                 </div>
@@ -151,16 +159,17 @@ export const DiagramHeaderPanel = ({
                         {showAddNode && (
                             <button
                                 onClick={() => setIsAddingNode(true)}
-                                className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+                                className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer flex items-center gap-1"
                             >
-                                ➕ Nodo
+                                <PlusIcon size={12} />
+                                Nodo
                             </button>
                         )}
                     </div>
 
                     {/* Fila 2 */}
-                    {(showEditorToggle || showCloseAll) && (
-                        <div className="flex gap-2">
+                    {(showEditorToggle || showCloseAll || onToggleBrowserFullscreen) && (
+                        <div className="flex gap-2 flex-wrap">
                             {showEditorToggle && onToggleEditor && (
                                 <button
                                     onClick={onToggleEditor}
@@ -178,6 +187,32 @@ export const DiagramHeaderPanel = ({
                                     className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
                                 >
                                     {isAnyCollapsed ? 'Abrir todo' : 'Cerrar todo'}
+                                </button>
+                            )}
+                            {onToggleBrowserFullscreen && (
+                                <button
+                                    onClick={onToggleBrowserFullscreen}
+                                    className={`px-3 py-1.5 text-xs font-semibold border rounded-lg shadow-sm transition cursor-pointer flex items-center gap-1 ${isBrowserFullscreen
+                                        ? 'bg-orange-50 text-white border-orange-500 hover:bg-orange-600'
+                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                                        }`}
+                                    title="Pantalla completa en la ventana del navegador"
+                                >
+                                    <BrowserFullscreenIcon size={12} />
+                                    Navegador
+                                </button>
+                            )}
+                            {onToggleDeviceFullscreen && (
+                                <button
+                                    onClick={onToggleDeviceFullscreen}
+                                    className={`px-3 py-1.5 text-xs font-semibold border rounded-lg shadow-sm transition cursor-pointer flex items-center gap-1 ${isDeviceFullscreen
+                                        ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600'
+                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                                        }`}
+                                    title="Pantalla completa de todo el dispositivo"
+                                >
+                                    <DeviceFullscreenIcon size={12} />
+                                    Pantalla
                                 </button>
                             )}
                         </div>

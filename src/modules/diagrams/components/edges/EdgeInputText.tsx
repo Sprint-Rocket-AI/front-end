@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import type { EdgeProps } from '@xyflow/react';
+import { PlayIcon, PauseIcon } from '../../../../assets/Icons';
 import {
     BaseEdge, EdgeLabelRenderer, EdgeToolbar,
     getBezierPath, getStraightPath, getSmoothStepPath,
@@ -71,12 +72,16 @@ export function EdgeInputText({
                         <button
                             onClick={() => update({ animated: !animated })}
                             style={{
-                                padding: '2px 8px', fontSize: 11, borderRadius: 4,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '4px 8px', borderRadius: 4,
                                 border: '1px solid #b1b1b7',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                background: '#fff'
                             }}
                         >
-                            {animated ? '⏸' : '▶'}
+                            {animated ? <PauseIcon size={12} /> : <PlayIcon size={12} />}
                         </button>
 
                         <div style={{ width: 1, background: '#b1b1b7' }} />

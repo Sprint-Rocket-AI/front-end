@@ -71,9 +71,17 @@ export const useDiagramBoard = ({ id }: UseDiagramBoardProps) => {
         dispatch(updateDiagramState(updated));
     }, [id, activeDiagram, dispatch]);
 
-    const handleRename = useCallback((newTitle: string) => {
+    const handleRename = useCallback(async (newTitle: string) => {
+        if (!activeDiagram || !id) return;
         setActiveDiagram(prev => prev ? { ...prev, title: newTitle } : null);
-    }, []);
+        try {
+            const updated = await diagramService.updateDiagram(id, { title: newTitle });
+            setActiveDiagram(updated);
+            dispatch(updateDiagramState(updated));
+        } catch (err) {
+            console.error("Error renaming diagram:", err);
+        }
+    }, [id, activeDiagram, dispatch]);
 
     const handleDownloadMd = (markdown: string) => {
         if (!activeDiagram) return;

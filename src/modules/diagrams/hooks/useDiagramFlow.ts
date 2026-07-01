@@ -134,9 +134,9 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
             const nextNodes = applyNodeChanges(changes, currentRef.current.nodes);
-            updateFlow(nextNodes, currentRef.current.edges);
+            commitFlow(nextNodes, currentRef.current.edges);
         },
-        [updateFlow]
+        [commitFlow]
     );
 
     const onEdgesChange = useCallback(

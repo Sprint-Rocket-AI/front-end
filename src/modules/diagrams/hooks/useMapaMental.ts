@@ -12,6 +12,7 @@ import {
     type FinalConnectionState
 } from '@xyflow/react';
 import { useHistory } from './useHistory';
+import { useNodeDragHistory } from './useNodeDragHistory';
 
 export const parseStatusFromLabel = (label: string) => {
     let status: 'PENDIENTE' | 'EN PROCESO' | 'TERMINADO' = 'PENDIENTE';
@@ -330,6 +331,11 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         }
     );
 
+    const { onNodeDragStart, onNodeDragStop } = useNodeDragHistory({
+        getSnapshot: () => ({ nodes, edges }),
+        pushHistory
+    });
+
     useEffect(() => {
         if (!active) return;
         const handler = (e: KeyboardEvent) => {
@@ -408,17 +414,22 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
     }, [nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
-        if (!connectionState.isValid && connectionState.fromNode) {
+        const fromNode = connectionState.fromNode;
+
+        if (!connectionState.isValid && fromNode) {
             const touchEvent = event as TouchEvent;
             const mouseEvent = event as MouseEvent;
             const clientX = 'changedTouches' in event ? touchEvent.changedTouches[0].clientX : mouseEvent.clientX;
             const clientY = 'changedTouches' in event ? touchEvent.changedTouches[0].clientY : mouseEvent.clientY;
-            const position = screenToFlowPosition({ x: clientX, y: clientY });
+            const sourceNode = nodes.find((node) => node.id === fromNode.id);
+            const position = sourceNode
+                ? { x: sourceNode.position.x + 320, y: sourceNode.position.y }
+                : screenToFlowPosition({ x: clientX, y: clientY });
 
             const nextId = `n-${Date.now()}`;
             const newEdge = {
-                id: `e-${connectionState.fromNode.id}-${nextId}`,
-                source: connectionState.fromNode.id,
+                id: `e-${fromNode.id}-${nextId}`,
+                source: fromNode.id,
                 target: nextId,
                 type: 'default',
                 animated: false
@@ -443,8 +454,7 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
                 data: { ...n.data, hasChildren: parentIds.has(n.id) }
             }));
 
-            const positioned = layoutNodes(updatedNds, nextEdges);
-            const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
+            const { nodes: visibleNodes } = updateVisibility(updatedNds, nextEdges);
             
             pushHistory({ nodes: visibleNodes, edges: nextEdges });
             syncMarkdownFromFlow(visibleNodes, nextEdges);
@@ -590,9 +600,6 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         onToggleCollapse,
         onLabelChange
     }), [onStatusChange, onDeleteNode, onToggleCollapse, onLabelChange]);
-
-    const onNodeDragStart = useCallback(() => {}, []);
-    const onNodeDragStop = useCallback(() => {}, []);
 
     const nodesWithHandlers = useMemo(() => {
         return nodes.map(n => ({

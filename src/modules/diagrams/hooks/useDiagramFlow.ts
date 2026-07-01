@@ -11,6 +11,7 @@ import {
     type Node,
     type FinalConnectionState
 } from '@xyflow/react';
+import { useNodeDragHistory } from './useNodeDragHistory';
 
 type FlowSnapshot = {
     nodes: Node[];
@@ -30,7 +31,6 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         past: [],
         future: []
     });
-    const dragStartSnapshotRef = useRef<FlowSnapshot | null>(null);
     const hasInitializedRef = useRef(false);
 
     useEffect(() => {
@@ -149,26 +149,22 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
     );
 
     const onConnect = useCallback((params: Connection) => {
-        const nextEdges = addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, currentRef.current.edges);
+        const nextEdges = addEdge({ ...params, type: 'edgeInputText', animated: false }, currentRef.current.edges);
         commitFlow(currentRef.current.nodes, nextEdges);
     }, [commitFlow]);
 
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
-        const nextEdges = currentRef.current.edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
+        const nextEdges = currentRef.current.edges.filter((e: Edge) => !edgesToDelete.find((del) => del.id === e.id));
         commitFlow(currentRef.current.nodes, nextEdges);
     }, [commitFlow]);
 
-    const onNodeDragStart = useCallback(() => {
-        dragStartSnapshotRef.current = currentRef.current;
-    }, []);
-
-    const onNodeDragStop = useCallback(() => {
-        if (!dragStartSnapshotRef.current) return;
-
-        historyRef.current.past.push(dragStartSnapshotRef.current);
-        historyRef.current.future = [];
-        dragStartSnapshotRef.current = null;
-    }, []);
+    const { onNodeDragStart, onNodeDragStop } = useNodeDragHistory({
+        getSnapshot: () => currentRef.current,
+        pushHistory: (snapshot) => {
+            historyRef.current.past.push(snapshot);
+            historyRef.current.future = [];
+        }
+    });
 
     const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
         if (!connectionState.isValid && connectionState.fromNode) {
@@ -189,7 +185,7 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
     }, [isAddingNode, screenToFlowPosition, createNode]);
 
     const onLabelChange = useCallback((id: string, newLabel: string) => {
-        const updated = currentRef.current.nodes.map((n) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
+        const updated = currentRef.current.nodes.map((n: Node) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
         commitFlow(updated, currentRef.current.edges);
     }, [commitFlow]);
 

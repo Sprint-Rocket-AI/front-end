@@ -1,62 +1,114 @@
-import axios from 'axios';
+import apiClient from "../api/interceptor";
+
 import type {
   ActividadInterface,
   CrearActividadRequest,
-} from '../modules/checkpoint/interfaces/ActividadInterface';
+} from "../modules/checkpoint/interfaces/ActividadInterface";
+
 import type {
   RecordatorioInterface,
   CrearRecordatorioRequest,
-} from '../modules/checkpoint/interfaces/RecordatorioInterface';
-import type {
-  SugerenciaIARequest,
-  SugerenciaIAResponse,
-} from '../modules/checkpoint/interfaces/SugerenciaIAInterface';
+} from "../modules/checkpoint/interfaces/RecordatorioInterface";
 
-const checkpointClient = axios.create({
-  baseURL: import.meta.env.VITE_CHECKPOINT_API_URL,
-  timeout: 30000,
-});
+class CheckpointService {
+  // ───────────────────────────────────────────────────────────────
+  // Actividades
+  // ───────────────────────────────────────────────────────────────
 
-checkpointClient.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(error),
-);
+  async crearActividad(
+    data: CrearActividadRequest
+  ): Promise<ActividadInterface> {
+    const response = await apiClient.post<ActividadInterface>(
+      "/checkpoint/api/actividades",
+      data
+    );
+    return response.data;
+  }
 
-// ─── Actividades ──────────────────────────────────────────────────────────────
+  async getActividadesByDesarrollador(
+    devId: string
+  ): Promise<ActividadInterface[]> {
+    const response = await apiClient.get<ActividadInterface[]>(
+      `/checkpoint/api/actividades/desarrollador/${devId}`
+    );
+    return response.data;
+  }
 
-export const crearActividad = (data: CrearActividadRequest) =>
-  checkpointClient.post<ActividadInterface>('/actividades', data);
+  async getActividadById(
+    id: string
+  ): Promise<ActividadInterface> {
+    const response = await apiClient.get<ActividadInterface>(
+      `/checkpoint/api/actividades/${id}`
+    );
+    return response.data;
+  }
 
-export const getActividadesByDesarrollador = (devId: string) =>
-  checkpointClient.get<ActividadInterface[]>(`/actividades/desarrollador/${devId}`);
+  async actualizarActividad(
+    id: string,
+    data: Partial<CrearActividadRequest>
+  ): Promise<ActividadInterface> {
+    const response = await apiClient.put<ActividadInterface>(
+      `/checkpoint/api/actividades/${id}`,
+      data
+    );
+    return response.data;
+  }
 
-export const getActividadById = (id: string) =>
-  checkpointClient.get<ActividadInterface>(`/actividades/${id}`);
+  async eliminarActividad(id: string): Promise<void> {
+    await apiClient.delete(
+      `/checkpoint/api/actividades/${id}`
+    );
+  }
 
-export const actualizarActividad = (id: string, data: Partial<CrearActividadRequest>) =>
-  checkpointClient.put<ActividadInterface>(`/actividades/${id}`, data);
+  // ───────────────────────────────────────────────────────────────
+  // Recordatorios
+  // ───────────────────────────────────────────────────────────────
 
-export const eliminarActividad = (id: string) =>
-  checkpointClient.delete(`/actividades/${id}`);
+  async crearRecordatorio(
+    data: CrearRecordatorioRequest
+  ): Promise<RecordatorioInterface> {
+    const response = await apiClient.post<RecordatorioInterface>(
+      "/checkpoint/api/recordatorios",
+      data
+    );
+    return response.data;
+  }
 
-// ─── Recordatorios ───────────────────────────────────────────────────────────
+  async getRecordatoriosByDesarrollador(
+    devId: string
+  ): Promise<RecordatorioInterface[]> {
+    const response = await apiClient.get<RecordatorioInterface[]>(
+      `/checkpoint/api/recordatorios/desarrollador/${devId}`
+    );
+    return response.data;
+  }
 
-export const crearRecordatorio = (data: CrearRecordatorioRequest) =>
-  checkpointClient.post<RecordatorioInterface>('/recordatorios', data);
+  async getRecordatorioById(
+    id: string
+  ): Promise<RecordatorioInterface> {
+    const response = await apiClient.get<RecordatorioInterface>(
+      `/checkpoint/api/recordatorios/${id}`
+    );
+    return response.data;
+  }
 
-export const getRecordatoriosByDesarrollador = (devId: string) =>
-  checkpointClient.get<RecordatorioInterface[]>(`/recordatorios/desarrollador/${devId}`);
+  async actualizarRecordatorio(
+    id: string,
+    data: Partial<CrearRecordatorioRequest & { activo: boolean }>
+  ): Promise<RecordatorioInterface> {
+    const response = await apiClient.put<RecordatorioInterface>(
+      `/checkpoint/api/recordatorios/${id}`,
+      data
+    );
+    return response.data;
+  }
 
-export const getRecordatorioById = (id: string) =>
-  checkpointClient.get<RecordatorioInterface>(`/recordatorios/${id}`);
+  async eliminarRecordatorio(id: string): Promise<void> {
+    await apiClient.delete(
+      `/checkpoint/api/recordatorios/${id}`
+    );
+  }
 
-export const actualizarRecordatorio = (id: string, data: Partial<CrearRecordatorioRequest & { activo: boolean }>) =>
-  checkpointClient.put<RecordatorioInterface>(`/recordatorios/${id}`, data);
+ }
 
-export const eliminarRecordatorio = (id: string) =>
-  checkpointClient.delete(`/recordatorios/${id}`);
-
-// ─── Sugerencias IA (vía ms-ia-engine por el body del ms-checkpoint) ─────────
-
-export const getSugerenciasIA = (data: SugerenciaIARequest) =>
-  checkpointClient.post<SugerenciaIAResponse>('/ia/sugerencias', data);
+export const checkpointService = new CheckpointService();

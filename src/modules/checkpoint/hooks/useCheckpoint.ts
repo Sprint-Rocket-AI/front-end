@@ -8,35 +8,17 @@ import type {
   RecordatorioInterface,
   CrearRecordatorioRequest,
 } from '../interfaces/RecordatorioInterface';
-import type {
-  ActividadSugerida,
-  FuenteContexto,
-} from '../interfaces/SugerenciaIAInterface';
-import {
-  crearActividad,
-  getActividadesByDesarrollador,
-  actualizarActividad,
-  crearRecordatorio,
-  getRecordatoriosByDesarrollador,
-  eliminarRecordatorio,
-  getSugerenciasIA,
-  actualizarRecordatorio,
-} from '../../../services/CheckpointService';
+
+import { checkpointService } from '../../../services/CheckpointService';
 
 const DEV_ID = 'dev-001';
 
 export interface CheckpointState {
   actividades: ActividadInterface[];
   recordatorios: RecordatorioInterface[];
-  sugerenciasActividad: ActividadSugerida[];
-  sugerenciasSeleccionadas: Set<number>;
-  sugerenciasContexto: ActividadSugerida[];
-  sugerenciasContextoSeleccionadas: Set<number>;
 
   loadingActividades: boolean;
   loadingRecordatorios: boolean;
-  loadingSugerencias: boolean;
-  loadingSugerenciasContexto: boolean;
   loadingConfirmar: boolean;
   feedback: string | null;
   error: string | null;
@@ -45,14 +27,8 @@ export interface CheckpointState {
 const initialState: CheckpointState = {
   actividades: [],
   recordatorios: [],
-  sugerenciasActividad: [],
-  sugerenciasSeleccionadas: new Set(),
-  sugerenciasContexto: [],
-  sugerenciasContextoSeleccionadas: new Set(),
   loadingActividades: false,
   loadingRecordatorios: false,
-  loadingSugerencias: false,
-  loadingSugerenciasContexto: false,
   loadingConfirmar: false,
   feedback: null,
   error: null,
@@ -75,18 +51,25 @@ export const useCheckpoint = () => {
 
   const cargarActividades = useCallback(async () => {
     setState((s) => ({ ...s, loadingActividades: true }));
+
     try {
-      const res = await getActividadesByDesarrollador(DEV_ID);
-      setState((s) => ({ ...s, actividades: res.data, loadingActividades: false }));
+      const actividades =
+        await checkpointService.getActividadesByDesarrollador(DEV_ID);
+
+      setState((s) => ({
+        ...s,
+        actividades,
+        loadingActividades: false,
+      }));
     } catch {
       setState((s) => ({ ...s, loadingActividades: false }));
-      setError('No se pudieron cargar las actividades.');
+      setError("No se pudieron cargar las actividades.");
     }
   }, []);
 
   const actualizarEstadoActividad = useCallback(async (id: string, estado: EstadoActividad) => {
     try {
-      await actualizarActividad(id, { estado } as any);
+      await checkpointService.actualizarActividad(id, { estado } as any);
       setState((s) => ({
         ...s,
         actividades: s.actividades.map((a) => (a.id === id ? { ...a, estado } : a)),
@@ -97,69 +80,16 @@ export const useCheckpoint = () => {
     }
   }, []);
 
-  // ─── Sugerencias IA (actividades diarias) ───────────────────────────────────
-
-  const pedirSugerenciasActividad = useCallback(async (prompt: string) => {
-    setState((s) => ({ ...s, loadingSugerencias: true, sugerenciasActividad: [], sugerenciasSeleccionadas: new Set() }));
-    try {
-      const res = await getSugerenciasIA({ prompt, fuente: 'JIRA' });
-      setState((s) => ({
-        ...s,
-        sugerenciasActividad: res.data.actividades,
-        loadingSugerencias: false,
-      }));
-    } catch {
-      setState((s) => ({ ...s, loadingSugerencias: false }));
-      setError('No se pudieron obtener sugerencias de IA.');
-    }
-  }, []);
-
-  const toggleSugerenciaActividad = useCallback((index: number) => {
-    setState((s) => {
-      const next = new Set(s.sugerenciasSeleccionadas);
-      next.has(index) ? next.delete(index) : next.add(index);
-      return { ...s, sugerenciasSeleccionadas: next };
-    });
-  }, []);
-
-  const guardarSugerenciasActividad = useCallback(async () => {
-    const seleccionadas = state.sugerenciasActividad.filter((_, i) =>
-      state.sugerenciasSeleccionadas.has(i),
-    );
-    if (seleccionadas.length === 0) return;
-    setState((s) => ({ ...s, loadingConfirmar: true }));
-    try {
-      const requests = seleccionadas.map((s) =>
-        crearActividad({ ...s, userId: DEV_ID }),
-      );
-      const results = await Promise.all(requests);
-      const nuevas = results.map((r) => r.data);
-      setState((s) => ({
-        ...s,
-        actividades: [...s.actividades, ...nuevas],
-        sugerenciasActividad: [],
-        sugerenciasSeleccionadas: new Set(),
-        loadingConfirmar: false,
-      }));
-      setFeedback(`${nuevas.length} sugerencia(s) guardada(s).`);
-    } catch {
-      setState((s) => ({ ...s, loadingConfirmar: false }));
-      setError('Error al guardar las sugerencias seleccionadas.');
-    }
-  }, [state.sugerenciasActividad, state.sugerenciasSeleccionadas]);
 
   // ─── Recordatorios ──────────────────────────────────────────────────────────
 
   const cargarRecordatorios = useCallback(async () => {
     setState((s) => ({ ...s, loadingRecordatorios: true }));
     try {
-      const res = await getRecordatoriosByDesarrollador(DEV_ID);
-      // Ordenar por proximoEnvio ascendente
-      const sorted = [...res.data].sort((a, b) => {
-        if (!a.proximoEnvio) return 1;
-        if (!b.proximoEnvio) return -1;
-        return new Date(a.proximoEnvio).getTime() - new Date(b.proximoEnvio).getTime();
-      });
+      const recordatorios =
+        await checkpointService.getRecordatoriosByDesarrollador(DEV_ID);
+
+      const sorted = [...recordatorios]
       setState((s) => ({ ...s, recordatorios: sorted, loadingRecordatorios: false }));
     } catch {
       setState((s) => ({ ...s, loadingRecordatorios: false }));
@@ -170,10 +100,14 @@ export const useCheckpoint = () => {
   const nuevoRecordatorio = useCallback(
     async (data: Omit<CrearRecordatorioRequest, 'userId'>) => {
       try {
-        const res = await crearRecordatorio({ ...data, userId: DEV_ID });
+        const recordatorio =
+          await checkpointService.crearRecordatorio({
+            ...data,
+            userId: DEV_ID,
+          });
         setState((s) => ({
           ...s,
-          recordatorios: [...s.recordatorios, res.data].sort((a, b) => {
+          recordatorios: [...s.recordatorios, recordatorio].sort((a, b) => {
             if (!a.proximoEnvio) return 1;
             if (!b.proximoEnvio) return -1;
             return new Date(a.proximoEnvio).getTime() - new Date(b.proximoEnvio).getTime();
@@ -190,7 +124,7 @@ export const useCheckpoint = () => {
   const gestionarEstadoRecordatorio = useCallback(async (id: string, accion: 'DESCARTAR' | 'POSPONER') => {
     try {
       if (accion === 'DESCARTAR') {
-        await eliminarRecordatorio(id);
+        await checkpointService.eliminarRecordatorio(id);
         setState((s) => ({
           ...s,
           recordatorios: s.recordatorios.filter((r) => r.id !== id),
@@ -204,7 +138,7 @@ export const useCheckpoint = () => {
           date.setHours(h, m + 15);
           const newHora = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 
-          await actualizarRecordatorio(id, { fechaExpiracion: newHora });
+          await checkpointService.actualizarRecordatorio(id, { fechaExpiracion: newHora });
           setState((s) => ({
             ...s,
             recordatorios: s.recordatorios.map((r) => r.id === id ? { ...r, horaActivacion: newHora } : r)
@@ -217,72 +151,18 @@ export const useCheckpoint = () => {
     }
   }, [state.recordatorios]);
 
-  // ─── Sugerencias IA desde contexto JIRA / GitHub ────────────────────────────
-
-  const pedirSugerenciasContexto = useCallback(
-    async (prompt: string, fuente: FuenteContexto) => {
-      setState((s) => ({
-        ...s,
-        loadingSugerenciasContexto: true,
-        sugerenciasContexto: [],
-        sugerenciasContextoSeleccionadas: new Set(),
-      }));
-      try {
-        const res = await getSugerenciasIA({ prompt, fuente });
-        setState((s) => ({
-          ...s,
-          sugerenciasContexto: res.data.actividades,
-          loadingSugerenciasContexto: false,
-        }));
-      } catch {
-        setState((s) => ({ ...s, loadingSugerenciasContexto: false }));
-        setError('No se obtuvieron sugerencias de IA para ese contexto.');
-      }
-    },
-    [],
-  );
-
-  const toggleSugerenciaContexto = useCallback((index: number) => {
-    setState((s) => {
-      const next = new Set(s.sugerenciasContextoSeleccionadas);
-      next.has(index) ? next.delete(index) : next.add(index);
-      return { ...s, sugerenciasContextoSeleccionadas: next };
-    });
-  }, []);
-
-  const guardarSugerenciasContexto = useCallback(async () => {
-    const seleccionadas = state.sugerenciasContexto.filter((_, i) =>
-      state.sugerenciasContextoSeleccionadas.has(i),
-    );
-    if (seleccionadas.length === 0) return;
-    setState((s) => ({ ...s, loadingConfirmar: true }));
-    try {
-      const requests = seleccionadas.map((s) =>
-        crearActividad({ ...s, userId: DEV_ID }),
-      );
-      const results = await Promise.all(requests);
-      const nuevas = results.map((r) => r.data);
-      setState((s) => ({
-        ...s,
-        actividades: [...s.actividades, ...nuevas],
-        sugerenciasContexto: [],
-        sugerenciasContextoSeleccionadas: new Set(),
-        loadingConfirmar: false,
-      }));
-      setFeedback(`${nuevas.length} actividad(es) de contexto guardada(s).`);
-    } catch {
-      setState((s) => ({ ...s, loadingConfirmar: false }));
-      setError('Error al guardar las sugerencias de contexto.');
-    }
-  }, [state.sugerenciasContexto, state.sugerenciasContextoSeleccionadas]);
 
   const crearActividadDirecta = useCallback(async (actividad: CrearActividadRequest) => {
      setState((s) => ({ ...s, loadingConfirmar: true }));
      try {
-       const result = await crearActividad({ ...actividad, userId: DEV_ID });
+       const actividadCreada =
+         await checkpointService.crearActividad({
+           ...actividad,
+           userId: DEV_ID,
+         });
        setState((s) => ({
          ...s,
-         actividades: [...s.actividades, result.data],
+         actividades: [...s.actividades, actividadCreada],
          loadingConfirmar: false,
        }));
        setFeedback('Actividad guardada correctamente.');
@@ -296,15 +176,9 @@ export const useCheckpoint = () => {
     ...state,
     cargarActividades,
     actualizarEstadoActividad,
-    pedirSugerenciasActividad,
-    toggleSugerenciaActividad,
-    guardarSugerenciasActividad,
     cargarRecordatorios,
     nuevoRecordatorio,
     gestionarEstadoRecordatorio,
-    pedirSugerenciasContexto,
-    toggleSugerenciaContexto,
-    guardarSugerenciasContexto,
     crearActividadDirecta,
   };
 };

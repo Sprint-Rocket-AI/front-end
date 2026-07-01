@@ -30,6 +30,7 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         past: [],
         future: []
     });
+    const dragStartSnapshotRef = useRef<FlowSnapshot | null>(null);
     const hasInitializedRef = useRef(false);
 
     useEffect(() => {
@@ -134,9 +135,9 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
             const nextNodes = applyNodeChanges(changes, currentRef.current.nodes);
-            commitFlow(nextNodes, currentRef.current.edges);
+            updateFlow(nextNodes, currentRef.current.edges);
         },
-        [commitFlow]
+        [updateFlow]
     );
 
     const onEdgesChange = useCallback(
@@ -156,6 +157,18 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         const nextEdges = currentRef.current.edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
         commitFlow(currentRef.current.nodes, nextEdges);
     }, [commitFlow]);
+
+    const onNodeDragStart = useCallback(() => {
+        dragStartSnapshotRef.current = currentRef.current;
+    }, []);
+
+    const onNodeDragStop = useCallback(() => {
+        if (!dragStartSnapshotRef.current) return;
+
+        historyRef.current.past.push(dragStartSnapshotRef.current);
+        historyRef.current.future = [];
+        dragStartSnapshotRef.current = null;
+    }, []);
 
     const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
         if (!connectionState.isValid && connectionState.fromNode) {
@@ -208,7 +221,9 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         onEdgesChange,
         onConnect,
         onEdgesDelete,
+        onNodeDragStart,
         onConnectEnd,
+        onNodeDragStop,
         onPaneClick,
         undo,
         redo,

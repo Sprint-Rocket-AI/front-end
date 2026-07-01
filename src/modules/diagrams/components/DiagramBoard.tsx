@@ -243,7 +243,9 @@ export const DiagramBoard = () => {
                     panOnDrag={panOnDrag}
                     selectionMode={SelectionMode.Partial}
                     onPaneClick={isMentalMap ? undefined : (e) => defaultFlow.onPaneClick(e as React.MouseEvent)}
+                    onNodeDragStart={activeFlow.onNodeDragStart}
                     onConnectEnd={activeFlow.onConnectEnd}
+                    onNodeDragStop={activeFlow.onNodeDragStop}
                     colorMode={isDark ? 'dark' : 'light'}
                 >
                     <DiagramHeaderPanel

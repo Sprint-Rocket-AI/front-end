@@ -591,6 +591,9 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         onLabelChange
     }), [onStatusChange, onDeleteNode, onToggleCollapse, onLabelChange]);
 
+    const onNodeDragStart = useCallback(() => {}, []);
+    const onNodeDragStop = useCallback(() => {}, []);
+
     const nodesWithHandlers = useMemo(() => {
         return nodes.map(n => ({
             ...n,
@@ -617,6 +620,8 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         onToggleCollapse,
         onCloseAll: onToggleAll,
         isAnyCollapsed,
+        onNodeDragStart,
+        onNodeDragStop,
         updateFromMarkdown,
         onAddNode,
         undo,

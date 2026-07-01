@@ -16,6 +16,9 @@ export const LoginPage = () => {
       </div>
 
       <div className="panel w-full max-w-md relative z-10 animate-slide-up">
+        <div className="mb-6">
+          <img src="/banner.png" alt="Banner" className="w-full h-auto object-cover rounded-xl shadow-sm" />
+        </div>
         <div className="text-center mb-8">
           <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-orange-500 block mb-2 animate-pulse">
             Sprint Rocket.AI

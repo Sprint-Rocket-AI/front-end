@@ -1,12 +1,12 @@
 import { Panel } from '@xyflow/react';
 import { useDiagramHeaderPanel } from '../../hooks/useDiagramHeaderPanel';
-import { 
-    PlusIcon, 
-    BrowserFullscreenIcon, 
-    DeviceFullscreenIcon, 
-    EyeIcon, 
-    EyeOffIcon, 
-    PencilIcon 
+import {
+    PlusIcon,
+    BrowserFullscreenIcon,
+    DeviceFullscreenIcon,
+    EyeIcon,
+    EyeOffIcon,
+    PencilIcon
 } from '../../../../assets/Icons';
 
 interface Props {
@@ -103,6 +103,9 @@ export const DiagramHeaderPanel = ({
         );
     }
 
+    // Estilo común para todos los botones del panel superior
+    const btnClass = "px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer flex items-center justify-center gap-1";
+
     return (
         <Panel position="top-left" className="bg-transparent shadow-none">
             <div className="flex flex-col gap-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg transition-all duration-300 ease-in-out origin-left animate-scale-in">
@@ -152,14 +155,14 @@ export const DiagramHeaderPanel = ({
                     <div className="flex gap-2">
                         <button
                             onClick={() => setExpanded((prev) => !prev)}
-                            className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+                            className={btnClass}
                         >
                             {expanded ? 'Ocultar detalle' : 'Ver detalle'}
                         </button>
                         {showAddNode && (
                             <button
                                 onClick={() => setIsAddingNode(true)}
-                                className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer flex items-center gap-1"
+                                className={btnClass}
                             >
                                 <PlusIcon size={12} />
                                 Nodo
@@ -173,10 +176,7 @@ export const DiagramHeaderPanel = ({
                             {showEditorToggle && onToggleEditor && (
                                 <button
                                     onClick={onToggleEditor}
-                                    className={`px-3 py-1.5 text-xs font-semibold border rounded-lg shadow-sm transition cursor-pointer flex items-center gap-1 ${isEditorOpen
-                                        ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600'
-                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-                                        }`}
+                                    className={`${btnClass} ${isEditorOpen ? 'border-orange-500 text-orange-600 dark:text-orange-400' : ''}`}
                                 >
                                     Editor
                                 </button>
@@ -184,7 +184,7 @@ export const DiagramHeaderPanel = ({
                             {showCloseAll && onCloseAll && (
                                 <button
                                     onClick={onCloseAll}
-                                    className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+                                    className={btnClass}
                                 >
                                     {isAnyCollapsed ? 'Abrir todo' : 'Cerrar todo'}
                                 </button>
@@ -192,10 +192,7 @@ export const DiagramHeaderPanel = ({
                             {onToggleBrowserFullscreen && (
                                 <button
                                     onClick={onToggleBrowserFullscreen}
-                                    className={`px-3 py-1.5 text-xs font-semibold border rounded-lg shadow-sm transition cursor-pointer flex items-center gap-1 ${isBrowserFullscreen
-                                        ? 'bg-orange-50 text-white border-orange-500 hover:bg-orange-600'
-                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-                                        }`}
+                                    className={`${btnClass} ${isBrowserFullscreen ? 'border-orange-500 text-orange-600 dark:text-orange-400' : ''}`}
                                     title="Pantalla completa en la ventana del navegador"
                                 >
                                     <BrowserFullscreenIcon size={12} />
@@ -205,10 +202,7 @@ export const DiagramHeaderPanel = ({
                             {onToggleDeviceFullscreen && (
                                 <button
                                     onClick={onToggleDeviceFullscreen}
-                                    className={`px-3 py-1.5 text-xs font-semibold border rounded-lg shadow-sm transition cursor-pointer flex items-center gap-1 ${isDeviceFullscreen
-                                        ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600'
-                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-                                        }`}
+                                    className={`${btnClass} ${isDeviceFullscreen ? 'border-orange-500 text-orange-600 dark:text-orange-400' : ''}`}
                                     title="Pantalla completa de todo el dispositivo"
                                 >
                                     <DeviceFullscreenIcon size={12} />

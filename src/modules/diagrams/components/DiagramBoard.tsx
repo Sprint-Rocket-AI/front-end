@@ -31,6 +31,8 @@ export const DiagramBoard = () => {
         setActiveDiagram,
         loading,
         setLoading,
+        expanded,
+        setExpanded,
         handleSave,
         handleRename,
         handleDownloadMd
@@ -196,8 +198,8 @@ export const DiagramBoard = () => {
                     <DiagramHeaderPanel
                         isAddingNode={isMentalMap ? false : defaultFlow.isAddingNode}
                         setIsAddingNode={isMentalMap ? () => { } : defaultFlow.setIsAddingNode}
-                        expanded={isMentalMap ? false : defaultFlow.expanded}
-                        setExpanded={isMentalMap ? (() => { }) as React.Dispatch<React.SetStateAction<boolean>> : defaultFlow.setExpanded}
+                        expanded={expanded}
+                        setExpanded={setExpanded}
                         showCloseAll={isMentalMap}
                         onCloseAll={isMentalMap ? mentalMapFlow.onCloseAll : undefined}
                         isAnyCollapsed={isMentalMap ? mentalMapFlow.isAnyCollapsed : false}
@@ -206,6 +208,7 @@ export const DiagramBoard = () => {
                         isEditorOpen={isMentalMap ? mentalMapFlow.isMdPanelOpen : false}
                         onToggleEditor={isMentalMap ? () => mentalMapFlow.setIsMdPanelOpen(!mentalMapFlow.isMdPanelOpen) : undefined}
                         title={activeDiagram.title}
+                        description={activeDiagram.description}
                         onRename={handleRename}
                         saveStatus={saveStatus}
                     />

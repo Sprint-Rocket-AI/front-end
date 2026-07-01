@@ -9,6 +9,7 @@ export const useDiagramHeaderPanel = ({ title = '', onRename }: UseDiagramHeader
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [prevTitle, setPrevTitle] = useState(title);
     const [tempTitle, setTempTitle] = useState(title);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     // Sincronización del estado durante la renderización para evitar useEffect
     if (prevTitle !== title) {
@@ -29,6 +30,8 @@ export const useDiagramHeaderPanel = ({ title = '', onRename }: UseDiagramHeader
         setIsEditingTitle,
         tempTitle,
         setTempTitle,
-        handleSaveTitle
+        handleSaveTitle,
+        isCollapsed,
+        setIsCollapsed
     };
 };

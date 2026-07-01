@@ -20,7 +20,6 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
     const [nodes, setNodes] = useState<Node[]>(initialNodes || []);
     const [edges, setEdges] = useState<Edge[]>(initialEdges || []);
     const [isAddingNode, setIsAddingNode] = useState(false);
-    const [expanded, setExpanded] = useState(false);
 
     if (active && (prevNodesProp !== initialNodes || prevEdgesProp !== initialEdges)) {
         setPrevNodesProp(initialNodes);
@@ -143,8 +142,6 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         setEdges,
         isAddingNode,
         setIsAddingNode,
-        expanded,
-        setExpanded,
         onNodesChange,
         onEdgesChange,
         onConnect,

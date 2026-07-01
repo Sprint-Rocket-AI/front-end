@@ -1,5 +1,5 @@
 import { Panel } from '@xyflow/react';
-
+import { useDiagramHeaderPanel } from '../../hooks/useDiagramHeaderPanel';
 
 interface Props {
     isAddingNode: boolean;
@@ -16,9 +16,8 @@ interface Props {
     showAddNode?: boolean;
     onRename?: (newTitle: string) => void;
     saveStatus?: 'idle' | 'saving' | 'saved' | 'error';
+    description?: string;
 }
-
-import { useDiagramHeaderPanel } from '../../hooks/useDiagramHeaderPanel';
 
 export const DiagramHeaderPanel = ({
     setIsAddingNode,
@@ -33,14 +32,17 @@ export const DiagramHeaderPanel = ({
     isAnyCollapsed = false,
     showAddNode = true,
     onRename,
-    saveStatus = 'idle'
+    saveStatus = 'idle',
+    description
 }: Props) => {
     const {
         isEditingTitle,
         setIsEditingTitle,
         tempTitle,
         setTempTitle,
-        handleSaveTitle
+        handleSaveTitle,
+        isCollapsed,
+        setIsCollapsed
     } = useDiagramHeaderPanel({ title, onRename });
 
     const getStatusBadge = () => {
@@ -71,10 +73,28 @@ export const DiagramHeaderPanel = ({
         }
     };
 
+    // Si el panel está minimizado, renderizamos solo el botón del ojo en la esquina izquierda
+    if (isCollapsed) {
+        return (
+            <Panel position="top-left" className="bg-transparent shadow-none">
+                <button
+                    onClick={() => setIsCollapsed(false)}
+                    className="w-10 h-10 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full border border-slate-200/80 dark:border-slate-800/80 shadow-lg text-slate-500 hover:text-orange-500 hover:scale-105 transition-all cursor-pointer"
+                    title="Mostrar panel de control"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                </button>
+            </Panel>
+        );
+    }
+
     return (
         <Panel position="top-left" className="bg-transparent shadow-none">
-            <div className="flex flex-col gap-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg">
-                <div className="flex items-center gap-3 min-w-[280px] max-w-[450px]">
+            <div className="flex flex-col gap-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg transition-all duration-300 ease-in-out origin-left animate-scale-in">
+                <div className="flex items-center justify-between gap-3 min-w-[280px] max-w-[450px]">
                     {isEditingTitle ? (
                         <input
                             type="text"
@@ -92,19 +112,32 @@ export const DiagramHeaderPanel = ({
                             className="text-base font-bold text-slate-950 dark:text-slate-50 bg-slate-50 dark:bg-slate-800 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 rounded-lg px-2 py-1 w-full"
                         />
                     ) : (
-                        <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setIsEditingTitle(true)}>
-                            <h1 className="text-base font-bold text-slate-800 dark:text-slate-200 hover:text-orange-500 dark:hover:text-orange-400 transition-colors truncate max-w-[300px]">
+                        <div className="flex items-center gap-2 group cursor-pointer flex-1 min-w-0" onClick={() => setIsEditingTitle(true)}>
+                            <h1 className="text-base font-bold text-slate-800 dark:text-slate-200 hover:text-orange-500 dark:hover:text-orange-400 transition-colors truncate max-w-[220px]">
                                 {title}
                             </h1>
                             <button
-                                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-orange-500 transition-all text-xs"
+                                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-orange-500 transition-all cursor-pointer"
                                 title="Editar nombre"
                             >
-                                ✏️
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                </svg>
                             </button>
                         </div>
                     )}
-                    {getStatusBadge()}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {getStatusBadge()}
+                        <button
+                            onClick={() => setIsCollapsed(true)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-350 transition cursor-pointer"
+                            title="Ocultar panel"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div className="flex flex-col gap-2">
                     {/* Fila 1 */}
@@ -119,9 +152,9 @@ export const DiagramHeaderPanel = ({
                             <button
                                 onClick={() => setIsAddingNode(true)}
                                 className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
-                              >
-                                  ➕ Nodo
-                              </button>
+                            >
+                                ➕ Nodo
+                            </button>
                         )}
                     </div>
 
@@ -152,6 +185,12 @@ export const DiagramHeaderPanel = ({
                 </div>
                 {expanded && (
                     <div className="bg-white/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-lg rounded-xl p-3.5 w-[360px] max-w-[90vw] text-xs leading-relaxed animate-fade-in">
+                        {description && (
+                            <div className="mb-3 pb-2.5 border-b border-slate-150 dark:border-slate-700/60 text-slate-800 dark:text-slate-200">
+                                <h4 className="font-bold mb-1">Descripción:</h4>
+                                <p className="italic text-slate-600 dark:text-slate-400">{description}</p>
+                            </div>
+                        )}
                         <p>
                             Este es un organizador de tareas y mapa mental interactivo. Permite ver la jerarquía y el estado de desarrollo de las tareas.
                         </p>

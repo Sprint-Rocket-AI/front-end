@@ -20,12 +20,14 @@ export const useDiagramBoard = ({ id }: UseDiagramBoardProps) => {
     const [prevId, setPrevId] = useState(id);
     const [activeDiagram, setActiveDiagram] = useState<Diagram | null>(null);
     const [loading, setLoading] = useState(true);
+    const [expanded, setExpanded] = useState(false);
 
     // Sincronización de ID en renderizado
     if (prevId !== id) {
         setPrevId(id);
         setLoading(true);
         setActiveDiagram(null);
+        setExpanded(false);
     }
 
     const handleSave = useCallback(async (activeFlow: ActiveFlowType, isMentalMap: boolean) => {
@@ -90,6 +92,8 @@ export const useDiagramBoard = ({ id }: UseDiagramBoardProps) => {
         setActiveDiagram,
         loading,
         setLoading,
+        expanded,
+        setExpanded,
         handleSave,
         handleRename,
         handleDownloadMd,

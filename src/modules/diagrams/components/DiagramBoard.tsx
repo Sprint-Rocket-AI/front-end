@@ -267,7 +267,7 @@ export const DiagramBoard = () => {
                         onToggleBrowserFullscreen={toggleBrowserFullscreen}
                         onToggleDeviceFullscreen={toggleDeviceFullscreen}
                     />
-                    <DiagramHistoryPanel undo={activeFlow.undo} redo={activeFlow.redo} />
+                    <DiagramHistoryPanel undo={activeFlow.undo} redo={activeFlow.redo} canUndo={activeFlow.canUndo} canRedo={activeFlow.canRedo} />
                     <Controls />
                     <MiniMap />
                     <Background />

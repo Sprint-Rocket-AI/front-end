@@ -322,18 +322,13 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         }
     }
 
-    const { push: pushNodes, undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
-    const { push: pushEdges, undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
-
-    const undo = useCallback(() => { 
-        undoNodes(); 
-        undoEdges(); 
-    }, [undoNodes, undoEdges]);
-
-    const redo = useCallback(() => { 
-        redoNodes(); 
-        redoEdges(); 
-    }, [redoNodes, redoEdges]);
+    const { push: pushHistory, undo, redo, canUndo, canRedo } = useHistory(
+        { nodes, edges },
+        (newState) => {
+            setNodes(newState.nodes);
+            setEdges(newState.edges);
+        }
+    );
 
     useEffect(() => {
         if (!active) return;
@@ -393,10 +388,9 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         const positioned = layoutNodes(updatedNds, nextEdges);
         const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
         
-        pushEdges(nextEdges);
-        pushNodes(visibleNodes);
+        pushHistory({ nodes: visibleNodes, edges: nextEdges });
         syncMarkdownFromFlow(visibleNodes, nextEdges);
-    }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
+    }, [nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
         const nextEdges = edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
@@ -409,10 +403,9 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         const positioned = layoutNodes(updatedNds, nextEdges);
         const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
         
-        pushEdges(nextEdges);
-        pushNodes(visibleNodes);
+        pushHistory({ nodes: visibleNodes, edges: nextEdges });
         syncMarkdownFromFlow(visibleNodes, nextEdges);
-    }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
+    }, [nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
         if (!connectionState.isValid && connectionState.fromNode) {
@@ -453,11 +446,10 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
             const positioned = layoutNodes(updatedNds, nextEdges);
             const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
             
-            pushEdges(nextEdges);
-            pushNodes(visibleNodes);
+            pushHistory({ nodes: visibleNodes, edges: nextEdges });
             syncMarkdownFromFlow(visibleNodes, nextEdges);
         }
-    }, [screenToFlowPosition, nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
+    }, [screenToFlowPosition, nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onStatusChange = useCallback((id: string, newStatus: 'PENDIENTE' | 'EN PROCESO' | 'TERMINADO') => {
         const updated = nodes.map((n) => {
@@ -473,9 +465,9 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
             return n;
         });
         
-        pushNodes(updated);
+        pushHistory({ nodes: updated, edges });
         syncMarkdownFromFlow(updated, edges);
-    }, [nodes, edges, pushNodes, syncMarkdownFromFlow]);
+    }, [nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onDeleteNode = useCallback((id: string) => {
         const collectDescendants = (nodeId: string, currentEdges: Edge[], acc: Set<string>) => {
@@ -505,10 +497,9 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         const positioned = layoutNodes(updatedNds, nextEdges);
         const { nodes: visibleNodes } = updateVisibility(positioned, nextEdges);
 
-        pushEdges(nextEdges);
-        pushNodes(visibleNodes);
+        pushHistory({ nodes: visibleNodes, edges: nextEdges });
         syncMarkdownFromFlow(visibleNodes, nextEdges);
-    }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
+    }, [nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onToggleCollapse = useCallback((id: string) => {
         const updated = nodes.map(n => {
@@ -527,9 +518,8 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         const positioned = layoutNodes(updated, edges);
         const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
         
-        pushEdges(visibleEdges);
-        pushNodes(visibleNodes);
-    }, [nodes, edges, pushNodes, pushEdges]);
+        pushHistory({ nodes: visibleNodes, edges: visibleEdges });
+    }, [nodes, edges, pushHistory]);
 
     const onLabelChange = useCallback((id: string, newLabel: string) => {
         const updated = nodes.map(n => {
@@ -545,9 +535,9 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
             return n;
         });
         
-        pushNodes(updated);
+        pushHistory({ nodes: updated, edges });
         syncMarkdownFromFlow(updated, edges);
-    }, [nodes, edges, pushNodes, syncMarkdownFromFlow]);
+    }, [nodes, edges, pushHistory, syncMarkdownFromFlow]);
 
     const onToggleAll = useCallback(() => {
         const isAny = nodes.some(n => n.data?.collapsed === true);
@@ -565,9 +555,8 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         const positioned = layoutNodes(updated, edges);
         const { nodes: visibleNodes, edges: visibleEdges } = updateVisibility(positioned, edges);
         
-        pushEdges(visibleEdges);
-        pushNodes(visibleNodes);
-    }, [nodes, edges, pushNodes, pushEdges]);
+        pushHistory({ nodes: visibleNodes, edges: visibleEdges });
+    }, [nodes, edges, pushHistory]);
 
     const isAnyCollapsed = useMemo(() => {
         return nodes.some(n => n.data?.collapsed === true);
@@ -577,12 +566,11 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         setMarkdown(newMarkdown);
         try {
             const parsed = parseMarkdownToFlow(newMarkdown);
-            pushNodes(parsed.nodes);
-            pushEdges(parsed.edges);
+            pushHistory({ nodes: parsed.nodes, edges: parsed.edges });
         } catch (e) {
             console.error('Error parsing markdown', e);
         }
-    }, [pushNodes, pushEdges]);
+    }, [pushHistory]);
 
     const onAddNode = useCallback(() => {
         setMarkdown((prev) => {
@@ -632,6 +620,8 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         updateFromMarkdown,
         onAddNode,
         undo,
-        redo
+        redo,
+        canUndo,
+        canRedo
     };
 };

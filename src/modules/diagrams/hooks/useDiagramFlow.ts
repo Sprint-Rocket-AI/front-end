@@ -28,18 +28,13 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         setEdges(initialEdges || []);
     }
 
-    const { push: pushNodes, undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
-    const { push: pushEdges, undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
-
-    const undo = useCallback(() => { 
-        undoNodes(); 
-        undoEdges(); 
-    }, [undoNodes, undoEdges]);
-
-    const redo = useCallback(() => { 
-        redoNodes(); 
-        redoEdges(); 
-    }, [redoNodes, redoEdges]);
+    const { push: pushHistory, undo, redo, canUndo, canRedo } = useHistory(
+        { nodes, edges },
+        (newState) => {
+            setNodes(newState.nodes);
+            setEdges(newState.edges);
+        }
+    );
 
     useEffect(() => {
         if (!active) return;
@@ -78,14 +73,13 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
 
     const onConnect = useCallback((params: Connection) => {
         const nextEdges = addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, edges);
-        pushEdges(nextEdges);
-    }, [edges, pushEdges]);
+        pushHistory({ nodes, edges: nextEdges });
+    }, [nodes, edges, pushHistory]);
 
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
-        setEdges((eds) =>
-            eds.filter((e) => !edgesToDelete.find((del) => del.id === e.id))
-        );
-    }, []);
+        const nextEdges = edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
+        pushHistory({ nodes, edges: nextEdges });
+    }, [nodes, edges, pushHistory]);
 
     const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
         if (!connectionState.isValid && connectionState.fromNode) {
@@ -99,27 +93,24 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
             const nextNodes = [...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }];
             const nextEdges = [...edges, { id: `e-${Date.now()}`, source: connectionState.fromNode.id, target: id, type: 'edgeInputText', animated: false, label: '' }];
             
-            pushNodes(nextNodes);
-            pushEdges(nextEdges);
+            pushHistory({ nodes: nextNodes, edges: nextEdges });
         }
-    }, [screenToFlowPosition, nodes, edges, pushNodes, pushEdges]);
+    }, [screenToFlowPosition, nodes, edges, pushHistory]);
 
     const onPaneClick = useCallback((event: React.MouseEvent) => {
         if (!isAddingNode) return;
         const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
         const id = `n-${Date.now()}`;
         
-        pushNodes([...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }]);
+        const nextNodes = [...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }];
+        pushHistory({ nodes: nextNodes, edges });
         setIsAddingNode(false);
-    }, [isAddingNode, screenToFlowPosition, nodes, pushNodes]);
+    }, [isAddingNode, screenToFlowPosition, nodes, edges, pushHistory]);
 
     const onLabelChange = useCallback((id: string, newLabel: string) => {
-        setNodes((nds) => {
-            const updated = nds.map((n) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
-            pushNodes(updated);
-            return updated;
-        });
-    }, [pushNodes]);
+        const updated = nodes.map((n) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
+        pushHistory({ nodes: updated, edges });
+    }, [nodes, edges, pushHistory]);
 
     const nodeHandlers = useMemo(() => ({
         onLabelChange
@@ -149,6 +140,8 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
         onConnectEnd,
         onPaneClick,
         undo,
-        redo
+        redo,
+        canUndo,
+        canRedo
     };
 };

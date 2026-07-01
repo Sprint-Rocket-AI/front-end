@@ -8,43 +8,11 @@ import {
     type EdgeChange,
     type Connection,
     type Edge,
-    type Node
+    type Node,
+    type FinalConnectionState
 } from '@xyflow/react';
 import { useHistory } from './useHistory';
 
-const INITIAL_MARKDOWN = `# DESARROLLO
-## EXTRA PRIMA (EN DESARROLLO - PABLO)
-## RECIBOS PENDIENTES 
-
-# DEUDA TECNICA
-## STEP FUNCTION
-### OMITIR ROLLBACK JOB CUANDO NO HAY ERRORES (CREAR LAMBDA) (OK)
-### APLICAR PATRON batch-processing-with-step-functions-map-state
-### ELIMINAR BUCKET POR PARAMETROS (OK)
-
-## MIGRATION GLUE
-### ORACLE 
-#### USUARIO LECTURA APVC_AHORRO CON SOLO TABLAS UTILIZADAS
-#### INSTANT_CLIENT
-##### VALIDAR TIEMPO EN INGESTA MASIVA
-#### DATALAKE
-### MYSQL
-#### ELIMINAR Y TESTEAR PING (OK)
-### MANEJAR ERROR POLIZA (OK)
-
-## QUADRATURE GLUE
-### CONEXION SINGLETON (OK)
-
-## MOTOR DE REGLAS
-### IMPLEMETACIÓN NUEVAS ESTRATEGIAS
-
-## PENDIENTE 
-### CHECKMARX (OK)
-### GET_METADATA (OK)
-#### REGULARIZAR FECHA (OK)
-#### INDEPOTENCIA = BATCH_ID POR PARAMETRO DEL STEP FUNCTION (OK)`;
-
-// Helper to parse status from heading text
 export const parseStatusFromLabel = (label: string) => {
     let status: 'PENDIENTE' | 'EN PROCESO' | 'TERMINADO' = 'PENDIENTE';
     let statusDetail = '';
@@ -65,7 +33,6 @@ export const parseStatusFromLabel = (label: string) => {
     return { status, statusDetail, cleanLabel };
 };
 
-// Tree node definition for hierarchy building
 interface TreeNode {
     id: string;
     label: string;
@@ -76,9 +43,8 @@ interface TreeNode {
     level: number;
 }
 
-// Convert flat nodes/edges back to tree structure
 const buildTree = (nodes: Node[], edges: Edge[]): TreeNode[] => {
-    const parentMap = new Map<string, string>(); // child -> parent
+    const parentMap = new Map<string, string>();
     edges.forEach(e => {
         parentMap.set(e.target, e.source);
     });
@@ -86,7 +52,7 @@ const buildTree = (nodes: Node[], edges: Edge[]): TreeNode[] => {
     const nodeMap = new Map<string, Node>();
     nodes.forEach(n => nodeMap.set(n.id, n));
 
-    const childrenMap = new Map<string, string[]>(); // parent -> children
+    const childrenMap = new Map<string, string[]>();
     edges.forEach(e => {
         if (!childrenMap.has(e.source)) {
             childrenMap.set(e.source, []);
@@ -94,7 +60,6 @@ const buildTree = (nodes: Node[], edges: Edge[]): TreeNode[] => {
         childrenMap.get(e.source)!.push(e.target);
     });
 
-    // Find roots: nodes in diagram that don't have parents
     const roots = nodes.filter(n => !parentMap.has(n.id));
     const visited = new Set<string>();
 
@@ -136,7 +101,6 @@ const buildTree = (nodes: Node[], edges: Edge[]): TreeNode[] => {
     return tree;
 };
 
-// Convert tree structure back to Markdown text
 const treeToMarkdown = (tree: TreeNode[]): string => {
     const lines: string[] = [];
 
@@ -153,14 +117,13 @@ const treeToMarkdown = (tree: TreeNode[]): string => {
     };
 
     tree.forEach((root, idx) => {
-        if (idx > 0) lines.push(''); // blank line between root trees
+        if (idx > 0) lines.push('');
         stringifyNode(root);
     });
 
     return lines.join('\n');
 };
 
-// Auto-layout algorithm for the tree structure
 export const layoutNodes = (nodes: Node[], edges: Edge[]): Node[] => {
     const parentMap = new Map<string, string>();
     edges.forEach(e => parentMap.set(e.target, e.source));
@@ -184,11 +147,11 @@ export const layoutNodes = (nodes: Node[], edges: Edge[]): Node[] => {
         const children = childrenMap.get(nodeId) || [];
         const isCollapsed = node?.data?.collapsed === true;
 
-        const x = (level - 1) * 320; // Horizontal spacing between levels
+        const x = (level - 1) * 320;
 
         if (children.length === 0 || isCollapsed) {
             const y = currentY;
-            currentY += 110; // Vertical spacing between siblings
+            currentY += 110;
             positions.set(nodeId, { x, y });
             return { x, y };
         }
@@ -201,7 +164,7 @@ export const layoutNodes = (nodes: Node[], edges: Edge[]): Node[] => {
             })
             .filter(Boolean) as { id: string, pos: { x: number, y: number } }[];
 
-        let y = 0;
+        let y: number;
         if (childPositions.length > 0) {
             const minY = childPositions[0].pos.y;
             const maxY = childPositions[childPositions.length - 1].pos.y;
@@ -217,7 +180,7 @@ export const layoutNodes = (nodes: Node[], edges: Edge[]): Node[] => {
 
     rootNodeIds.forEach(rootId => {
         layoutNode(rootId, 1);
-        currentY += 60; // Extra spacing between different trees
+        currentY += 60;
     });
 
     return nodes.map(node => {
@@ -229,7 +192,6 @@ export const layoutNodes = (nodes: Node[], edges: Edge[]): Node[] => {
     });
 };
 
-// Check recursively if a node is hidden due to any collapsed ancestor
 const isNodeHidden = (nodeId: string, nodesMap: Map<string, Node>, parentMap: Map<string, string>): boolean => {
     const parentId = parentMap.get(nodeId);
     if (!parentId) return false;
@@ -243,7 +205,6 @@ const isNodeHidden = (nodeId: string, nodesMap: Map<string, Node>, parentMap: Ma
     return false;
 };
 
-// Update visibility (hidden property) of nodes and edges
 export const updateVisibility = (nodes: Node[], edges: Edge[]): { nodes: Node[], edges: Edge[] } => {
     const parentMap = new Map<string, string>();
     edges.forEach(e => parentMap.set(e.target, e.source));
@@ -275,7 +236,6 @@ export const updateVisibility = (nodes: Node[], edges: Edge[]): { nodes: Node[],
     return { nodes: updatedNodes, edges: updatedEdges };
 };
 
-// Parse Markdown into nodes and edges
 export const parseMarkdownToFlow = (markdown: string): { nodes: Node[], edges: Edge[] } => {
     const lines = markdown.split('\n');
     const nodes: Node[] = [];
@@ -325,13 +285,11 @@ export const parseMarkdownToFlow = (markdown: string): { nodes: Node[], edges: E
 
         activeParents[level] = nodeId;
 
-        // Clear active parents at deeper levels
         for (let l = level + 1; l <= 20; l++) {
             delete activeParents[l];
         }
     });
 
-    // Determine hasChildren flag for all nodes
     const parentIds = new Set(edges.map(e => e.source));
     nodes.forEach(n => {
         n.data = {
@@ -344,22 +302,38 @@ export const parseMarkdownToFlow = (markdown: string): { nodes: Node[], edges: E
     return updateVisibility(positionedNodes, edges);
 };
 
-export const useMapaMental = (active = true) => {
-    const [markdown, setMarkdown] = useState<string>(INITIAL_MARKDOWN);
+export const useMapaMental = (active = true, initialMarkdown?: string) => {
+    const [prevMarkdownProp, setPrevMarkdownProp] = useState<string | undefined>(initialMarkdown);
+    const [markdown, setMarkdown] = useState<string>(initialMarkdown || '');
     const [isMdPanelOpen, setIsMdPanelOpen] = useState(true);
 
-    const initialFlow = useMemo(() => {
-        return parseMarkdownToFlow(INITIAL_MARKDOWN);
-    }, []);
+    const [nodes, setNodes] = useState<Node[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
 
-    const [nodes, setNodes] = useState<Node[]>(initialFlow.nodes);
-    const [edges, setEdges] = useState<Edge[]>(initialFlow.edges);
+    if (active && prevMarkdownProp !== initialMarkdown) {
+        setPrevMarkdownProp(initialMarkdown);
+        setMarkdown(initialMarkdown || '');
+        try {
+            const parsed = parseMarkdownToFlow(initialMarkdown || '');
+            setNodes(parsed.nodes);
+            setEdges(parsed.edges);
+        } catch (e) {
+            console.error('Error parsing markdown on load', e);
+        }
+    }
 
     const { push: pushNodes, undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
     const { push: pushEdges, undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
 
-    const undo = useCallback(() => { undoNodes(); undoEdges(); }, [undoNodes, undoEdges]);
-    const redo = useCallback(() => { redoNodes(); redoEdges(); }, [redoNodes, redoEdges]);
+    const undo = useCallback(() => { 
+        undoNodes(); 
+        undoEdges(); 
+    }, [undoNodes, undoEdges]);
+
+    const redo = useCallback(() => { 
+        redoNodes(); 
+        redoEdges(); 
+    }, [redoNodes, redoEdges]);
 
     useEffect(() => {
         if (!active) return;
@@ -382,7 +356,6 @@ export const useMapaMental = (active = true) => {
 
     const { screenToFlowPosition } = useReactFlow();
 
-    // Helper to generate MD from current nodes/edges and update state
     const syncMarkdownFromFlow = useCallback((currentNodes: Node[], currentEdges: Edge[]) => {
         const tree = buildTree(currentNodes, currentEdges);
         const md = treeToMarkdown(tree);
@@ -412,7 +385,6 @@ export const useMapaMental = (active = true) => {
     const onConnect = useCallback((params: Connection) => {
         const nextEdges = addEdge({ ...params, type: 'default', animated: false }, edges);
         
-        // Re-render layout and update Markdown
         const parentIds = new Set(nextEdges.map(e => e.source));
         const updatedNds = nodes.map(n => ({
             ...n,
@@ -429,7 +401,6 @@ export const useMapaMental = (active = true) => {
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
         const nextEdges = edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
 
-        // Recalculate children flags, layout and markdown
         const parentIds = new Set(nextEdges.map(e => e.source));
         const updatedNds = nodes.map(n => ({
             ...n,
@@ -443,9 +414,12 @@ export const useMapaMental = (active = true) => {
         syncMarkdownFromFlow(visibleNodes, nextEdges);
     }, [nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
 
-    const onConnectEnd = useCallback((event: any, connectionState: any) => {
-        if (!connectionState.isValid) {
-            const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+    const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
+        if (!connectionState.isValid && connectionState.fromNode) {
+            const touchEvent = event as TouchEvent;
+            const mouseEvent = event as MouseEvent;
+            const clientX = 'changedTouches' in event ? touchEvent.changedTouches[0].clientX : mouseEvent.clientX;
+            const clientY = 'changedTouches' in event ? touchEvent.changedTouches[0].clientY : mouseEvent.clientY;
             const position = screenToFlowPosition({ x: clientX, y: clientY });
 
             const nextId = `n-${Date.now()}`;
@@ -485,8 +459,6 @@ export const useMapaMental = (active = true) => {
         }
     }, [screenToFlowPosition, nodes, edges, pushNodes, pushEdges, syncMarkdownFromFlow]);
 
-    // Handlers called by the custom NodeMapaMental
-
     const onStatusChange = useCallback((id: string, newStatus: 'PENDIENTE' | 'EN PROCESO' | 'TERMINADO') => {
         const updated = nodes.map((n) => {
             if (n.id === id) {
@@ -506,7 +478,6 @@ export const useMapaMental = (active = true) => {
     }, [nodes, edges, pushNodes, syncMarkdownFromFlow]);
 
     const onDeleteNode = useCallback((id: string) => {
-        // Collect descendants to delete recursively
         const collectDescendants = (nodeId: string, currentEdges: Edge[], acc: Set<string>) => {
             currentEdges.forEach(e => {
                 if (e.source === nodeId && !acc.has(e.target)) {
@@ -522,7 +493,6 @@ export const useMapaMental = (active = true) => {
         const nextNodes = nodes.filter(n => !toDelete.has(n.id));
         const nextEdges = edges.filter(e => !toDelete.has(e.source) && !toDelete.has(e.target));
 
-        // Update parents hasChildren flag
         const parentIds = new Set(nextEdges.map(e => e.source));
         const updatedNds = nextNodes.map(n => ({
             ...n,
@@ -579,7 +549,6 @@ export const useMapaMental = (active = true) => {
         syncMarkdownFromFlow(updated, edges);
     }, [nodes, edges, pushNodes, syncMarkdownFromFlow]);
 
-    // Toggle all: abre y cierra todos los nodos
     const onToggleAll = useCallback(() => {
         const isAny = nodes.some(n => n.data?.collapsed === true);
 
@@ -604,7 +573,6 @@ export const useMapaMental = (active = true) => {
         return nodes.some(n => n.data?.collapsed === true);
     }, [nodes]);
 
-    // Update diagram structure when user types in the MD editor
     const updateFromMarkdown = useCallback((newMarkdown: string) => {
         setMarkdown(newMarkdown);
         try {
@@ -616,11 +584,9 @@ export const useMapaMental = (active = true) => {
         }
     }, [pushNodes, pushEdges]);
 
-    // Create a new root node
     const onAddNode = useCallback(() => {
         setMarkdown((prev) => {
             const next = prev.trim() + '\n\n# NUEVO NODO';
-            // Trigger flow update
             setTimeout(() => {
                 const parsed = parseMarkdownToFlow(next);
                 setNodes(parsed.nodes);
@@ -630,7 +596,6 @@ export const useMapaMental = (active = true) => {
         });
     }, []);
 
-    // Helper to expose node methods inside React Flow components
     const nodeHandlers = useMemo(() => ({
         onStatusChange,
         onDeleteNode,
@@ -638,7 +603,6 @@ export const useMapaMental = (active = true) => {
         onLabelChange
     }), [onStatusChange, onDeleteNode, onToggleCollapse, onLabelChange]);
 
-    // Inject handlers into node data before returning
     const nodesWithHandlers = useMemo(() => {
         return nodes.map(n => ({
             ...n,

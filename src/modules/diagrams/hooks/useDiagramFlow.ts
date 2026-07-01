@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
     applyNodeChanges,
     applyEdgeChanges,
@@ -8,31 +8,39 @@ import {
     type EdgeChange,
     type Connection,
     type Edge,
-    type Node
+    type Node,
+    type FinalConnectionState
 } from '@xyflow/react';
 
 import { useHistory } from './useHistory';
 
-const initialNodes = [
-    { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1' }, type: 'nodeInputText' },
-    { id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2' }, type: 'nodeInputText' },
-];
-
-const initialEdges = [
-    { id: 'n1-n2', source: 'n1', target: 'n2', animated: true, type: 'edgeInputText', label: 'connects with' }
-];
-
-export const useDiagramFlow = (active = true) => {
-    const [nodes, setNodes] = useState<Node[]>(initialNodes);
-    const [edges, setEdges] = useState<Edge[]>(initialEdges);
+export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdges?: Edge[]) => {
+    const [prevNodesProp, setPrevNodesProp] = useState<Node[] | undefined>(initialNodes);
+    const [prevEdgesProp, setPrevEdgesProp] = useState<Edge[] | undefined>(initialEdges);
+    const [nodes, setNodes] = useState<Node[]>(initialNodes || []);
+    const [edges, setEdges] = useState<Edge[]>(initialEdges || []);
     const [isAddingNode, setIsAddingNode] = useState(false);
     const [expanded, setExpanded] = useState(false);
+
+    if (active && (prevNodesProp !== initialNodes || prevEdgesProp !== initialEdges)) {
+        setPrevNodesProp(initialNodes);
+        setPrevEdgesProp(initialEdges);
+        setNodes(initialNodes || []);
+        setEdges(initialEdges || []);
+    }
 
     const { push: pushNodes, undo: undoNodes, redo: redoNodes } = useHistory(nodes, setNodes);
     const { push: pushEdges, undo: undoEdges, redo: redoEdges } = useHistory(edges, setEdges);
 
-    const undo = useCallback(() => { undoNodes(); undoEdges(); }, [undoNodes, undoEdges]);
-    const redo = useCallback(() => { redoNodes(); redoEdges(); }, [redoNodes, redoEdges]);
+    const undo = useCallback(() => { 
+        undoNodes(); 
+        undoEdges(); 
+    }, [undoNodes, undoEdges]);
+
+    const redo = useCallback(() => { 
+        redoNodes(); 
+        redoEdges(); 
+    }, [redoNodes, redoEdges]);
 
     useEffect(() => {
         if (!active) return;
@@ -53,21 +61,25 @@ export const useDiagramFlow = (active = true) => {
         return () => window.removeEventListener('keydown', handler);
     }, [undo, redo, active]);
 
-
     const { screenToFlowPosition } = useReactFlow();
 
     const onNodesChange = useCallback(
-        (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+        (changes: NodeChange[]) => {
+            setNodes((nds) => applyNodeChanges(changes, nds));
+        },
         []
     );
 
     const onEdgesChange = useCallback(
-        (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+        (changes: EdgeChange[]) => {
+            setEdges((eds) => applyEdgeChanges(changes, eds));
+        },
         []
     );
 
     const onConnect = useCallback((params: Connection) => {
-        pushEdges(addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, edges));
+        const nextEdges = addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, edges);
+        pushEdges(nextEdges);
     }, [edges, pushEdges]);
 
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
@@ -76,27 +88,59 @@ export const useDiagramFlow = (active = true) => {
         );
     }, []);
 
-    const onConnectEnd = useCallback((event: any, connectionState: any) => {
-        if (!connectionState.isValid) {
-            const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+    const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
+        if (!connectionState.isValid && connectionState.fromNode) {
+            const touchEvent = event as TouchEvent;
+            const mouseEvent = event as MouseEvent;
+            const clientX = 'changedTouches' in event ? touchEvent.changedTouches[0].clientX : mouseEvent.clientX;
+            const clientY = 'changedTouches' in event ? touchEvent.changedTouches[0].clientY : mouseEvent.clientY;
             const position = screenToFlowPosition({ x: clientX, y: clientY });
-            const id = `n${nodes.length + 1}`;
-            pushNodes([...nodes, { id, position, data: { label: `Node ${nodes.length + 1}` }, type: 'nodeInputText' }]);
-            pushEdges([...edges, { id: `e${edges.length + 1}`, source: connectionState.fromNode.id, target: id, type: 'edgeInputText', animated: false, label: '' }]);
+            const id = `n-${Date.now()}`;
+            
+            const nextNodes = [...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }];
+            const nextEdges = [...edges, { id: `e-${Date.now()}`, source: connectionState.fromNode.id, target: id, type: 'edgeInputText', animated: false, label: '' }];
+            
+            pushNodes(nextNodes);
+            pushEdges(nextEdges);
         }
     }, [screenToFlowPosition, nodes, edges, pushNodes, pushEdges]);
 
     const onPaneClick = useCallback((event: React.MouseEvent) => {
         if (!isAddingNode) return;
         const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-        const id = `n${nodes.length + 1}`;
-        pushNodes([...nodes, { id, position, data: { label: `Node ${nodes.length + 1}` }, type: 'nodeInputText' }]);
+        const id = `n-${Date.now()}`;
+        
+        pushNodes([...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }]);
         setIsAddingNode(false);
     }, [isAddingNode, screenToFlowPosition, nodes, pushNodes]);
 
+    const onLabelChange = useCallback((id: string, newLabel: string) => {
+        setNodes((nds) => {
+            const updated = nds.map((n) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
+            pushNodes(updated);
+            return updated;
+        });
+    }, [pushNodes]);
+
+    const nodeHandlers = useMemo(() => ({
+        onLabelChange
+    }), [onLabelChange]);
+
+    const nodesWithHandlers = useMemo(() => {
+        return nodes.map(n => ({
+            ...n,
+            data: {
+                ...n.data,
+                ...nodeHandlers
+            }
+        }));
+    }, [nodes, nodeHandlers]);
+
     return {
-        nodes,
+        nodes: nodesWithHandlers,
         edges,
+        setNodes,
+        setEdges,
         isAddingNode,
         setIsAddingNode,
         expanded,

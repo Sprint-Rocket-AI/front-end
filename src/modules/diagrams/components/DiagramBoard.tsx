@@ -1,13 +1,18 @@
+import { useEffect, useCallback } from 'react';
 import { ReactFlow, Controls, MiniMap, Background, SelectionMode } from '@xyflow/react';
 import { useParams } from 'react-router-dom';
 import { useDiagramFlow } from '../hooks/useDiagramFlow';
 import { useMapaMental } from '../hooks/useMapaMental';
+import { useAutoSave } from '../hooks/useAutoSave';
+import { useDiagramBoard } from '../hooks/useDiagramBoard';
 import { DiagramHeaderPanel } from './panels/DiagramHeaderPanel';
 import { DiagramHistoryPanel } from './panels/DiagramHistoryPanel';
 import { NodeInputText } from './nodes/NodeInputText';
 import { NodeMapaMental } from './nodes/NodeMapaMental';
 import { EdgeInputText } from './edges/EdgeInputText';
 import { useTheme } from '../../../commons/context/ThemeContext';
+import { diagramService } from '../../../services/DiagramService';
+import { LoadingSpinner } from '../../../commons/components/LoadingSpinner';
 
 const nodeTypes = {
     nodeInputText: NodeInputText,
@@ -19,29 +24,127 @@ const panOnDrag = [1, 2];
 export const DiagramBoard = () => {
     const { isDark } = useTheme();
     const { id } = useParams<{ id: string }>();
-    const isMentalMap = id === '1';
+    
+    // Consumo del hook que maneja el estado del diagrama, guardado y renombrado
+    const {
+        activeDiagram,
+        setActiveDiagram,
+        loading,
+        setLoading,
+        handleSave,
+        handleRename,
+        handleDownloadMd
+    } = useDiagramBoard({ id });
 
-    // Call both hooks to comply with React Rules of Hooks, passing active flag
-    const defaultFlow = useDiagramFlow(!isMentalMap);
-    const mentalMapFlow = useMapaMental(isMentalMap);
+    const isMentalMap = activeDiagram?.type === 'mental_map';
+
+    // Invocación de hooks de flujo y mapa mental pasando los datos iniciales cargados
+    const defaultFlow = useDiagramFlow(!isMentalMap && !loading, activeDiagram?.nodes, activeDiagram?.edges);
+    const mentalMapFlow = useMapaMental(isMentalMap && !loading, activeDiagram?.markdown);
 
     const activeFlow = isMentalMap ? mentalMapFlow : defaultFlow;
 
-    const handleDownloadMd = () => {
-        if (!isMentalMap) return;
-        const blob = new Blob([mentalMapFlow.markdown], { type: 'text/markdown;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'mapa_mental.md');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    // Carga de diagrama por ID (Este useEffect queda en el componente)
+    useEffect(() => {
+        let isMounted = true;
+        
+        if (!id) return;
+
+        diagramService.getDiagramById(id)
+            .then((diagram) => {
+                if (!isMounted) return;
+                setActiveDiagram(diagram);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Error loading diagram:", err);
+                if (isMounted) setLoading(false);
+            });
+            
+        return () => {
+            isMounted = false;
+        };
+    }, [id, setActiveDiagram, setLoading]);
+
+    // Cálculo dinámico de cambios en la fase de renderizado
+    const getIsDirty = () => {
+        if (!activeDiagram || loading) return false;
+
+        const currentNodesStr = JSON.stringify(activeFlow.nodes.map(n => {
+            const d = n.data as Record<string, unknown>;
+            return {
+                id: n.id,
+                position: { x: Math.round(n.position.x), y: Math.round(n.position.y) },
+                data: { label: d.label, status: d.status, statusDetail: d.statusDetail, collapsed: d.collapsed }
+            };
+        }));
+        const savedNodesStr = JSON.stringify(activeDiagram.nodes.map(n => {
+            const d = n.data as Record<string, unknown>;
+            return {
+                id: n.id,
+                position: { x: Math.round(n.position.x), y: Math.round(n.position.y) },
+                data: { label: d.label, status: d.status, statusDetail: d.statusDetail, collapsed: d.collapsed }
+            };
+        }));
+        const nodesChanged = currentNodesStr !== savedNodesStr;
+
+        const currentEdgesStr = JSON.stringify(activeFlow.edges.map(e => ({
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            label: e.label
+        })));
+        const savedEdgesStr = JSON.stringify(activeDiagram.edges.map(e => ({
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            label: e.label
+        })));
+        const edgesChanged = currentEdgesStr !== savedEdgesStr;
+
+        const markdownChanged = isMentalMap && mentalMapFlow.markdown !== activeDiagram.markdown;
+
+        return nodesChanged || edgesChanged || markdownChanged;
     };
+
+    const isDirty = getIsDirty();
+
+    const onSave = useCallback(() => {
+        return handleSave(activeFlow, isMentalMap);
+    }, [handleSave, activeFlow, isMentalMap]);
+
+    // Sincronización del auto-guardado (Este hook con efectos internos queda en el componente)
+    const { saveStatus } = useAutoSave({
+        id,
+        isDirty,
+        onSave,
+        resetDirty: () => {},
+        debounceMs: 3000
+    });
+
+    const handleDownload = () => {
+        handleDownloadMd(mentalMapFlow.markdown);
+    };
+
+    if (loading) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    if (!activeDiagram) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center">
+                <p className="text-slate-500 dark:text-slate-400 text-lg mb-2">No se pudo cargar el diagrama.</p>
+                <p className="text-slate-400 dark:text-slate-500 text-sm">Selecciona otro diagrama de la barra lateral o vuelve a la lista.</p>
+            </div>
+        );
+    }
 
     return (
         <section className="w-full h-full flex gap-4">
-            {/* Markdown Editor Panel (on the left) */}
             {isMentalMap && mentalMapFlow.isMdPanelOpen && (
                 <div className="w-[380px] flex-shrink-0 flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 transition-all">
                     <div className="flex items-center justify-between mb-4">
@@ -63,7 +166,7 @@ export const DiagramBoard = () => {
                         placeholder="# Desarrollo&#10;## Tarea 1&#10;### Tarea 1.1..."
                     />
                     <button
-                        onClick={handleDownloadMd}
+                        onClick={handleDownload}
                         className="mt-4 w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition cursor-pointer text-sm"
                     >
                         Descargar en .md
@@ -86,7 +189,7 @@ export const DiagramBoard = () => {
                     selectionOnDrag
                     panOnDrag={panOnDrag}
                     selectionMode={SelectionMode.Partial}
-                    onPaneClick={isMentalMap ? undefined : (defaultFlow as any).onPaneClick}
+                    onPaneClick={isMentalMap ? undefined : (e) => defaultFlow.onPaneClick(e as React.MouseEvent)}
                     onConnectEnd={activeFlow.onConnectEnd}
                     colorMode={isDark ? 'dark' : 'light'}
                 >
@@ -94,15 +197,17 @@ export const DiagramBoard = () => {
                         isAddingNode={isMentalMap ? false : defaultFlow.isAddingNode}
                         setIsAddingNode={isMentalMap ? () => { } : defaultFlow.setIsAddingNode}
                         expanded={isMentalMap ? false : defaultFlow.expanded}
-                        setExpanded={isMentalMap ? (() => { }) as any : defaultFlow.setExpanded}
+                        setExpanded={isMentalMap ? (() => { }) as React.Dispatch<React.SetStateAction<boolean>> : defaultFlow.setExpanded}
                         showCloseAll={isMentalMap}
-                        onCloseAll={isMentalMap ? (mentalMapFlow as any).onCloseAll : undefined}
-                        isAnyCollapsed={isMentalMap ? (mentalMapFlow as any).isAnyCollapsed : false}
+                        onCloseAll={isMentalMap ? mentalMapFlow.onCloseAll : undefined}
+                        isAnyCollapsed={isMentalMap ? mentalMapFlow.isAnyCollapsed : false}
                         showAddNode={!isMentalMap}
                         showEditorToggle={isMentalMap}
                         isEditorOpen={isMentalMap ? mentalMapFlow.isMdPanelOpen : false}
                         onToggleEditor={isMentalMap ? () => mentalMapFlow.setIsMdPanelOpen(!mentalMapFlow.isMdPanelOpen) : undefined}
-                        title={isMentalMap ? 'Mapa Mental APV-123' : 'Diagrama'}
+                        title={activeDiagram.title}
+                        onRename={handleRename}
+                        saveStatus={saveStatus}
                     />
                     <DiagramHistoryPanel undo={activeFlow.undo} redo={activeFlow.redo} />
                     <Controls />
@@ -113,4 +218,3 @@ export const DiagramBoard = () => {
         </section>
     );
 };
-

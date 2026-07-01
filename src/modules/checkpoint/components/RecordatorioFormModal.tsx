@@ -3,29 +3,35 @@ import type { CrearRecordatorioRequest } from '../interfaces/RecordatorioInterfa
 import { DateTimePicker } from '../../../commons/components/DateTimePicker';
 
 interface RecordatorioFormModalProps {
-  onAdd: (data: Omit<CrearRecordatorioRequest, 'userId'>) => void;
-  onClose: () => void;
+    onAdd: (data: CrearRecordatorioRequest) => void;
+    onClose: () => void;
 }
-
 
 export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalProps) => {
   const [titulo, setTitulo] = useState('');
-  const [horaActivacion, setHoraActivacion] = useState('08:30');
-  const [fechaExpiracion, setFechaExpiracion] = useState<string | undefined>(undefined);
+  const [horaExpiracion, setHoraExpiracion] = useState('08:30');
   const minDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
     .toISOString()
     .split('T')[0];
-
+  const [fechaExpiracion, setFechaExpiracion] = useState<string | undefined>(minDate);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!titulo.trim()) return;
+
+    let isoDateTime: string | undefined = undefined;
+
+    if (fechaExpiracion) {
+      const horaFormateada = horaExpiracion ? horaExpiracion : '00:00';
+      isoDateTime = `${fechaExpiracion}T${horaFormateada}:00`;
+    }
+
     onAdd({
+      userId: 'dev-001',
       titulo: titulo.trim(),
-      tipoRecordatorio: 'EVENTO',
-      horaActivacion: horaActivacion,
-      fechaExpiracion: fechaExpiracion,
+      fechaExpiracion: isoDateTime,
     });
+
     onClose();
   };
 
@@ -56,18 +62,16 @@ export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalP
             />
           </div>
 
-
-
           <div className="flex flex-col gap-3">
             <label className="label">Fecha y hora de activación</label>
             <DateTimePicker
               dateLabel="Fecha"
               timeLabel="Hora"
               dateValue={fechaExpiracion}
-              timeValue={horaActivacion}
+              timeValue={horaExpiracion}
               minDate={minDate}
               onDateChange={setFechaExpiracion}
-              onTimeChange={setHoraActivacion}
+              onTimeChange={setHoraExpiracion}
             />
           </div>
 

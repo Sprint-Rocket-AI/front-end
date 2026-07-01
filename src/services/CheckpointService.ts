@@ -13,7 +13,7 @@ import type {
 } from '../modules/checkpoint/interfaces/SugerenciaIAInterface';
 
 const checkpointClient = axios.create({
-  baseURL: import.meta.env.VITE_CHECKPOINT_API_URL ?? 'http://localhost:8082/api',
+  baseURL: import.meta.env.VITE_CHECKPOINT_API_URL,
   timeout: 30000,
 });
 

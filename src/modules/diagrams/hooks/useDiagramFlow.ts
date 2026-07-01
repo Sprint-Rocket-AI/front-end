@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
     applyNodeChanges,
     applyEdgeChanges,
@@ -12,29 +12,76 @@ import {
     type FinalConnectionState
 } from '@xyflow/react';
 
-import { useHistory } from './useHistory';
+type FlowSnapshot = {
+    nodes: Node[];
+    edges: Edge[];
+};
 
 export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdges?: Edge[]) => {
-    const [prevNodesProp, setPrevNodesProp] = useState<Node[] | undefined>(initialNodes);
-    const [prevEdgesProp, setPrevEdgesProp] = useState<Edge[] | undefined>(initialEdges);
     const [nodes, setNodes] = useState<Node[]>(initialNodes || []);
     const [edges, setEdges] = useState<Edge[]>(initialEdges || []);
     const [isAddingNode, setIsAddingNode] = useState(false);
 
-    if (active && (prevNodesProp !== initialNodes || prevEdgesProp !== initialEdges)) {
-        setPrevNodesProp(initialNodes);
-        setPrevEdgesProp(initialEdges);
-        setNodes(initialNodes || []);
-        setEdges(initialEdges || []);
-    }
+    const currentRef = useRef<FlowSnapshot>({
+        nodes: initialNodes || [],
+        edges: initialEdges || []
+    });
+    const historyRef = useRef<{ past: FlowSnapshot[]; future: FlowSnapshot[] }>({
+        past: [],
+        future: []
+    });
+    const hasInitializedRef = useRef(false);
 
-    const { push: pushHistory, undo, redo, canUndo, canRedo } = useHistory(
-        { nodes, edges },
-        (newState) => {
-            setNodes(newState.nodes);
-            setEdges(newState.edges);
+    useEffect(() => {
+        if (!active) {
+            hasInitializedRef.current = false;
+            return;
         }
-    );
+
+        if (hasInitializedRef.current) return;
+
+        const nextNodes = initialNodes || [];
+        const nextEdges = initialEdges || [];
+
+        currentRef.current = { nodes: nextNodes, edges: nextEdges };
+        historyRef.current = { past: [], future: [] };
+        setNodes(nextNodes);
+        setEdges(nextEdges);
+        setIsAddingNode(false);
+        hasInitializedRef.current = true;
+    }, [active, initialNodes, initialEdges]);
+
+    const commitFlow = useCallback((nextNodes: Node[], nextEdges: Edge[]) => {
+        historyRef.current.past.push(currentRef.current);
+        historyRef.current.future = [];
+        currentRef.current = { nodes: nextNodes, edges: nextEdges };
+        setNodes(nextNodes);
+        setEdges(nextEdges);
+    }, []);
+
+    const updateFlow = useCallback((nextNodes: Node[], nextEdges: Edge[]) => {
+        currentRef.current = { nodes: nextNodes, edges: nextEdges };
+        setNodes(nextNodes);
+        setEdges(nextEdges);
+    }, []);
+
+    const undo = useCallback(() => {
+        const { past, future } = historyRef.current;
+        if (!past.length) return;
+
+        const previous = past.pop()!;
+        future.push(currentRef.current);
+        updateFlow(previous.nodes, previous.edges);
+    }, [updateFlow]);
+
+    const redo = useCallback(() => {
+        const { past, future } = historyRef.current;
+        if (!future.length) return;
+
+        const next = future.pop()!;
+        past.push(currentRef.current);
+        updateFlow(next.nodes, next.edges);
+    }, [updateFlow]);
 
     useEffect(() => {
         if (!active) return;
@@ -57,29 +104,58 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
 
     const { screenToFlowPosition } = useReactFlow();
 
+    const createNode = useCallback((position: { x: number; y: number }, sourceId?: string) => {
+        const nextId = `n-${Date.now()}`;
+        const nextNode = {
+            id: nextId,
+            position,
+            data: { label: `Nodo ${currentRef.current.nodes.length + 1}` },
+            type: 'nodeInputText'
+        };
+
+        const nextNodes = [...currentRef.current.nodes, nextNode];
+        const nextEdges = sourceId
+            ? [
+                ...currentRef.current.edges,
+                {
+                    id: `e-${Date.now()}`,
+                    source: sourceId,
+                    target: nextId,
+                    type: 'edgeInputText',
+                    animated: false,
+                    label: ''
+                }
+            ]
+            : currentRef.current.edges;
+
+        commitFlow(nextNodes, nextEdges);
+    }, [commitFlow]);
+
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
-            setNodes((nds) => applyNodeChanges(changes, nds));
+            const nextNodes = applyNodeChanges(changes, currentRef.current.nodes);
+            updateFlow(nextNodes, currentRef.current.edges);
         },
-        []
+        [updateFlow]
     );
 
     const onEdgesChange = useCallback(
         (changes: EdgeChange[]) => {
-            setEdges((eds) => applyEdgeChanges(changes, eds));
+            const nextEdges = applyEdgeChanges(changes, currentRef.current.edges);
+            updateFlow(currentRef.current.nodes, nextEdges);
         },
-        []
+        [updateFlow]
     );
 
     const onConnect = useCallback((params: Connection) => {
-        const nextEdges = addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, edges);
-        pushHistory({ nodes, edges: nextEdges });
-    }, [nodes, edges, pushHistory]);
+        const nextEdges = addEdge({ ...params, type: 'edgeInputText', animated: false, label: '' }, currentRef.current.edges);
+        commitFlow(currentRef.current.nodes, nextEdges);
+    }, [commitFlow]);
 
     const onEdgesDelete = useCallback((edgesToDelete: Edge[]) => {
-        const nextEdges = edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
-        pushHistory({ nodes, edges: nextEdges });
-    }, [nodes, edges, pushHistory]);
+        const nextEdges = currentRef.current.edges.filter((e) => !edgesToDelete.find((del) => del.id === e.id));
+        commitFlow(currentRef.current.nodes, nextEdges);
+    }, [commitFlow]);
 
     const onConnectEnd = useCallback((event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
         if (!connectionState.isValid && connectionState.fromNode) {
@@ -88,29 +164,24 @@ export const useDiagramFlow = (active = true, initialNodes?: Node[], initialEdge
             const clientX = 'changedTouches' in event ? touchEvent.changedTouches[0].clientX : mouseEvent.clientX;
             const clientY = 'changedTouches' in event ? touchEvent.changedTouches[0].clientY : mouseEvent.clientY;
             const position = screenToFlowPosition({ x: clientX, y: clientY });
-            const id = `n-${Date.now()}`;
-            
-            const nextNodes = [...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }];
-            const nextEdges = [...edges, { id: `e-${Date.now()}`, source: connectionState.fromNode.id, target: id, type: 'edgeInputText', animated: false, label: '' }];
-            
-            pushHistory({ nodes: nextNodes, edges: nextEdges });
+            createNode(position, connectionState.fromNode.id);
         }
-    }, [screenToFlowPosition, nodes, edges, pushHistory]);
+    }, [screenToFlowPosition, createNode]);
 
     const onPaneClick = useCallback((event: React.MouseEvent) => {
         if (!isAddingNode) return;
         const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-        const id = `n-${Date.now()}`;
-        
-        const nextNodes = [...nodes, { id, position, data: { label: `Nodo ${nodes.length + 1}` }, type: 'nodeInputText' }];
-        pushHistory({ nodes: nextNodes, edges });
+        createNode(position);
         setIsAddingNode(false);
-    }, [isAddingNode, screenToFlowPosition, nodes, edges, pushHistory]);
+    }, [isAddingNode, screenToFlowPosition, createNode]);
 
     const onLabelChange = useCallback((id: string, newLabel: string) => {
-        const updated = nodes.map((n) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
-        pushHistory({ nodes: updated, edges });
-    }, [nodes, edges, pushHistory]);
+        const updated = currentRef.current.nodes.map((n) => n.id === id ? { ...n, data: { ...n.data, label: newLabel } } : n);
+        commitFlow(updated, currentRef.current.edges);
+    }, [commitFlow]);
+
+    const canUndo = historyRef.current.past.length > 0;
+    const canRedo = historyRef.current.future.length > 0;
 
     const nodeHandlers = useMemo(() => ({
         onLabelChange

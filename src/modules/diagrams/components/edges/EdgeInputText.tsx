@@ -71,15 +71,11 @@ export function EdgeInputText({
                     <div style={{ display: 'flex', gap: 4 }}>
                         <button
                             onClick={() => update({ animated: !animated })}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '4px 8px', borderRadius: 4,
-                                border: '1px solid #b1b1b7',
-                                cursor: 'pointer',
-                                background: '#fff'
-                            }}
+                            className={`flex items-center justify-center px-2 py-1 rounded border cursor-pointer transition ${
+                                animated
+                                    ? 'bg-orange-50 text-orange-700 border-orange-300 dark:bg-orange-950/30 dark:text-orange-200 dark:border-orange-800'
+                                    : 'bg-white text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'
+                            }`}
                         >
                             {animated ? <PauseIcon size={12} /> : <PlayIcon size={12} />}
                         </button>

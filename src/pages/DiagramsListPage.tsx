@@ -50,7 +50,6 @@ export const DiagramsListPage = () => {
                     className="inline-flex items-center justify-center rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 transition shadow-md shadow-orange-500/10 cursor-pointer self-start sm:self-center gap-1.5"
                 >
                     <PlusIcon size={16} />
-                    Nuevo Diagrama
                 </button>
             </div>
 

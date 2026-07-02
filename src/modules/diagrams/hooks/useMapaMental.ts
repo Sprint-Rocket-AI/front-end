@@ -323,7 +323,7 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
         }
     }
 
-    const { push: pushHistory, undo, redo, canUndo, canRedo } = useHistory(
+    const { push: pushHistory, record: recordHistory, undo, redo, canUndo, canRedo } = useHistory(
         { nodes, edges },
         (newState) => {
             setNodes(newState.nodes);
@@ -333,7 +333,7 @@ export const useMapaMental = (active = true, initialMarkdown?: string) => {
 
     const { onNodeDragStart, onNodeDragStop } = useNodeDragHistory({
         getSnapshot: () => ({ nodes, edges }),
-        pushHistory
+        pushHistory: recordHistory
     });
 
     useEffect(() => {

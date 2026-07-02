@@ -17,6 +17,12 @@ export function useHistory<T>(current: T, setCurrent: (val: T) => void) {
         setCurrent(newState);
     }, [setCurrent]);
 
+    const record = useCallback((snapshot: T) => {
+        past.current.push(snapshot);
+        future.current = [];
+        setHistoryCounts({ past: past.current.length, future: 0 });
+    }, []);
+
     const undo = useCallback(() => {
         if (!past.current.length) return;
         future.current.push(currentRef.current);
@@ -35,6 +41,7 @@ export function useHistory<T>(current: T, setCurrent: (val: T) => void) {
 
     return { 
         push, 
+        record,
         undo, 
         redo, 
         canUndo: historyCounts.past > 0, 

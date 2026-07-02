@@ -215,7 +215,7 @@ export const DiagramBoard = () => {
                     <textarea
                         value={mentalMapFlow.markdown}
                         onChange={(e) => mentalMapFlow.updateFromMarkdown(e.target.value)}
-                        className="flex-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 font-mono focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500 resize-none"
+                        className="flex-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 font-mono focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500 resize-none"
                         placeholder="# Desarrollo&#10;## Tarea 1&#10;### Tarea 1.1..."
                     />
                     <button

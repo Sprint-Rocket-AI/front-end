@@ -14,7 +14,7 @@ export const useRemindersWebSocket = () => {
     }
 
     const connectWebSocket = () => {
-      const baseUrl = import.meta.env.VITE_WS_BASE_URL;
+      const baseUrl = import.meta.env.VITE_CHECKPOINT_WS_URL;
       const wsUrl = `${baseUrl}userId=${userId}`;
 
       console.log(`[WS] Conectando a recordatorios para el usuario: ${userId}`);

@@ -66,7 +66,6 @@ export const DiagramSidebar = ({ currentId, onDiagramClick }: Props) => {
                         title="Crear diagrama"
                     >
                         <PlusIcon size={12} />
-                        Nuevo
                     </button>
                     <button 
                         onClick={() => setIsSidebarOpen(false)}

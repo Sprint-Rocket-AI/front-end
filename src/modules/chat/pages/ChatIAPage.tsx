@@ -7,6 +7,7 @@ import { LoadingSpinner } from "../../../commons/components/LoadingSpinner";
 import { ConfirmModal } from "../../../commons/components/ConfirmModal";
 import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useChat } from "../hooks/useChat";
+import { MarkdownRenderer } from "../../../commons/components/MarkdownRenderer";
 
 export const ChatIAPage = () => {
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
@@ -264,7 +265,7 @@ export const ChatIAPage = () => {
                       : "rounded-3xl border border-slate-700/50 bg-slate-800/80 text-slate-200 px-5 py-3 w-fit max-w-[85%] ml-auto"
                       }`}
                   >
-                    <p>{message.content}</p>
+                    <MarkdownRenderer content={message.content} />
                   </article>
                 ))}
                 {isSending && (

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { CrearActividadRequest } from '../interfaces/ActividadInterface';
 
 interface ActividadFormModalProps {
-  onAdd: (actividad: CrearActividadRequest) => void;
+  onAdd: (actividad: Omit<CrearActividadRequest, 'userId'>) => void;
   onClose: () => void;
 }
 
@@ -25,7 +25,7 @@ export const ActividadFormModal = ({ onAdd, onClose }: ActividadFormModalProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.titulo.trim()) return;
-    onAdd({ ...form, userId: 'dev-001' });
+    onAdd(form);
     onClose();
   };
 

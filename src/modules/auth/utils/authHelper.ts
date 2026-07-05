@@ -29,7 +29,7 @@ export const getStoredOidcUser = (): StoredOidcUser | null => {
 
 export const getToken = (): string => {
   const storedUser = getStoredOidcUser();
-  const token =  storedUser?.id_token;
+  const token = storedUser?.id_token;
 
   if (!token) {
     throw new Error("No se encontró token");
@@ -39,3 +39,8 @@ export const getToken = (): string => {
 };
 
 export const getProfile = (): Record<string, unknown> | null => getStoredOidcUser()?.profile ?? null;
+
+export const getUserId = (): string => {
+  const profile = getProfile();
+  return profile?.sub as string;
+};

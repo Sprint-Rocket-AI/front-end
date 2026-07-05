@@ -3,7 +3,7 @@ import type { CrearRecordatorioRequest } from '../interfaces/RecordatorioInterfa
 import { DateTimePicker } from '../../../commons/components/DateTimePicker';
 
 interface RecordatorioFormModalProps {
-    onAdd: (data: CrearRecordatorioRequest) => void;
+    onAdd: (data: Omit<CrearRecordatorioRequest, 'userId'>) => void;
     onClose: () => void;
 }
 
@@ -27,7 +27,6 @@ export const RecordatorioFormModal = ({ onAdd, onClose }: RecordatorioFormModalP
     }
 
     onAdd({
-      userId: 'dev-001',
       titulo: titulo.trim(),
       fechaExpiracion: isoDateTime,
     });

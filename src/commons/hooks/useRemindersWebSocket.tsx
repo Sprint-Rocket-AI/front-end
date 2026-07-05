@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from '../services/toastService';
+
+import { useCognitoSession } from '../../modules/auth/services/cognitoAuthService';
 
 export const useRemindersWebSocket = () => {
-  const userId = "dev-001";
+  const { profile } = useCognitoSession();
+  const userId = profile?.sub as string;
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!userId) return;
-
     if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission();
     }
@@ -50,11 +51,9 @@ export const useRemindersWebSocket = () => {
               };
             }
 
-            toast.custom((t) => (
+            toast.custom((id: string) => (
               <div
-                className={`${
-                  t.visible ? 'animate-enter' : 'animate-leave'
-                } max-w-md w-full bg-white dark:bg-slate-950 shadow-xl rounded-2xl pointer-events-auto flex border border-slate-200 dark:border-slate-800 p-4 transition-all duration-300`}
+                className="max-w-md w-full bg-white dark:bg-slate-950 shadow-xl rounded-2xl pointer-events-auto flex border border-slate-200 dark:border-slate-800 p-4 transition-all duration-300 animate-fade-in-up"
               >
                 <div className="flex-1 w-0">
                   <div className="flex items-start">
@@ -74,7 +73,7 @@ export const useRemindersWebSocket = () => {
                 <div className="ml-4 flex flex-shrink-0 items-center justify-center gap-1 border-l border-slate-100 dark:border-slate-800 pl-3">
                   <button
                     type="button"
-                    onClick={() => toast.dismiss(t.id)}
+                    onClick={() => toast.dismiss(id)}
                     className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                   >
                     OK

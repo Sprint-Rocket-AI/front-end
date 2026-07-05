@@ -9,6 +9,7 @@ import {
   addMessage,
   deleteChat
 } from "../../../store/slices/chatSlice";
+import { getUserId } from "../../auth/utils/authHelper";
 
 export const useChat = () => {
   const navigate = useNavigate();
@@ -21,20 +22,16 @@ export const useChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-
-  const defaultUserId = "1";
-
   const activeThread = useMemo(
     () => threads.find((thread) => thread.sessionId === sessionId) ?? null,
     [threads, sessionId],
   );
 
-
-
   const cargarChats = useCallback(async () => {
     setLoadingThreads(true);
     try {
-      const chats = await chatService.getChatsByUserId(defaultUserId);
+      const userId = getUserId();
+      const chats = await chatService.getChatsByUserId(userId);
       dispatch(setChats(chats));
     } catch (error) {
       console.error("Error cargando chats", error);
@@ -60,8 +57,6 @@ export const useChat = () => {
     }
   }, [dispatch]);
 
-
-
   const handleSendMessage = useCallback(async () => {
     if (!inputValue.trim()) return;
 
@@ -75,7 +70,8 @@ export const useChat = () => {
       setIsSending(true);
 
       try {
-        const response = await chatService.createChat(defaultUserId, messageContent);
+        const userId = getUserId();
+        const response = await chatService.createChat(userId, messageContent);
         currentSessionId = response.sessionId;
 
         const tempUserMsg: ChatMessage = {

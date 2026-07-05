@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import type {
   ActividadInterface,
   CrearActividadRequest,
- EstadoActividad,
+  EstadoActividad,
 } from '../interfaces/ActividadInterface';
 import type {
   RecordatorioInterface,
@@ -10,8 +10,7 @@ import type {
 } from '../interfaces/RecordatorioInterface';
 
 import { checkpointService } from '../../../services/CheckpointService';
-
-const DEV_ID = 'dev-001';
+import { getUserId } from '../../auth/utils/authHelper';
 
 export interface CheckpointState {
   actividades: ActividadInterface[];
@@ -53,8 +52,9 @@ export const useCheckpoint = () => {
     setState((s) => ({ ...s, loadingActividades: true }));
 
     try {
+      const userId = getUserId();
       const actividades =
-        await checkpointService.getActividadesByDesarrollador(DEV_ID);
+        await checkpointService.getActividadesByDesarrollador(userId);
 
       setState((s) => ({
         ...s,
@@ -86,8 +86,9 @@ export const useCheckpoint = () => {
   const cargarRecordatorios = useCallback(async () => {
     setState((s) => ({ ...s, loadingRecordatorios: true }));
     try {
+      const userId = getUserId();
       const recordatorios =
-        await checkpointService.getRecordatoriosByDesarrollador(DEV_ID);
+        await checkpointService.getRecordatoriosByDesarrollador(userId);
 
       const sorted = [...recordatorios]
       setState((s) => ({ ...s, recordatorios: sorted, loadingRecordatorios: false }));
@@ -100,10 +101,11 @@ export const useCheckpoint = () => {
   const nuevoRecordatorio = useCallback(
     async (data: Omit<CrearRecordatorioRequest, 'userId'>) => {
       try {
+        const userId = getUserId();
         const recordatorio =
           await checkpointService.crearRecordatorio({
             ...data,
-            userId: DEV_ID,
+            userId,
           });
         setState((s) => ({
           ...s,
@@ -152,13 +154,14 @@ export const useCheckpoint = () => {
   }, [state.recordatorios]);
 
 
-  const crearActividadDirecta = useCallback(async (actividad: CrearActividadRequest) => {
+  const crearActividadDirecta = useCallback(async (actividad: Omit<CrearActividadRequest, 'userId'>) => {
      setState((s) => ({ ...s, loadingConfirmar: true }));
      try {
+       const userId = getUserId();
        const actividadCreada =
          await checkpointService.crearActividad({
            ...actividad,
-           userId: DEV_ID,
+           userId,
          });
        setState((s) => ({
          ...s,

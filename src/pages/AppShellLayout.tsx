@@ -4,6 +4,7 @@ import { AppMenuBar } from "../components/AppMenuBar";
 import { AppFooter } from "../components/AppFooter";
 import { ThemeContext } from "../commons/context/ThemeContext";
 import { useRemindersWebSocket } from "../commons/hooks/useRemindersWebSocket";
+import { ToastContainer } from "../commons/components/ToastContainer";
 
 export const AppShellLayout = () => {
   const [isDark, setIsDark] = useState(() => {
@@ -41,6 +42,7 @@ export const AppShellLayout = () => {
           </button>
         )}
       </main>
+      <ToastContainer />
     </ThemeContext.Provider>
   );
 };

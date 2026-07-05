@@ -39,11 +39,8 @@ export const ChatIAPage = () => {
   useEffect(() => {
     checkpoint.cargarActividades();
     checkpoint.cargarRecordatorios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     cargarChats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cargarChats]);
 
   useEffect(() => {

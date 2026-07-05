@@ -6,12 +6,6 @@ interface ActividadBorradorItemProps {
   onRemove: (index: number) => void;
 }
 
-const PRIORIDAD_COLORS: Record<string, string> = {
-  ALTA: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300',
-  MEDIA: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300',
-  BAJA: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
-};
-
 export const ActividadBorradorItem = ({
   actividad,
   index,
@@ -23,14 +17,6 @@ export const ActividadBorradorItem = ({
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
             {actividad.titulo}
-          </span>
-          <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${PRIORIDAD_COLORS[actividad.prioridad] ?? ''}`}
-          >
-            {actividad.prioridad}
-          </span>
-          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-            {actividad.tipo}
           </span>
         </div>
         {actividad.ticketJira && (

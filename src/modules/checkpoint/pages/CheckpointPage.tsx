@@ -4,6 +4,15 @@ import type { EstadoActividad } from '../interfaces/ActividadInterface';
 import { ActividadFormModal } from '../components/ActividadFormModal';
 import { RecordatorioFormModal } from '../components/RecordatorioFormModal';
 import { RecordatorioItem } from '../components/RecordatorioItem';
+import { 
+  ClipboardDocumentListIcon, 
+  InboxIcon, 
+  BellIcon, 
+  BellSlashIcon, 
+  CheckCircleIcon, 
+  ExclamationCircleIcon,
+  PlusIcon 
+} from '../../../assets/Icons';
 
 export const CheckpointPage = () => {
   const hook = useCheckpoint();
@@ -52,12 +61,12 @@ export const CheckpointPage = () => {
       {/* Feedback / error banners */}
       {hook.feedback && (
         <div className="flex items-center gap-2 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300">
-          <span>✅</span> {hook.feedback}
+          <CheckCircleIcon className="w-5 h-5 shrink-0" /> {hook.feedback}
         </div>
       )}
       {hook.error && (
         <div className="flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
-          <span>⚠️</span> {hook.error}
+          <ExclamationCircleIcon className="w-5 h-5 shrink-0" /> {hook.error}
         </div>
       )}
 
@@ -69,7 +78,7 @@ export const CheckpointPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-500/10 text-lg text-accent-500 dark:bg-accent-500/20">
-                📋
+                <ClipboardDocumentListIcon className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -86,9 +95,7 @@ export const CheckpointPage = () => {
               onClick={() => setShowActividadModal(true)}
               className="action-primary gap-2 px-4 py-2.5 text-sm"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              <PlusIcon className="w-4 h-4" strokeWidth={2.5} />
             </button>
           </div>
 
@@ -132,7 +139,7 @@ export const CheckpointPage = () => {
             </div>
           ) : (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-8 text-center dark:border-white/10 dark:bg-white/5">
-                <span className="text-3xl">📭</span>
+                <InboxIcon className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-2" />
                 <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                   No hay actividades aún
                 </p>
@@ -148,7 +155,7 @@ export const CheckpointPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-assistant-500/10 text-lg text-assistant-400 dark:bg-assistant-500/20">
-                🔔
+                <BellIcon className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -165,9 +172,7 @@ export const CheckpointPage = () => {
               onClick={() => setShowRecordatorioModal(true)}
               className="action-primary gap-2 px-4 py-2.5 text-sm"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              <PlusIcon className="w-4 h-4" strokeWidth={2.5} />
             </button>
           </div>
 
@@ -184,7 +189,7 @@ export const CheckpointPage = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-8 text-center dark:border-white/10 dark:bg-white/5">
-              <span className="text-3xl">🔕</span>
+              <BellSlashIcon className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-2" />
               <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                 Sin recordatorios activos
               </p>

@@ -20,7 +20,7 @@ const nodeTypes = {
     nodeMapaMental: NodeMapaMental
 };
 const edgeTypes = { edgeInputText: EdgeInputText };
-const panOnDrag = [1, 2];
+const panOnDrag = true;
 
 export const DiagramBoard = () => {
     const { isDark } = useTheme();
@@ -241,6 +241,7 @@ export const DiagramBoard = () => {
                     deleteKeyCode={['Backspace', 'Delete']}
                     selectionOnDrag
                     panOnDrag={panOnDrag}
+                    selectionKeyCode="Space"
                     selectionMode={SelectionMode.Partial}
                     onPaneClick={isMentalMap ? undefined : (e) => defaultFlow.onPaneClick(e as React.MouseEvent)}
                     onNodeDragStart={activeFlow.onNodeDragStart}

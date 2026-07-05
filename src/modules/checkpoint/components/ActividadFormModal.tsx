@@ -8,8 +8,6 @@ interface ActividadFormModalProps {
 
 const emptyForm = (): Omit<CrearActividadRequest, 'userId'> => ({
   titulo: '',
-  tipo: 'TAREA',
-  prioridad: 'MEDIA',
   descripcion: '',
 });
 
@@ -57,8 +55,8 @@ export const ActividadFormModal = ({ onAdd, onClose }: ActividadFormModalProps) 
           </div>
 
           <div>
-            <label className="label" htmlFor="act-descripcion">Descripción (opcional)</label>
-            <input
+            <label className="label" htmlFor="act-descripcion">Descripción</label>
+            <textarea
               id="act-descripcion"
               name="descripcion"
               className="field min-h-32 resize-y"

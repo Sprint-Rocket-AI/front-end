@@ -7,8 +7,6 @@ export interface ActividadInterface {
   id?: string;
   userId: string;
   titulo: string;
-  tipo: TipoActividad;
-  prioridad: PrioridadActividad;
   estado?: EstadoActividad;
   ticketJira?: string;
   fechaVencimiento?: string; // ISO date YYYY-MM-DD
@@ -21,8 +19,6 @@ export interface ActividadInterface {
 export interface CrearActividadRequest {
   userId: string;
   titulo: string;
-  tipo: TipoActividad;
-  prioridad: PrioridadActividad;
   ticketJira?: string;
   fechaVencimiento?: string;
   etiquetas?: string[];

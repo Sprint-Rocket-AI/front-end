@@ -8,7 +8,7 @@ import { ConfirmModal } from "../../../commons/components/ConfirmModal";
 import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useChat } from "../hooks/useChat";
 import { MarkdownRenderer } from "../../../commons/components/MarkdownRenderer";
-import { WrenchIcon } from "../../../assets/Icons";
+import { HammerIcon } from "../../../assets/Icons";
 import { FormatUtilsModal } from "../components/FormatUtilsModal";
 
 export const ChatIAPage = () => {
@@ -176,7 +176,7 @@ export const ChatIAPage = () => {
                 className="group relative rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                 title="Tools"
               >
-                <WrenchIcon className="w-4 h-4" />
+                <HammerIcon className="w-4 h-4" />
                 <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[11px] text-slate-300 opacity-0 transition group-hover:opacity-100">
                   Tools
                 </span>

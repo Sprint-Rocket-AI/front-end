@@ -120,9 +120,10 @@ export const ExclamationCircleIcon = ({ className = 'w-4 h-4', size = 16, ...pro
     </svg>
 );
 
-export const WrenchIcon = ({ className = 'w-4 h-4', size = 16, ...props }: IconProps) => (
+export const HammerIcon = ({ className = 'w-4 h-4', size = 16, ...props }: IconProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className} style={{ width: size, height: size }} {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.07c.39-.39.87-.6 1.377-.597.501.003.97.218 1.332.58l5.256 5.256a1.125 1.125 0 0 1-1.59 1.59l-5.256-5.256a.375.375 0 0 0-.53 0L9.31 19.347a3.75 3.75 0 0 1-5.304-5.304l2.69-2.693a.75.75 0 0 1 1.06 1.06l-2.69 2.693a2.25 2.25 0 1 0 3.182 3.182l2.693-2.69a.375.375 0 0 0 0-.53l-.18-.18a1.425 1.425 0 0 1 0-2.015l1.428-1.428z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="m14 12-8.5 8.5a2.122 2.122 0 1 1-3-3L11 9" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="m15 13 6.5-6.5a1.5 1.5 0 0 0 0-2.12l-3.38-3.38a1.5 1.5 0 0 0-2.12 0L9.5 7.5Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="m18 10 2.5-2.5" />
     </svg>
 );

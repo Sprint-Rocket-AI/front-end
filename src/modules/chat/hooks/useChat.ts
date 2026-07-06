@@ -71,7 +71,8 @@ export const useChat = () => {
 
       try {
         const userId = getUserId();
-        const response = await chatService.createChat(userId, messageContent);
+        const chatTitle = messageContent.substring(0, 15);
+        const response = await chatService.createChat(userId, messageContent, chatTitle);
         currentSessionId = response.sessionId;
 
         const tempUserMsg: ChatMessage = {

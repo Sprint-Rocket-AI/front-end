@@ -83,6 +83,18 @@ export const useDiagramBoard = ({ id }: UseDiagramBoardProps) => {
         }
     }, [id, activeDiagram, dispatch]);
 
+    const handleUpdateDescription = useCallback(async (newDescription: string) => {
+        if (!activeDiagram || !id) return;
+        setActiveDiagram(prev => prev ? { ...prev, description: newDescription } : null);
+        try {
+            const updated = await diagramService.updateDiagram(id, { description: newDescription });
+            setActiveDiagram(updated);
+            dispatch(updateDiagramState(updated));
+        } catch (err) {
+            console.error("Error updating diagram description:", err);
+        }
+    }, [id, activeDiagram, dispatch]);
+
     const handleDownloadMd = (markdown: string) => {
         if (!activeDiagram) return;
         const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8;' });
@@ -104,6 +116,7 @@ export const useDiagramBoard = ({ id }: UseDiagramBoardProps) => {
         setExpanded,
         handleSave,
         handleRename,
+        handleUpdateDescription,
         handleDownloadMd,
         dispatch
     };

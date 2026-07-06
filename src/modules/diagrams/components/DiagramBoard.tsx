@@ -36,6 +36,7 @@ export const DiagramBoard = () => {
         setExpanded,
         handleSave,
         handleRename,
+        handleUpdateDescription,
         handleDownloadMd
     } = useDiagramBoard({ id });
 
@@ -264,6 +265,7 @@ export const DiagramBoard = () => {
                         title={activeDiagram.title}
                         description={activeDiagram.description}
                         onRename={handleRename}
+                        onUpdateDescription={handleUpdateDescription}
                         saveStatus={saveStatus}
                         isBrowserFullscreen={fullscreenMode === 'browser'}
                         isDeviceFullscreen={fullscreenMode === 'device'}

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Panel } from '@xyflow/react';
 import { useDiagramHeaderPanel } from '../../hooks/useDiagramHeaderPanel';
 import {
@@ -23,6 +24,7 @@ interface Props {
     isAnyCollapsed?: boolean;
     showAddNode?: boolean;
     onRename?: (newTitle: string) => void;
+    onUpdateDescription?: (newDescription: string) => void;
     saveStatus?: 'idle' | 'saving' | 'saved' | 'error';
     description?: string;
     isBrowserFullscreen?: boolean;
@@ -44,6 +46,7 @@ export const DiagramHeaderPanel = ({
     isAnyCollapsed = false,
     showAddNode = true,
     onRename,
+    onUpdateDescription,
     saveStatus = 'idle',
     description,
     isBrowserFullscreen = false,
@@ -60,6 +63,23 @@ export const DiagramHeaderPanel = ({
         isCollapsed,
         setIsCollapsed
     } = useDiagramHeaderPanel({ title, onRename });
+
+    const [isEditingDesc, setIsEditingDesc] = useState(false);
+    const [tempDesc, setTempDesc] = useState(description || '');
+    const [prevDesc, setPrevDesc] = useState(description);
+
+    if (prevDesc !== description) {
+        setPrevDesc(description);
+        setTempDesc(description || '');
+    }
+
+    const handleSaveDesc = () => {
+        const trimmed = tempDesc.trim();
+        if (trimmed !== (description || '') && onUpdateDescription) {
+            onUpdateDescription(trimmed);
+        }
+        setIsEditingDesc(false);
+    };
 
     const getStatusBadge = () => {
         switch (saveStatus) {
@@ -214,12 +234,44 @@ export const DiagramHeaderPanel = ({
                 </div>
                 {expanded && (
                     <div className="bg-white/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-lg rounded-xl p-3.5 w-[360px] max-w-[90vw] text-xs leading-relaxed animate-fade-in">
-                        {description && (
-                            <div className="mb-3 pb-2.5 border-b border-slate-150 dark:border-slate-700/60 text-slate-800 dark:text-slate-200">
-                                <h4 className="font-bold mb-1">Descripción:</h4>
-                                <p className="italic text-slate-600 dark:text-slate-400">{description}</p>
-                            </div>
-                        )}
+                        <div className="mb-3 pb-2.5 border-b border-slate-150 dark:border-slate-700/60 text-slate-800 dark:text-slate-200">
+                            <h4 className="font-bold mb-1">Descripción:</h4>
+                            {isEditingDesc ? (
+                                <textarea
+                                    value={tempDesc}
+                                    onChange={(e) => setTempDesc(e.target.value)}
+                                    onBlur={handleSaveDesc}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Escape') {
+                                            setTempDesc(description || '');
+                                            setIsEditingDesc(false);
+                                        }
+                                        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                            handleSaveDesc();
+                                        }
+                                    }}
+                                    autoFocus
+                                    rows={3}
+                                    className="text-xs text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 rounded-lg px-2 py-1 w-full resize-y"
+                                    placeholder="Describe este diagrama... (Ctrl+Enter para guardar)"
+                                />
+                            ) : (
+                                <div 
+                                    className="flex items-start gap-2 group cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 p-1 rounded-lg transition-colors"
+                                    onClick={() => setIsEditingDesc(true)}
+                                >
+                                    <p className="italic text-slate-600 dark:text-slate-400 flex-1 min-h-[1.5rem]">
+                                        {description || "Añadir descripción..."}
+                                    </p>
+                                    <button
+                                        className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-orange-500 transition-all cursor-pointer flex-shrink-0 mt-0.5"
+                                        title="Editar descripción"
+                                    >
+                                        <PencilIcon size={12} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                         <p>
                             Este es un organizador de tareas y mapa mental interactivo. Permite ver la jerarquía y el estado de desarrollo de las tareas.
                         </p>

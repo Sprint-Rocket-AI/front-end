@@ -6,14 +6,14 @@ interface RecordatoriosSeccionProps {
   recordatorios: RecordatorioInterface[];
   loadingRecordatorios: boolean;
   onNuevoRecordatorioClick: () => void;
-  onStateChange: (id: string, accion: 'DESCARTAR' | 'POSPONER') => void;
+  onDelete: (id: string) => void;
 }
 
 export const RecordatoriosSeccion = ({
   recordatorios,
   loadingRecordatorios,
   onNuevoRecordatorioClick,
-  onStateChange,
+  onDelete,
 }: RecordatoriosSeccionProps) => {
   return (
     <section className="panel flex flex-col gap-5">
@@ -52,7 +52,7 @@ export const RecordatoriosSeccion = ({
             <RecordatorioItem
               key={rec.id ?? rec.titulo}
               recordatorio={rec}
-              onStateChange={onStateChange}
+              onDelete={onDelete}
             />
           ))}
         </div>

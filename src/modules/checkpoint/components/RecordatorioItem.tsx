@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
 import type { RecordatorioInterface } from '../interfaces/RecordatorioInterface';
+import { TrashIcon } from '../../../assets/Icons';
 
 interface RecordatorioItemProps {
   recordatorio: RecordatorioInterface;
-  onStateChange: (id: string, accion: 'DESCARTAR' | 'POSPONER') => void;
+  onDelete: (id: string) => void;
 }
 
 function getTimeLeft(proximoEnvio?: string): { label: string; colorClass: string } {
@@ -37,27 +37,13 @@ function formatIsoDateTime(isoString?: string): string {
   }
 }
 
-export const RecordatorioItem = ({ recordatorio, onStateChange }: RecordatorioItemProps) => {
+export const RecordatorioItem = ({ recordatorio, onDelete }: RecordatorioItemProps) => {
   const { label, colorClass } = getTimeLeft(recordatorio.proximoEnvio);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleAction = (accion: 'DESCARTAR' | 'POSPONER') => {
+  const handleDelete = () => {
     if (recordatorio.id) {
-      onStateChange(recordatorio.id, accion);
+      onDelete(recordatorio.id);
     }
-    setIsOpen(false);
   };
 
   return (
@@ -74,37 +60,17 @@ export const RecordatorioItem = ({ recordatorio, onStateChange }: RecordatorioIt
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-1">
+      <div className="flex shrink-0 flex-col items-end gap-2">
         {label && <span className={`text-xs font-bold ${colorClass}`}>{label}</span>}
 
-        <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            className="rounded-full bg-slate-100 px-3 py-0.5 text-[10px] font-bold uppercase text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            Acciones ▾
-          </button>
-
-          {isOpen && (
-            <div className="absolute right-0 z-10 mt-1 w-28 origin-top-right rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-800 dark:bg-slate-900 animate-[fadeInUp_0.1s_ease]">
-              <button
-                type="button"
-                className="w-full rounded-lg px-2 py-1.5 text-left text-[10px] font-bold uppercase text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition"
-                onClick={() => handleAction('POSPONER')}
-              >
-                ⏳ Posponer
-              </button>
-              <button
-                type="button"
-                className="w-full rounded-lg px-2 py-1.5 text-left text-[10px] font-bold uppercase text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30 transition"
-                onClick={() => handleAction('DESCARTAR')}
-              >
-                ❌ Descartar
-              </button>
-            </div>
-          )}
-        </div>
+        <button
+          type="button"
+          aria-label="Eliminar recordatorio"
+          onClick={handleDelete}
+          className="shrink-0 rounded-full p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+        >
+          <TrashIcon className="w-4 h-4" />
+        </button>
 
         {recordatorio.activo ? (
           <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400">

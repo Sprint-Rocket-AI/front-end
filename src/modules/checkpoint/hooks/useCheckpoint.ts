@@ -123,35 +123,18 @@ export const useCheckpoint = () => {
     [],
   );
 
-  const gestionarEstadoRecordatorio = useCallback(async (id: string, accion: 'DESCARTAR' | 'POSPONER') => {
+  const eliminarRecordatorio = useCallback(async (id: string) => {
     try {
-      if (accion === 'DESCARTAR') {
-        await checkpointService.eliminarRecordatorio(id);
-        setState((s) => ({
-          ...s,
-          recordatorios: s.recordatorios.filter((r) => r.id !== id),
-        }));
-        setFeedback('Recordatorio descartado');
-      } else if (accion === 'POSPONER') {
-        const recordatorio = state.recordatorios.find((r) => r.id === id);
-        if (recordatorio && recordatorio.fechaExpiracion) {
-          const [h, m] = recordatorio.fechaExpiracion.split(':').map(Number);
-          const date = new Date();
-          date.setHours(h, m + 15);
-          const newHora = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-
-          await checkpointService.actualizarRecordatorio(id, { fechaExpiracion: newHora });
-          setState((s) => ({
-            ...s,
-            recordatorios: s.recordatorios.map((r) => r.id === id ? { ...r, horaActivacion: newHora } : r)
-          }));
-          setFeedback(`Recordatorio pospuesto a las ${newHora}`);
-        }
-      }
+      await checkpointService.eliminarRecordatorio(id);
+      setState((s) => ({
+        ...s,
+        recordatorios: s.recordatorios.filter((r) => r.id !== id),
+      }));
+      setFeedback('Recordatorio eliminado.');
     } catch {
-      setError('Error al gestionar el recordatorio.');
+      setError('Error al eliminar el recordatorio.');
     }
-  }, [state.recordatorios]);
+  }, []);
 
 
   const crearActividadDirecta = useCallback(async (actividad: Omit<CrearActividadRequest, 'userId'>) => {
@@ -181,7 +164,7 @@ export const useCheckpoint = () => {
     actualizarEstadoActividad,
     cargarRecordatorios,
     nuevoRecordatorio,
-    gestionarEstadoRecordatorio,
+    eliminarRecordatorio,
     crearActividadDirecta,
   };
 };

@@ -62,7 +62,7 @@ export const CheckpointPage = () => {
           recordatorios={hook.recordatorios}
           loadingRecordatorios={hook.loadingRecordatorios}
           onNuevoRecordatorioClick={() => setShowRecordatorioModal(true)}
-          onStateChange={hook.gestionarEstadoRecordatorio}
+          onDelete={hook.eliminarRecordatorio}
         />
       </div>
 

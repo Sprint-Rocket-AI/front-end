@@ -334,7 +334,7 @@ export const ChatIAPage = () => {
         onClose={() => setShowRecordatoriosPanel(false)}
         loading={checkpoint.loadingRecordatorios}
         recordatorios={checkpoint.recordatorios}
-        onStateChange={checkpoint.gestionarEstadoRecordatorio}
+        onDelete={checkpoint.eliminarRecordatorio}
       />
 
       <ActividadesPanel

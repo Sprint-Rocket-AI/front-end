@@ -7,7 +7,7 @@ interface RecordatoriosPanelProps {
   onClose: () => void;
   loading: boolean;
   recordatorios: RecordatorioInterface[];
-  onStateChange: (id: string, estado: 'DESCARTAR' | 'POSPONER') => void;
+  onDelete: (id: string) => void;
 }
 
 export const RecordatoriosPanel: React.FC<RecordatoriosPanelProps> = ({
@@ -15,7 +15,7 @@ export const RecordatoriosPanel: React.FC<RecordatoriosPanelProps> = ({
   onClose,
   loading,
   recordatorios,
-  onStateChange,
+  onDelete,
 }) => {
   if (!isOpen) return null;
 
@@ -43,7 +43,7 @@ export const RecordatoriosPanel: React.FC<RecordatoriosPanelProps> = ({
               <RecordatorioItem
                 key={rec.id ?? rec.titulo}
                 recordatorio={rec}
-                onStateChange={onStateChange}
+                onDelete={onDelete}
               />
             ))
           ) : (

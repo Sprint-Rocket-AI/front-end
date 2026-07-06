@@ -75,15 +75,32 @@ export const useChat = () => {
         const newSessionId = await chatService.createChat(userId, messageContent, chatTitle);
         currentSessionId = newSessionId;
 
-        // Reload the sidebar chats list so that the new chat thread appears
+        // 1. Add user's message locally first
+        const tempUserMsg: ChatMessage = {
+          role: "USER",
+          content: messageContent,
+          timestamp: new Date().toISOString()
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg, title: chatTitle }));
+
+        // 2. Reload the sidebar chats list so that the new chat thread appears
         await cargarChats();
 
-        // Fetch messages for the newly created chat session
-        await cargarMensajes(currentSessionId, true);
-
+        // 3. Navigate to the new chat page
         navigate(`/chat/${currentSessionId}`);
+
+        // 4. Send RAG query to get assistant response
+        const aiResponse = await chatService.sendRAGQuery(currentSessionId, messageContent);
+
+        // 5. Add assistant response locally
+        const tempAssistantMsg: ChatMessage = {
+          role: "ASSISTANT",
+          content: aiResponse.answer,
+          timestamp: new Date().toISOString()
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
       } catch (error) {
-        console.error("Error creando chat", error);
+        console.error("Error creando chat o enviando consulta RAG", error);
       } finally {
         isSendingMessage.current = false;
         setIsSending(false);

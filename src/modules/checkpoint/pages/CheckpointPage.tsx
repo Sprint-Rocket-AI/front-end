@@ -56,6 +56,8 @@ export const CheckpointPage = () => {
           loadingActividades={hook.loadingActividades}
           onNuevaActividadClick={() => setShowActividadModal(true)}
           onActualizarEstadoActividad={hook.actualizarEstadoActividad}
+          onActualizarActividadTitulo={hook.actualizarActividadTitulo}
+          onActualizarActividadDescripcion={hook.actualizarActividadDescripcion}
         />
 
         <RecordatoriosSeccion
@@ -63,6 +65,8 @@ export const CheckpointPage = () => {
           loadingRecordatorios={hook.loadingRecordatorios}
           onNuevoRecordatorioClick={() => setShowRecordatorioModal(true)}
           onDelete={hook.eliminarRecordatorio}
+          onUpdateTitulo={hook.actualizarRecordatorioTitulo}
+          onUpdateFecha={hook.actualizarRecordatorioFecha}
         />
       </div>
 

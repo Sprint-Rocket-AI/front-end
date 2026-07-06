@@ -8,6 +8,8 @@ import { ConfirmModal } from "../../../commons/components/ConfirmModal";
 import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useChat } from "../hooks/useChat";
 import { MarkdownRenderer } from "../../../commons/components/MarkdownRenderer";
+import { WrenchIcon } from "../../../assets/Icons";
+import { FormatUtilsModal } from "../components/FormatUtilsModal";
 
 export const ChatIAPage = () => {
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
@@ -18,8 +20,10 @@ export const ChatIAPage = () => {
   const [showActividadModal, setShowActividadModal] = useState(false);
   const [showRecordatorioOptions, setShowRecordatorioOptions] = useState(false);
   const [showActividadOptions, setShowActividadOptions] = useState(false);
+  const [showToolsOptions, setShowToolsOptions] = useState(false);
   const [showRecordatoriosPanel, setShowRecordatoriosPanel] = useState(false);
   const [showActividadesPanel, setShowActividadesPanel] = useState(false);
+  const [showToolsModal, setShowToolsModal] = useState(false);
 
   const {
     threads,
@@ -165,8 +169,41 @@ export const ChatIAPage = () => {
               <button
                 type="button"
                 onClick={() => {
+                  setShowToolsOptions((v) => !v);
+                  setShowRecordatorioOptions(false);
+                  setShowActividadOptions(false);
+                }}
+                className="group relative rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                title="Tools"
+              >
+                <WrenchIcon className="w-4 h-4" />
+                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[11px] text-slate-300 opacity-0 transition group-hover:opacity-100">
+                  Tools
+                </span>
+              </button>
+              {showToolsOptions && (
+                <div className="absolute right-0 z-20 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-900 p-1 shadow-lg">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowToolsModal(true);
+                      setShowToolsOptions(false);
+                    }}
+                    className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800"
+                  >
+                    Format Utils
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
                   setShowRecordatorioOptions((v) => !v);
                   setShowActividadOptions(false);
+                  setShowToolsOptions(false);
                 }}
                 className="group relative rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                 title="Recordatorios"
@@ -211,6 +248,7 @@ export const ChatIAPage = () => {
                 onClick={() => {
                   setShowActividadOptions((v) => !v);
                   setShowRecordatorioOptions(false);
+                  setShowToolsOptions(false);
                 }}
                 className="group relative rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                 title="Actividades"
@@ -335,6 +373,8 @@ export const ChatIAPage = () => {
         loading={checkpoint.loadingRecordatorios}
         recordatorios={checkpoint.recordatorios}
         onDelete={checkpoint.eliminarRecordatorio}
+        onUpdateTitulo={checkpoint.actualizarRecordatorioTitulo}
+        onUpdateFecha={checkpoint.actualizarRecordatorioFecha}
       />
 
       <ActividadesPanel
@@ -356,6 +396,11 @@ export const ChatIAPage = () => {
           }
         }}
         onCancel={() => setChatToDelete(null)}
+      />
+
+      <FormatUtilsModal
+        isOpen={showToolsModal}
+        onClose={() => setShowToolsModal(false)}
       />
     </section>
   );

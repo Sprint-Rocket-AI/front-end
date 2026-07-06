@@ -7,6 +7,8 @@ interface RecordatoriosSeccionProps {
   loadingRecordatorios: boolean;
   onNuevoRecordatorioClick: () => void;
   onDelete: (id: string) => void;
+  onUpdateTitulo?: (id: string, titulo: string) => void;
+  onUpdateFecha?: (id: string, fechaExpiracion: string) => void;
 }
 
 export const RecordatoriosSeccion = ({
@@ -14,6 +16,8 @@ export const RecordatoriosSeccion = ({
   loadingRecordatorios,
   onNuevoRecordatorioClick,
   onDelete,
+  onUpdateTitulo,
+  onUpdateFecha,
 }: RecordatoriosSeccionProps) => {
   return (
     <section className="panel flex flex-col gap-5">
@@ -53,6 +57,8 @@ export const RecordatoriosSeccion = ({
               key={rec.id ?? rec.titulo}
               recordatorio={rec}
               onDelete={onDelete}
+              onUpdateTitulo={onUpdateTitulo}
+              onUpdateFecha={onUpdateFecha}
             />
           ))}
         </div>

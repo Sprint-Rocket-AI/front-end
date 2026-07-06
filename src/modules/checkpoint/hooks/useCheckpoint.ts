@@ -158,12 +158,68 @@ export const useCheckpoint = () => {
      }
   }, []);
 
+  const actualizarActividadTitulo = useCallback(async (id: string, titulo: string) => {
+    try {
+      const updated = await checkpointService.actualizarActividadTitulo(id, titulo);
+      setState((s) => ({
+        ...s,
+        actividades: s.actividades.map((a) => (a.id === id ? { ...a, ...updated } : a)),
+      }));
+      setFeedback('Título de actividad actualizado.');
+    } catch {
+      setError('Error al actualizar el título.');
+    }
+  }, []);
+
+  const actualizarActividadDescripcion = useCallback(async (id: string, descripcion: string) => {
+    try {
+      const updated = await checkpointService.actualizarActividadDescripcion(id, descripcion);
+      setState((s) => ({
+        ...s,
+        actividades: s.actividades.map((a) => (a.id === id ? { ...a, ...updated } : a)),
+      }));
+      setFeedback('Descripción de actividad actualizada.');
+    } catch {
+      setError('Error al actualizar la descripción.');
+    }
+  }, []);
+
+  const actualizarRecordatorioTitulo = useCallback(async (id: string, titulo: string) => {
+    try {
+      const updated = await checkpointService.actualizarRecordatorioTitulo(id, titulo);
+      setState((s) => ({
+        ...s,
+        recordatorios: s.recordatorios.map((r) => (r.id === id ? { ...r, ...updated } : r)),
+      }));
+      setFeedback('Título de recordatorio actualizado.');
+    } catch {
+      setError('Error al actualizar el título.');
+    }
+  }, []);
+
+  const actualizarRecordatorioFecha = useCallback(async (id: string, fechaExpiracion: string) => {
+    try {
+      const updated = await checkpointService.actualizarRecordatorioFecha(id, fechaExpiracion);
+      setState((s) => ({
+        ...s,
+        recordatorios: s.recordatorios.map((r) => (r.id === id ? { ...r, ...updated } : r)),
+      }));
+      setFeedback('Fecha de recordatorio actualizada.');
+    } catch {
+      setError('Error al actualizar la fecha.');
+    }
+  }, []);
+
   return {
     ...state,
     cargarActividades,
     actualizarEstadoActividad,
+    actualizarActividadTitulo,
+    actualizarActividadDescripcion,
     cargarRecordatorios,
     nuevoRecordatorio,
+    actualizarRecordatorioTitulo,
+    actualizarRecordatorioFecha,
     eliminarRecordatorio,
     crearActividadDirecta,
   };

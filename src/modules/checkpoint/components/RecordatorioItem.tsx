@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import type { RecordatorioInterface } from '../interfaces/RecordatorioInterface';
-import { TrashIcon } from '../../../assets/Icons';
+import { TrashIcon, PencilIcon, CheckCircleIcon } from '../../../assets/Icons';
 
 interface RecordatorioItemProps {
   recordatorio: RecordatorioInterface;
   onDelete: (id: string) => void;
+  onUpdateTitulo?: (id: string, titulo: string) => void;
+  onUpdateFecha?: (id: string, fechaExpiracion: string) => void;
 }
 
 function getTimeLeft(proximoEnvio?: string): { label: string; colorClass: string } {
@@ -37,8 +40,28 @@ function formatIsoDateTime(isoString?: string): string {
   }
 }
 
-export const RecordatorioItem = ({ recordatorio, onDelete }: RecordatorioItemProps) => {
+const toDatetimeLocal = (isoString?: string) => {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    const tzOffset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+  } catch {
+    return '';
+  }
+};
+
+export const RecordatorioItem = ({
+  recordatorio,
+  onDelete,
+  onUpdateTitulo,
+  onUpdateFecha
+}: RecordatorioItemProps) => {
   const { label, colorClass } = getTimeLeft(recordatorio.proximoEnvio);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempTitulo, setTempTitulo] = useState(recordatorio.titulo);
+  const [tempFecha, setTempFecha] = useState(toDatetimeLocal(recordatorio.fechaExpiracion));
 
   const handleDelete = () => {
     if (recordatorio.id) {
@@ -46,31 +69,107 @@ export const RecordatorioItem = ({ recordatorio, onDelete }: RecordatorioItemPro
     }
   };
 
+  const handleSave = () => {
+    if (!tempTitulo.trim()) return;
+    if (recordatorio.id) {
+      if (tempTitulo.trim() !== recordatorio.titulo && onUpdateTitulo) {
+        onUpdateTitulo(recordatorio.id, tempTitulo.trim());
+      }
+      if (tempFecha) {
+        const isoDateTime = new Date(tempFecha).toISOString();
+        if (isoDateTime !== recordatorio.fechaExpiracion && onUpdateFecha) {
+          onUpdateFecha(recordatorio.id, isoDateTime);
+        }
+      }
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTempTitulo(recordatorio.titulo);
+    setTempFecha(toDatetimeLocal(recordatorio.fechaExpiracion));
+    setIsEditing(false);
+  };
+
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-orange-200 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-orange-500/30">
 
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-          {recordatorio.titulo}
-        </span>
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="font-medium text-slate-500 dark:text-slate-400">
-            📅 {formatIsoDateTime(recordatorio.fechaExpiracion)}
-          </span>
+      {isEditing ? (
+        <div className="flex flex-col gap-2 flex-1 min-w-0">
+          <input
+            type="text"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-900 outline-none focus:border-orange-500 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100 focus:ring-1 focus:ring-orange-500/20"
+            value={tempTitulo}
+            onChange={(e) => setTempTitulo(e.target.value)}
+            placeholder="Título del recordatorio"
+            autoFocus
+          />
+          <input
+            type="datetime-local"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-900 outline-none focus:border-orange-500 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100 focus:ring-1 focus:ring-orange-500/20"
+            value={tempFecha}
+            onChange={(e) => setTempFecha(e.target.value)}
+          />
         </div>
-      </div>
+      ) : (
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+            {recordatorio.titulo}
+          </span>
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-medium text-slate-500 dark:text-slate-400">
+              📅 {formatIsoDateTime(recordatorio.fechaExpiracion)}
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="flex shrink-0 flex-col items-end gap-2">
         {label && <span className={`text-xs font-bold ${colorClass}`}>{label}</span>}
 
-        <button
-          type="button"
-          aria-label="Eliminar recordatorio"
-          onClick={handleDelete}
-          className="shrink-0 rounded-full p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-        >
-          <TrashIcon className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          {isEditing ? (
+            <>
+              <button
+                type="button"
+                aria-label="Guardar recordatorio"
+                onClick={handleSave}
+                className="shrink-0 rounded-full p-1.5 text-slate-400 transition hover:bg-green-50 hover:text-green-500 dark:hover:bg-green-500/10 dark:hover:text-green-400"
+              >
+                <CheckCircleIcon className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                aria-label="Cancelar edición"
+                onClick={handleCancel}
+                className="shrink-0 rounded-full px-2 py-0.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 transition"
+              >
+                ❌
+              </button>
+            </>
+          ) : (
+            <>
+              {(onUpdateTitulo || onUpdateFecha) && (
+                <button
+                  type="button"
+                  aria-label="Editar recordatorio"
+                  onClick={() => setIsEditing(true)}
+                  className="shrink-0 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-50 hover:text-orange-500 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+                >
+                  <PencilIcon className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button
+                type="button"
+                aria-label="Eliminar recordatorio"
+                onClick={handleDelete}
+                className="shrink-0 rounded-full p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </button>
+            </>
+          )}
+        </div>
 
         {recordatorio.activo ? (
           <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400">

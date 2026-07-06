@@ -54,6 +54,28 @@ class CheckpointService {
     return response.data;
   }
 
+  async actualizarActividadTitulo(
+    id: string,
+    titulo: string
+  ): Promise<ActividadInterface> {
+    const response = await apiClient.patch<ActividadInterface>(
+      `/checkpoint/api/actividades/${id}/title`,
+      { titulo }
+    );
+    return response.data;
+  }
+
+  async actualizarActividadDescripcion(
+    id: string,
+    descripcion: string
+  ): Promise<ActividadInterface> {
+    const response = await apiClient.patch<ActividadInterface>(
+      `/checkpoint/api/actividades/${id}/description`,
+      { descripcion }
+    );
+    return response.data;
+  }
+
   async eliminarActividad(id: string): Promise<void> {
     await apiClient.delete(
       `/checkpoint/api/actividades/${id}`
@@ -103,10 +125,44 @@ class CheckpointService {
     return response.data;
   }
 
+  async actualizarRecordatorioTitulo(
+    id: string,
+    titulo: string
+  ): Promise<RecordatorioInterface> {
+    const response = await apiClient.patch<RecordatorioInterface>(
+      `/checkpoint/api/recordatorios/${id}/title`,
+      { titulo }
+    );
+    return response.data;
+  }
+
+  async actualizarRecordatorioFecha(
+    id: string,
+    fechaExpiracion: string
+  ): Promise<RecordatorioInterface> {
+    const response = await apiClient.patch<RecordatorioInterface>(
+      `/checkpoint/api/recordatorios/${id}/date-end`,
+      { fechaExpiracion }
+    );
+    return response.data;
+  }
+
   async eliminarRecordatorio(id: string): Promise<void> {
     await apiClient.delete(
       `/checkpoint/api/recordatorios/${id}`
     );
+  }
+
+  async formatIn(data: {
+    columna: string;
+    tipo: 'STRING' | 'INT';
+    valores: string[];
+  }): Promise<{ statement: string }> {
+    const response = await apiClient.post<{ statement: string }>(
+      "/checkpoint/api/tools/format-in",
+      data
+    );
+    return response.data;
   }
 
  }

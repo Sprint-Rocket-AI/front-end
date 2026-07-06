@@ -8,6 +8,8 @@ interface RecordatoriosPanelProps {
   loading: boolean;
   recordatorios: RecordatorioInterface[];
   onDelete: (id: string) => void;
+  onUpdateTitulo?: (id: string, titulo: string) => void;
+  onUpdateFecha?: (id: string, fechaExpiracion: string) => void;
 }
 
 export const RecordatoriosPanel: React.FC<RecordatoriosPanelProps> = ({
@@ -16,6 +18,8 @@ export const RecordatoriosPanel: React.FC<RecordatoriosPanelProps> = ({
   loading,
   recordatorios,
   onDelete,
+  onUpdateTitulo,
+  onUpdateFecha,
 }) => {
   if (!isOpen) return null;
 
@@ -44,6 +48,8 @@ export const RecordatoriosPanel: React.FC<RecordatoriosPanelProps> = ({
                 key={rec.id ?? rec.titulo}
                 recordatorio={rec}
                 onDelete={onDelete}
+                onUpdateTitulo={onUpdateTitulo}
+                onUpdateFecha={onUpdateFecha}
               />
             ))
           ) : (

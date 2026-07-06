@@ -72,22 +72,14 @@ export const useChat = () => {
       try {
         const userId = getUserId();
         const chatTitle = messageContent.substring(0, 15);
-        const response = await chatService.createChat(userId, messageContent, chatTitle);
-        currentSessionId = response.sessionId;
+        const newSessionId = await chatService.createChat(userId, messageContent, chatTitle);
+        currentSessionId = newSessionId;
 
-        const tempUserMsg: ChatMessage = {
-          role: "USER",
-          content: messageContent,
-          timestamp: new Date().toISOString()
-        };
-        dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg, title: response.title }));
+        // Reload the sidebar chats list so that the new chat thread appears
+        await cargarChats();
 
-        const tempAssistantMsg: ChatMessage = {
-          role: "ASSISTANT",
-          content: response.answer,
-          timestamp: new Date().toISOString()
-        };
-        dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
+        // Fetch messages for the newly created chat session
+        await cargarMensajes(currentSessionId, true);
 
         navigate(`/chat/${currentSessionId}`);
       } catch (error) {

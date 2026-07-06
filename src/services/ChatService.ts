@@ -25,17 +25,19 @@ export interface CreateChatResponse {
 
 class ChatService {
   async getChatsByUserId(userId: string): Promise<ChatResponse[]> {
-    const response = await apiClient.post<ChatResponse[]>("/ai-engine/api/chat/list", { userId });
+    const response = await apiClient.get<ChatResponse[]>(`/ai-engine/api/chat/user/${userId}`, {
+      data: { userId }
+    });
     return response.data;
   }
 
-  async createChat(userId: string, content: string, title?: string): Promise<CreateChatResponse> {
-    const response = await apiClient.post<CreateChatResponse>("/ai-engine/api/chat", { userId, content, title });
+  async createChat(userId: string, content: string, title: string): Promise<string> {
+    const response = await apiClient.post<string>("/ai-engine/api/chat", { userId, content, title });
     return response.data;
   }
 
   async getMessagesBySessionId(sessionId: string): Promise<ChatMessage[]> {
-    const response = await apiClient.get<ChatMessage[]>(`/ai-engine/api/chat/${sessionId}/messages`);
+    const response = await apiClient.get<ChatMessage[]>(`/ai-engine/api/chat/${sessionId}`);
     return response.data;
   }
 

@@ -42,7 +42,7 @@ export const CreateDiagramModal = ({ isOpen, onClose, onCreate }: CreateDiagramM
                             onChange={(e) => setType(e.target.value as 'mental_map' | 'flow')}
                             className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500"
                         >
-                            <option value="flow">Diagrama de Flujo (React Flow)</option>
+                            <option value="flow">Diagrama de Flujo</option>
                             <option value="mental_map">Mapa Mental (Markdown)</option>
                         </select>
                     </div>

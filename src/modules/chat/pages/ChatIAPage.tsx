@@ -14,7 +14,7 @@ import { FormatUtilsModal } from "../components/FormatUtilsModal";
 export const ChatIAPage = () => {
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const checkpoint = useCheckpoint();
-  
+
   const [isHistoryVisible, setIsHistoryVisible] = useState(true);
   const [showRecordatorioModal, setShowRecordatorioModal] = useState(false);
   const [showActividadModal, setShowActividadModal] = useState(false);
@@ -106,7 +106,7 @@ export const ChatIAPage = () => {
                   onClick={() => navigate("/chat")}
                   className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                 >
-                  + Nuevo
+                  +
                 </button>
               </div>
 

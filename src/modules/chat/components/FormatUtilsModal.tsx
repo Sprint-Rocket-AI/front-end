@@ -24,16 +24,6 @@ export const FormatUtilsModal: React.FC<FormatUtilsModalProps> = ({ isOpen, onCl
       return;
     }
 
-    const valoresList = valoresText
-      .split('\n')
-      .map((val) => val.trim())
-      .filter((val) => val.length > 0);
-
-    if (valoresList.length === 0) {
-      setError('Por favor, ingresa al menos un valor en la lista.');
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setResult(null);
@@ -43,7 +33,7 @@ export const FormatUtilsModal: React.FC<FormatUtilsModalProps> = ({ isOpen, onCl
       const response = await checkpointService.formatIn({
         columna: columna.trim(),
         tipo,
-        valores: valoresList,
+        valores: valoresText,
       });
       setResult(response.statement);
     } catch (err: any) {

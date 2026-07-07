@@ -156,7 +156,7 @@ class CheckpointService {
   async formatIn(data: {
     columna: string;
     tipo: 'STRING' | 'INT';
-    valores: string[];
+    valores: string;
   }): Promise<{ statement: string }> {
     const response = await apiClient.post<{ statement: string }>(
       "/checkpoint/api/tools/format-in",
@@ -165,6 +165,6 @@ class CheckpointService {
     return response.data;
   }
 
- }
+}
 
 export const checkpointService = new CheckpointService();

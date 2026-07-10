@@ -90,15 +90,25 @@ export const useChat = () => {
         navigate(`/chat/${currentSessionId}`);
 
         // 4. Send RAG query to get assistant response
-        const aiResponse = await chatService.sendRAGQuery(currentSessionId, messageContent);
+        try {
+          const aiResponse = await chatService.sendRAGQuery(currentSessionId, messageContent);
 
-        // 5. Add assistant response locally
-        const tempAssistantMsg: ChatMessage = {
-          role: "ASSISTANT",
-          content: aiResponse.answer,
-          timestamp: new Date().toISOString()
-        };
-        dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
+          // 5. Add assistant response locally
+          const tempAssistantMsg: ChatMessage = {
+            role: "ASSISTANT",
+            content: aiResponse.answer,
+            timestamp: new Date().toISOString()
+          };
+          dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
+        } catch (ragError) {
+          console.error("Error enviando consulta RAG", ragError);
+          const tempAssistantMsg: ChatMessage = {
+            role: "ASSISTANT",
+            content: "Hubo un error, intente nuevamente.",
+            timestamp: new Date().toISOString()
+          };
+          dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
+        }
       } catch (error) {
         console.error("Error creando chat o enviando consulta RAG", error);
       } finally {
@@ -131,6 +141,12 @@ export const useChat = () => {
         dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
       } catch (error) {
         console.error("Error enviando consulta RAG", error);
+        const tempAssistantMsg: ChatMessage = {
+          role: "ASSISTANT",
+          content: "Hubo un error, intente nuevamente.",
+          timestamp: new Date().toISOString()
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
       } finally {
         isSendingMessage.current = false;
         setIsSending(false);

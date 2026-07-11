@@ -19,6 +19,7 @@ export interface AIResponse {
 export interface CreateChatResponse {
   sessionId: string;
   title: string;
+  query: string;
   answer: string;
   createdAt: string;
 }
@@ -31,8 +32,8 @@ class ChatService {
     return response.data;
   }
 
-  async createChat(userId: string, content: string, title: string): Promise<string> {
-    const response = await apiClient.post<string>("/ai-engine/api/chat", { userId, content, title });
+  async createChat(userId: string, content: string, title: string): Promise<CreateChatResponse> {
+    const response = await apiClient.post<CreateChatResponse>("/ai-engine/api/chat", { userId, content, title });
     return response.data;
   }
 

@@ -72,45 +72,32 @@ export const useChat = () => {
       try {
         const userId = getUserId();
         const chatTitle = messageContent.substring(0, 15);
-        const newSessionId = await chatService.createChat(userId, messageContent, chatTitle);
-        currentSessionId = newSessionId;
+        const chatResponse = await chatService.createChat(userId, messageContent, chatTitle);
+        currentSessionId = chatResponse.sessionId;
 
         // 1. Add user's message locally first
-        const tempUserMsg: ChatMessage = {
+        const userMsg: ChatMessage = {
           role: "USER",
-          content: messageContent,
-          timestamp: new Date().toISOString()
+          content: chatResponse.query,
+          timestamp: chatResponse.createdAt
         };
-        dispatch(addMessage({ sessionId: currentSessionId, message: tempUserMsg, title: chatTitle }));
+        dispatch(addMessage({ sessionId: currentSessionId, message: userMsg, title: chatResponse.title }));
 
-        // 2. Reload the sidebar chats list so that the new chat thread appears
+        // 2. Add assistant's message locally
+        const assistantMsg: ChatMessage = {
+          role: "ASSISTANT",
+          content: chatResponse.answer,
+          timestamp: chatResponse.createdAt
+        };
+        dispatch(addMessage({ sessionId: currentSessionId, message: assistantMsg }));
+
+        // 3. Reload the sidebar chats list so that the new chat thread appears
         await cargarChats();
 
-        // 3. Navigate to the new chat page
+        // 4. Navigate to the new chat page
         navigate(`/chat/${currentSessionId}`);
-
-        // 4. Send RAG query to get assistant response
-        try {
-          const aiResponse = await chatService.sendRAGQuery(currentSessionId, messageContent);
-
-          // 5. Add assistant response locally
-          const tempAssistantMsg: ChatMessage = {
-            role: "ASSISTANT",
-            content: aiResponse.answer,
-            timestamp: new Date().toISOString()
-          };
-          dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
-        } catch (ragError) {
-          console.error("Error enviando consulta RAG", ragError);
-          const tempAssistantMsg: ChatMessage = {
-            role: "ASSISTANT",
-            content: "Hubo un error, intente nuevamente.",
-            timestamp: new Date().toISOString()
-          };
-          dispatch(addMessage({ sessionId: currentSessionId, message: tempAssistantMsg }));
-        }
       } catch (error) {
-        console.error("Error creando chat o enviando consulta RAG", error);
+        console.error("Error creando chat", error);
       } finally {
         isSendingMessage.current = false;
         setIsSending(false);

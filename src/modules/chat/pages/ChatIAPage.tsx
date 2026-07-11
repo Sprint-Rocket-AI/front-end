@@ -8,7 +8,7 @@ import { ConfirmModal } from "../../../commons/components/ConfirmModal";
 import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useChat } from "../hooks/useChat";
 import { MarkdownRenderer } from "../../../commons/components/MarkdownRenderer";
-import { HammerIcon } from "../../../assets/Icons";
+import { HammerIcon, PlusIcon } from "../../../assets/Icons";
 import { FormatUtilsModal } from "../components/FormatUtilsModal";
 
 export const ChatIAPage = () => {
@@ -104,9 +104,10 @@ export const ChatIAPage = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/chat")}
-                  className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                  className="rounded-full border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+                  title="Nuevo Chat"
                 >
-                  +
+                  <PlusIcon />
                 </button>
               </div>
 

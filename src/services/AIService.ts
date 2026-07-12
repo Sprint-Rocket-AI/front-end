@@ -10,7 +10,7 @@ export interface AIServiceMapperResponse {
 }
 
 export const mapWithAI = (content: string, template: Record<string, any>) =>
-  apiClient.post<AIServiceMapperResponse>("/ai-engine/prompt/mapper", {
+  apiClient.post<AIServiceMapperResponse>("/ai-engine/api/prompt/mapper", {
     content,
     template,
   });
@@ -18,8 +18,8 @@ export const mapWithAI = (content: string, template: Record<string, any>) =>
 export const indexPdf = (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
-  
-  return apiClient.post("/ai-engine/index/pdf", formData, {
+
+  return apiClient.post("/ai-engine/api/index/pdf", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

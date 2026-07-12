@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken, getUserId } from "../modules/auth/utils/authHelper";
+import { getToken } from "../modules/auth/utils/authHelper";
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -11,14 +11,6 @@ apiClient.interceptors.request.use(
         const token = getToken();
         if (token) {
             config.headers.Authorization = token;
-        }
-        try {
-            const userId = getUserId();
-            if (userId) {
-                config.headers["X-User-Id"] = userId;
-            }
-        } catch (error) {
-            console.warn("[interceptor] Could not retrieve user ID for header", error);
         }
         return config;
     },

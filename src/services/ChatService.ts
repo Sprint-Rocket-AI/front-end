@@ -1,4 +1,5 @@
 import apiClient from "../api/interceptor";
+import { getUserId } from "../modules/auth/utils/authHelper";
 
 export interface ChatMessage {
   role: "USER" | "ASSISTANT" | "SYSTEM";
@@ -43,9 +44,21 @@ class ChatService {
   }
 
   async sendRAGQuery(sessionId: string, userPrompt: string): Promise<AIResponse> {
+    const headers: Record<string, string> = {};
+    try {
+      const userId = getUserId();
+      if (userId) {
+        headers["X-User-Id"] = userId;
+      }
+    } catch (error) {
+      console.warn("[ChatService] Could not retrieve user ID for RAG query header", error);
+    }
+
     const response = await apiClient.post<AIResponse>("/ai-engine/api/rag/query", {
       sessionId,
       userPrompt,
+    }, {
+      headers,
     });
     return response.data;
   }

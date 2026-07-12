@@ -85,7 +85,7 @@ export const FormatUtilsModal: React.FC<FormatUtilsModalProps> = ({ isOpen, onCl
                 id="tool-columna"
                 type="text"
                 className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
-                placeholder="Ej: POLICY_ID"
+                placeholder="Ej: CUENTA_ID"
                 value={columna}
                 onChange={(e) => setColumna(e.target.value)}
                 required

@@ -127,3 +127,20 @@ export const HammerIcon = ({ className = 'w-4 h-4', size = 16, ...props }: IconP
         <path strokeLinecap="round" strokeLinejoin="round" d="m18 10 2.5-2.5" />
     </svg>
 );
+
+export const SidebarLeftCloseIcon = ({ className = 'w-4 h-4', size = 16, ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className} style={{ width: size, height: size }} {...props}>
+        <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 3v18" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 15l-3-3 3-3" />
+    </svg>
+);
+
+export const SidebarLeftOpenIcon = ({ className = 'w-4 h-4', size = 16, ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className} style={{ width: size, height: size }} {...props}>
+        <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 3v18" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 9l3 3-3 3" />
+    </svg>
+);
+

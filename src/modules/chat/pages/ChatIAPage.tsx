@@ -8,7 +8,7 @@ import { ConfirmModal } from "../../../commons/components/ConfirmModal";
 import { useCheckpoint } from "../../checkpoint/hooks/useCheckpoint";
 import { useChat } from "../hooks/useChat";
 import { MarkdownRenderer } from "../../../commons/components/MarkdownRenderer";
-import { HammerIcon, PlusIcon } from "../../../assets/Icons";
+import { HammerIcon, PlusIcon, SidebarLeftCloseIcon, SidebarLeftOpenIcon } from "../../../assets/Icons";
 import { FormatUtilsModal } from "../components/FormatUtilsModal";
 
 export const ChatIAPage = () => {
@@ -68,7 +68,7 @@ export const ChatIAPage = () => {
               className="rounded-full p-2 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
               title="Mostrar historial"
             >
-              ▶
+              <SidebarLeftOpenIcon className="w-5 h-5" size={20} />
             </button>
           </div>
         ) : (
@@ -92,7 +92,7 @@ export const ChatIAPage = () => {
                 className="rounded-full p-2 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
                 title="Ocultar historial"
               >
-                ◀
+                <SidebarLeftCloseIcon className="w-5 h-5" size={20} />
               </button>
             </div>
 

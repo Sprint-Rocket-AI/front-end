@@ -157,6 +157,7 @@ class CheckpointService {
     columna: string;
     tipo: 'STRING' | 'INT';
     valores: string;
+    addIn: boolean;
   }): Promise<{ statement: string }> {
     const response = await apiClient.post<{ statement: string }>(
       "/checkpoint/api/tools/format-in",

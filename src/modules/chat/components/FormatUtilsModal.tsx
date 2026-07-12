@@ -10,6 +10,7 @@ export const FormatUtilsModal: React.FC<FormatUtilsModalProps> = ({ isOpen, onCl
   const [columna, setColumna] = useState('');
   const [tipo, setTipo] = useState<'STRING' | 'INT'>('STRING');
   const [valoresText, setValoresText] = useState('');
+  const [addIn, setAddIn] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -34,6 +35,7 @@ export const FormatUtilsModal: React.FC<FormatUtilsModalProps> = ({ isOpen, onCl
         columna: columna.trim(),
         tipo,
         valores: valoresText,
+        addIn,
       });
       setResult(response.statement);
     } catch (err: any) {
@@ -105,6 +107,20 @@ export const FormatUtilsModal: React.FC<FormatUtilsModalProps> = ({ isOpen, onCl
                 <option value="INT">INT</option>
               </select>
             </div>
+          </div>
+
+          {/* addIn Checkbox/Toggle */}
+          <div className="flex items-center gap-2.5 py-1">
+            <input
+              id="tool-addin"
+              type="checkbox"
+              checked={addIn}
+              onChange={(e) => setAddIn(e.target.checked)}
+              className="h-4.5 w-4.5 rounded border-slate-800 bg-slate-900 text-orange-500 focus:ring-orange-500/20 cursor-pointer accent-orange-500"
+            />
+            <label htmlFor="tool-addin" className="text-xs font-semibold text-slate-400 select-none cursor-pointer">
+              Incluir cláusula IN
+            </label>
           </div>
 
           {/* Valores */}

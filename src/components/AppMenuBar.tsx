@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { logout, useCognitoSession } from "../modules/auth/services/cognitoAuthService";
+import { logout, useCognitoSession, validateRole } from "../modules/auth/services/cognitoAuthService";
+import { APP_ROLES } from "../modules/auth/utils/roles";
 
 interface AppMenuBarProps {
   isDark: boolean;
@@ -17,6 +18,7 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
   const docsRef = useRef<HTMLDivElement>(null);
   
   const auth = useCognitoSession();
+  const isAdmin = validateRole(auth.profile, [APP_ROLES.ADMIN]);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const navItems = [
@@ -95,39 +97,41 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
               </NavLink>
             ))}
 
-            <div className="relative" ref={docsRef}>
-              <button
-                type="button"
-                onClick={() => setIsDocumentsMenuOpen((v) => !v)}
-                aria-expanded={isDocumentsMenuOpen}
-                aria-haspopup="menu"
-                className={["nav-link gap-1.5", isDocumentsSection ? "nav-link-active" : ""].join(" ")}
-              >
-                Documentos
-                <span className="text-[9px] opacity-60">{isDocumentsMenuOpen ? "▲" : "▼"}</span>
-              </button>
+            {isAdmin && (
+              <div className="relative" ref={docsRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsDocumentsMenuOpen((v) => !v)}
+                  aria-expanded={isDocumentsMenuOpen}
+                  aria-haspopup="menu"
+                  className={["nav-link gap-1.5", isDocumentsSection ? "nav-link-active" : ""].join(" ")}
+                >
+                  Documentos
+                  <span className="text-[9px] opacity-60">{isDocumentsMenuOpen ? "▲" : "▼"}</span>
+                </button>
 
-              {isDocumentsMenuOpen && (
-                <div className="absolute left-0 top-full mt-3 flex min-w-[220px] flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg backdrop-blur-xl transition-colors duration-300 dark:border-accent-500/20 dark:bg-ink-900/95 dark:shadow-elevated animate-fade-in">
-                  {documentSubmenuItems.map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      className={({ isActive }) =>
-                        [
-                          "rounded-xl px-4 py-2.5 text-sm font-medium transition",
-                          isActive
-                            ? "bg-orange-50 text-orange-600 dark:bg-accent-500/15 dark:text-accent-300"
-                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-slate-100",
-                        ].join(" ")
-                      }
-                    >
-                      {item.label}
-                    </NavLink>
-                  ))}
-                </div>
-              )}
-            </div>
+                {isDocumentsMenuOpen && (
+                  <div className="absolute left-0 top-full mt-3 flex min-w-[220px] flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg backdrop-blur-xl transition-colors duration-300 dark:border-accent-500/20 dark:bg-ink-900/95 dark:shadow-elevated animate-fade-in">
+                    {documentSubmenuItems.map((item) => (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        className={({ isActive }) =>
+                          [
+                            "rounded-xl px-4 py-2.5 text-sm font-medium transition",
+                            isActive
+                              ? "bg-orange-50 text-orange-600 dark:bg-accent-500/15 dark:text-accent-300"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-slate-100",
+                          ].join(" ")
+                        }
+                      >
+                        {item.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
         </div>
 
@@ -199,9 +203,11 @@ export const AppMenuBar = ({ isDark, onToggleTheme }: AppMenuBarProps) => {
             {item.label}
           </NavLink>
         ))}
-        <NavLink to="/documents/builder" className={navLinkClass}>
-          Documentos
-        </NavLink>
+        {isAdmin && (
+          <NavLink to="/documents/builder" className={navLinkClass}>
+            Documentos
+          </NavLink>
+        )}
       </nav>
     </header>
   );

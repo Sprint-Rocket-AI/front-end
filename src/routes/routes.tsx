@@ -71,17 +71,13 @@ export const routes = [
       {
         path: "diagrams",
         element: (
-          <AuthRoute allowedRoles={[APP_ROLES.ADMIN, APP_ROLES.DEV]}>
-            <DiagramsListPage />
-          </AuthRoute>
+          <DiagramsListPage />
         ),
       },
       {
         path: "diagram/:id",
         element: (
-          <AuthRoute allowedRoles={[APP_ROLES.ADMIN, APP_ROLES.DEV]}>
-            <DiagramPage />
-          </AuthRoute>
+          <DiagramPage />
         ),
       },
     ],
@@ -89,9 +85,7 @@ export const routes = [
   {
     path: "/chat/:sessionId?",
     element: (
-      <AuthRoute allowedRoles={[APP_ROLES.ADMIN, APP_ROLES.DEV]}>
-        <ChatIAPage />
-      </AuthRoute>
+      <ChatIAPage />
     ),
   },
   {
